@@ -11,7 +11,7 @@ public abstract class ValueConverter
     public abstract Type ValueType { get; }
 }
 
-public abstract class ValueConverter<T> : ValueConverter where T : notnull
+public abstract class ValueConverter<T> : ValueConverter
 {
     /// <inheritdoc />
     public override Type ValueType => typeof(T);

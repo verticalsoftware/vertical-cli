@@ -5,7 +5,7 @@
 /// perform the conversion activity.
 /// </summary>
 /// <typeparam name="T">Value type.</typeparam>
-internal sealed class DelegateConverter<T> : ValueConverter<T> where T : notnull
+internal sealed class DelegateConverter<T> : ValueConverter<T>
 {
     private readonly Func<ConversionContext<T>, T> _function;
 

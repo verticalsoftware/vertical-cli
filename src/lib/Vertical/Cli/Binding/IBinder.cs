@@ -8,8 +8,8 @@ public interface IBinder
     /// <summary>
     /// Creates a binding given path data.
     /// </summary>
-    /// <param name="bindingPath">An object that contains data about the current command path.</param>
+    /// <param name="bindingCreateContext">An object that contains data about the current command path.</param>
     /// <param name="symbol">The symbol to bind.</param>
     /// <returns><see cref="ArgumentBinding"/></returns>
-    ArgumentBinding CreateBinding(IBindingPath bindingPath, SymbolDefinition symbol);
+    ArgumentBinding CreateBinding(IBindingCreateContext bindingCreateContext, SymbolDefinition symbol);
 }

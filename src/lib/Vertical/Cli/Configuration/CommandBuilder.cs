@@ -2,6 +2,7 @@
 using CommunityToolkit.Diagnostics;
 using Vertical.Cli.Binding;
 using Vertical.Cli.Conversion;
+using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;
@@ -17,15 +18,20 @@ internal sealed class CommandBuilder<TModel, TResult> :
     private readonly List<Validator> _validators = new();
     private readonly List<(string Id, Func<ICommandDefinition<TResult>> Provider)> _commandFactories = new();
 
-    internal CommandBuilder(string id) : this(new PositionReference(), id, parent: null)
+    internal CommandBuilder(string id, CliOptions options) : this(new PositionReference(), id, parent: null, options)
     {
     }
 
-    internal CommandBuilder(PositionReference positionReference, string id, ICommandDefinition<TResult>? parent)
+    internal CommandBuilder(
+        PositionReference positionReference, 
+        string id, 
+        ICommandDefinition? parent,
+        CliOptions options)
     {
+        _positionReference = positionReference;
         Id = id;
         Parent = parent;
-        _positionReference = positionReference;
+        Options = options;
     }
 
     /// <inheritdoc />
@@ -48,6 +54,9 @@ internal sealed class CommandBuilder<TModel, TResult> :
 
     /// <inheritdoc />
     public bool HasHandler => Handler != null;
+
+    /// <inheritdoc />
+    public string? Description { get; private set; }
 
     /// <inheritdoc />
     public Func<TModel, TResult>? Handler { get; private set; }
@@ -73,6 +82,19 @@ internal sealed class CommandBuilder<TModel, TResult> :
     public IEnumerable<string> SubCommandIdentities => _commandFactories.Select(entry => entry.Id);
 
     /// <inheritdoc />
+    public IEnumerable<ICommandDefinition> CreateChildDefinitions()
+    {
+        foreach (var id in SubCommandIdentities)
+        {
+            _ = TryCreateChild(id, out var command);
+            yield return command!;
+        }
+    }
+
+    /// <inheritdoc />
+    public CliOptions Options { get; }
+
+    /// <inheritdoc />
     public ICommandBuilder<TModel, TResult> ConfigureSubCommand(
         string id,
         Action<ICommandBuilder<TModel, TResult>> configure)
@@ -91,7 +113,7 @@ internal sealed class CommandBuilder<TModel, TResult> :
 
         var factory = new Func<ICommandDefinition<TResult>>(() =>
         {
-            var builder = new CommandBuilder<TChildModel, TResult>(_positionReference, id, this);
+            var builder = new CommandBuilder<TChildModel, TResult>(_positionReference, id, this, Options);
             configure(builder);
             return builder.Build();
         });
@@ -117,8 +139,8 @@ internal sealed class CommandBuilder<TModel, TResult> :
         SymbolScope scope = SymbolScope.Self,
         Func<T>? defaultProvider = null,
         ValueConverter<T>? converter = null,
-        Validator<T>? validator = null) 
-        where T : notnull
+        Validator<T>? validator = null)
+        
     {
         return AddSymbol(
             SymbolType.Option,
@@ -131,6 +153,26 @@ internal sealed class CommandBuilder<TModel, TResult> :
             defaultProvider,
             converter,
             validator);
+    }
+
+    /// <inheritdoc />
+    public ICommandBuilder<TModel, TResult> AddHelpOption(
+        string? id = null,
+        string[]? aliases = null,
+        SymbolScope scope = SymbolScope.Self,
+        IHelpRenderer? helpRenderer = null,
+        TResult returnValue = default!)
+    {
+        _symbols.Add(new HelpSymbolDefinition<TResult>(
+            this,
+            _positionReference.Next(),
+            id ?? "--help",
+            aliases ?? Array.Empty<string>(),
+            scope,
+            helpRenderer ?? DefaultHelpRenderer.Instance,
+            returnValue));
+
+        return this;
     }
 
     /// <inheritdoc />
@@ -160,7 +202,7 @@ internal sealed class CommandBuilder<TModel, TResult> :
         SymbolScope scope = SymbolScope.Self,
         Func<T>? defaultProvider = null,
         ValueConverter<T>? converter = null,
-        Validator<T>? validator = null) where T : notnull
+        Validator<T>? validator = null)
     {
         return AddSymbol(
             SymbolType.Argument,
@@ -176,7 +218,7 @@ internal sealed class CommandBuilder<TModel, TResult> :
     }
 
     /// <inheritdoc />
-    public ICommandBuilder<TModel, TResult> AddConverter<T>(ValueConverter<T> converter) where T : notnull
+    public ICommandBuilder<TModel, TResult> AddConverter<T>(ValueConverter<T> converter)
     {
         Guard.IsNotNull(converter);
         
@@ -185,11 +227,20 @@ internal sealed class CommandBuilder<TModel, TResult> :
     }
 
     /// <inheritdoc />
-    public ICommandBuilder<TModel, TResult> AddValidator<T>(Validator<T> validator) where T : notnull
+    public ICommandBuilder<TModel, TResult> AddValidator<T>(Validator<T> validator)
     {
         Guard.IsNotNull(validator);
         
         _validators.Add(validator);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ICommandBuilder<TModel, TResult> AddDescription(string description)
+    {
+        Guard.IsNotNullOrEmpty(description);
+
+        Description = description;
         return this;
     }
 
@@ -204,7 +255,6 @@ internal sealed class CommandBuilder<TModel, TResult> :
         Func<T>? defaultProvider = null,
         ValueConverter<T>? converter = null,
         Validator<T>? validator = null)
-        where T : notnull
     {
         Guard.IsNotNullOrWhiteSpace(id);
         

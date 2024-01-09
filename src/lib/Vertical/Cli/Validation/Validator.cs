@@ -15,7 +15,11 @@ public abstract class Validator
     public abstract Type ValueType { get; }
 }
 
-public abstract class Validator<T> : Validator where T : notnull
+/// <summary>
+/// Validates values of a specific type.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public abstract class Validator<T> : Validator
 {
     /// <inheritdoc />
     public override Type ValueType => typeof(T);

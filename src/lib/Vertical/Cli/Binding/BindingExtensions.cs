@@ -12,24 +12,22 @@ internal static class BindingExtensions
         list => list.Clear());
 
     internal static T GetBindingValue<T>(
-        this IBindingPath bindingPath,
+        this IBindingCreateContext bindingCreateContext,
         SymbolDefinition<T> symbol,
         string value)
-        where T : notnull
     {
-        var convertedValue = bindingPath.ConvertValue(symbol, value);
+        var convertedValue = bindingCreateContext.ConvertValue(symbol, value);
 
-        return bindingPath.ValidateValue(symbol, convertedValue);
+        return bindingCreateContext.ValidateValue(symbol, convertedValue);
     }
 
     internal static T ConvertValue<T>(
-        this IBindingPath bindingPath,
+        this IBindingCreateContext bindingCreateContext,
         SymbolDefinition<T> symbol,
         string value)
-        where T : notnull
     {
         var converter = symbol.Converter
-                        ?? bindingPath.ConverterDictionary.GetValueOrDefault(typeof(T))
+                        ?? bindingCreateContext.ConverterDictionary.GetValueOrDefault(typeof(T))
                         ?? DefaultConverter<T>.Value
                         ?? throw new InvalidOperationException();
 
@@ -44,12 +42,11 @@ internal static class BindingExtensions
     }
 
     internal static T ValidateValue<T>(
-        this IBindingPath bindingPath,
+        this IBindingCreateContext bindingCreateContext,
         SymbolDefinition<T> symbol,
         T value)
-        where T : notnull
     {
-        var validator = symbol.Validator ?? bindingPath.ValidatorDictionary.GetValueOrDefault(typeof(T));
+        var validator = symbol.Validator ?? bindingCreateContext.ValidatorDictionary.GetValueOrDefault(typeof(T));
 
         if (validator == null)
             return value;

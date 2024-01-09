@@ -4,15 +4,15 @@ namespace Vertical.Cli.Utilities;
 
 internal sealed class ErrorMessageCollection : IEnumerable<string>
 {
-    private readonly MessageBuilder _messageBuilder = new();
+    private readonly TextBuilder _textBuilder = new();
     private readonly List<string> _errors = new();
 
-    internal void Add(Action<MessageBuilder> action)
+    internal void Add(Action<TextBuilder> action)
     {
-        _messageBuilder.Clear();
-        _messageBuilder.Append($"({_errors.Count + 1}) ");
-        action(_messageBuilder);
-        _errors.Add(_messageBuilder.ToString());
+        _textBuilder.Clear();
+        _textBuilder.Append($"({_errors.Count + 1}) ");
+        action(_textBuilder);
+        _errors.Add(_textBuilder.ToString());
     }
     
     /// <inheritdoc />

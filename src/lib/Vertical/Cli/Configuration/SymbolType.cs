@@ -18,5 +18,10 @@ public enum SymbolType
     /// <summary>
     /// Indicates the symbol is a switch (<c>Option&lt;bool&gt;).</c>
     /// </summary>
-    Switch
+    Switch,
+    
+    /// <summary>
+    /// Indicates a help option.
+    /// </summary>
+    HelpOption
 }

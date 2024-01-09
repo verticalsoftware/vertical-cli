@@ -64,12 +64,10 @@ public class RootCommandExtensionsGenerator : IIncrementalGenerator
         var memberAccessExpressionSyntax = (MemberAccessExpressionSyntax)syntaxContext.Node;
         var semanticModel = syntaxContext.SemanticModel;
 
-        return memberAccessExpressionSyntax.Name.Identifier.Text == "Create"
-            ? TryCreateRootCommandMetadata(memberAccessExpressionSyntax, semanticModel)
-            : TryCreateSubCommandMetadata(memberAccessExpressionSyntax, semanticModel);
+        return TryCreateCommandMetadata(memberAccessExpressionSyntax, semanticModel);
     }
-
-    private static CommandModel? TryCreateRootCommandMetadata(
+    
+    private static CommandModel? TryCreateCommandMetadata(
         SyntaxNode memberAccessExpressionSyntax,
         SemanticModel semanticModel)
     {
@@ -78,22 +76,10 @@ public class RootCommandExtensionsGenerator : IIncrementalGenerator
         if (symbol is not IMethodSymbol methodSymbol)
             return null;
 
-        return methodSymbol.TryGetCommandBuilderGenericArguments(0, out var modelType, out var resultType)
-            ? new CommandModel(isRootCommand: true, modelType!, resultType!)
-            : null;
-    }
-
-    private static CommandModel? TryCreateSubCommandMetadata(
-        SyntaxNode memberAccessExpressionSyntax,
-        SemanticModel semanticModel)
-    {
-        var symbol = semanticModel.GetSymbolInfo(memberAccessExpressionSyntax).Symbol;
-
-        if (symbol is not IMethodSymbol methodSymbol)
-            return null;
+        var isRootCommand = methodSymbol.Name == "Create";
 
         return methodSymbol.TryGetCommandBuilderGenericArguments(1, out var modelType, out var resultType)
-            ? new CommandModel(isRootCommand: false, modelType!, resultType!)
+            ? new CommandModel(isRootCommand: isRootCommand, modelType!, resultType!)
             : null;
     }
 }

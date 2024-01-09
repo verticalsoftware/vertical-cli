@@ -14,7 +14,7 @@ public abstract class CliArgumentException : Exception
         : base(MessageFormatter.GetString(format, arguments), innerException)
     {
         OriginalFormat = format;
-        Arguments = arguments;
+        MessageArguments = arguments;
     }
 
     /// <summary>
@@ -25,5 +25,5 @@ public abstract class CliArgumentException : Exception
     /// <summary>
     /// Gets the formatting arguments.
     /// </summary>
-    public IDictionary<string, object> Arguments { get; }
+    public IDictionary<string, object> MessageArguments { get; }
 }

@@ -12,12 +12,14 @@ public sealed class SymbolSyntax : IEquatable<SymbolSyntax>
         string text,
         string prefix = "",
         string[]? identifiers = null,
+        string[]? simpleIdentifiers = null,
         char operandAssignmentToken = '\0',
         string operandValue = "")
     {
         Type = type;
         Text = text;
         Prefix = prefix;
+        SimpleIdentifiers = simpleIdentifiers;
         Identifiers = identifiers ?? Array.Empty<string>();
         OperandAssignmentToken = operandAssignmentToken;
         OperandValue = operandValue;
@@ -65,6 +67,11 @@ public sealed class SymbolSyntax : IEquatable<SymbolSyntax>
     /// no prefix.
     /// </summary>
     public string Prefix { get; }
+
+    /// <summary>
+    /// Gets identifiers without the prefix.
+    /// </summary>
+    public string[]? SimpleIdentifiers { get; }
 
     /// <summary>
     /// Gets the identifiers of the symbol, which is any part of the text that excludes an operand expression

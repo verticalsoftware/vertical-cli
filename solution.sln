@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicSetup", "examples\Basi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vertical.Cli.SourceGenerator", "src\source-gen\Vertical.Cli.SourceGenerator.csproj", "{E1717CF6-3766-4DEB-80FE-0E67165193E6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D7AFA729-1119-431C-BB36-FAAC012B33D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vertical.Cli.Tests", "test\Vertical.Cli.Tests\Vertical.Cli.Tests.csproj", "{4F9FD354-65B1-467E-A409-DC4969BC9615}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,10 +38,15 @@ Global
 		{E1717CF6-3766-4DEB-80FE-0E67165193E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1717CF6-3766-4DEB-80FE-0E67165193E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1717CF6-3766-4DEB-80FE-0E67165193E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F9FD354-65B1-467E-A409-DC4969BC9615}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F9FD354-65B1-467E-A409-DC4969BC9615}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F9FD354-65B1-467E-A409-DC4969BC9615}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F9FD354-65B1-467E-A409-DC4969BC9615}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F2FEA388-DC0F-4BED-89B8-A60C0F9DF878} = {7F7D37A0-4F5F-4C4C-872E-7A7593342672}
 		{9A11E333-25E3-4F78-BE2B-FDB9E3DED4E0} = {8D23DBB1-42A8-43A5-9D2C-8703D2B5989C}
 		{E1717CF6-3766-4DEB-80FE-0E67165193E6} = {7F7D37A0-4F5F-4C4C-872E-7A7593342672}
+		{4F9FD354-65B1-467E-A409-DC4969BC9615} = {D7AFA729-1119-431C-BB36-FAAC012B33D0}
 	EndGlobalSection
 EndGlobal

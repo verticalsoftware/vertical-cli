@@ -72,7 +72,7 @@ internal static class Extensions
             });
     }
 
-    internal static T GetValueOrDefault<T>(this SymbolDefinition symbol) where T : notnull
+    internal static T GetValueOrDefault<T>(this SymbolDefinition symbol)
     {
         var typedSymbol = (SymbolDefinition<T>)symbol;
 

@@ -48,6 +48,27 @@ public interface ICommandDefinition
     /// Gets whether the handler was assigned.
     /// </summary>
     bool HasHandler { get; }
+    
+    /// <summary>
+    /// Gets the description to display for the command.
+    /// </summary>
+    string? Description { get; }
+    
+    /// <summary>
+    /// Enumerates the identities of sub commands.
+    /// </summary>
+    IEnumerable<string> SubCommandIdentities { get; }
+
+    /// <summary>
+    /// Creates child command definitions.
+    /// </summary>
+    /// <returns>Enumeration of <see cref="ICommandDefinition"/></returns>
+    IEnumerable<ICommandDefinition> CreateChildDefinitions();
+    
+    /// <summary>
+    /// Gets options that control command line processing.
+    /// </summary>
+    CliOptions Options { get; }
 }
 
 /// <summary>
@@ -69,11 +90,6 @@ public interface ICommandDefinition<TResult> : ICommandDefinition
     /// Enumerates the defined sub commands.
     /// </summary>
     IEnumerable<ICommandDefinition<TResult>> SubCommands { get; }
-    
-    /// <summary>
-    /// Enumerates the identities of sub commands.
-    /// </summary>
-    IEnumerable<string> SubCommandIdentities { get; }
 }
 
 /// <summary>

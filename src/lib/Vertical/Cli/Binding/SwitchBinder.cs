@@ -12,9 +12,9 @@ internal sealed class SwitchBinder : IBinder
     internal static SwitchBinder Instance { get; } = new();
 
     /// <inheritdoc />
-    public ArgumentBinding CreateBinding(IBindingPath bindingPath, SymbolDefinition symbol)
+    public ArgumentBinding CreateBinding(IBindingCreateContext bindingCreateContext, SymbolDefinition symbol)
     {
-        var arguments = bindingPath
+        var arguments = bindingCreateContext
             .SemanticArguments
             .GetOptionArguments(symbol);
 

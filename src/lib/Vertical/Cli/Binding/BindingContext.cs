@@ -10,29 +10,34 @@ public static class BindingContext
 {
     public static IBindingContext<TResult> Create<TModel, TResult>(
         IRootCommand<TModel, TResult> rootCommand,
-        IEnumerable<string> args)
+        IEnumerable<string> args,
+        TResult defaultValue)
         where TModel : class
     {
-        return BindingContextFactory.Create(rootCommand, args);
+        return BindingContextFactory.Create(rootCommand, args, defaultValue);
     }
 }
 
 internal sealed class BindingContext<TResult> : IBindingContext<TResult>
 {
     internal BindingContext(
-        BindingCommandPath<TResult> commandPath,
+        BindingCreateContext<TResult> createContext,
         IEnumerable<ArgumentBinding> bindings,
+        Func<TResult>? helpCallSite,
         Exception? bindingException)
     {
-        OriginalSemanticArguments = new SemanticArgumentCollection(commandPath.SemanticArguments);
-        CommandPath = commandPath;
+        OriginalSemanticArguments = new SemanticArgumentCollection(createContext.SemanticArguments);
+        CreateContext = createContext;
+        HelpCallSite = helpCallSite;
         BindingDictionary = bindings.ToDictionary(
             binding => binding.BindingId,
             BindingIdComparer.Default);
         BindingException = bindingException;
     }
 
-    private BindingCommandPath<TResult> CommandPath { get; }
+    private BindingCreateContext<TResult> CreateContext { get; }
+    
+    public Func<TResult>? HelpCallSite { get; }
 
     /// <inheritdoc />
     public IReadOnlyDictionary<string, ArgumentBinding> BindingDictionary { get; }
@@ -47,22 +52,22 @@ internal sealed class BindingContext<TResult> : IBindingContext<TResult>
     public IEnumerable<T> GetValues<T>(string bindingId) => GetBinding<T>(bindingId).Values;
 
     /// <inheritdoc />
-    public string[] RawArguments => CommandPath.RawArguments;
+    public string[] RawArguments => CreateContext.RawArguments;
 
     /// <inheritdoc />
-    public string[] SubjectArguments => CommandPath.SubjectArguments;
+    public string[] SubjectArguments => CreateContext.SubjectArguments;
 
     /// <inheritdoc />
-    public SymbolSyntax[] ArgumentSyntax => CommandPath.ArgumentSyntax;
+    public SymbolSyntax[] ArgumentSyntax => CreateContext.ArgumentSyntax;
 
     /// <inheritdoc />
-    public SemanticArgumentCollection SemanticArguments => CommandPath.SemanticArguments;
+    public SemanticArgumentCollection SemanticArguments => CreateContext.SemanticArguments;
 
     /// <inheritdoc />
     public SemanticArgumentCollection OriginalSemanticArguments { get; }
 
     /// <inheritdoc />
-    public ICommandDefinition<TResult> Subject => CommandPath.Subject;
+    public ICommandDefinition<TResult> Subject => CreateContext.Subject;
 
     /// <inheritdoc />
     public Exception? BindingException { get; }
@@ -77,29 +82,43 @@ internal sealed class BindingContext<TResult> : IBindingContext<TResult>
     }
 
     /// <inheritdoc />
+    public bool IsHelpCallSite => HelpCallSite != null;
+
+    /// <inheritdoc />
+    public Type CallSiteModelType => HelpCallSite != null ? typeof(None) : Subject.ModelType;
+
+    /// <inheritdoc />
     public Func<TResult> CreateCallSite<TModel>(TModel model) where TModel : class
+    {
+        return HelpCallSite ?? WrapCallSite(model);
+    }
+
+    /// <inheritdoc />
+    public IReadOnlyDictionary<Type, ValueConverter> ConverterDictionary => CreateContext.ConverterDictionary;
+
+    /// <inheritdoc />
+    public IReadOnlyDictionary<Type, Validator> ValidatorDictionary => CreateContext.ValidatorDictionary;
+
+    /// <inheritdoc />
+    public IReadOnlyCollection<string> SymbolIdentities => CreateContext.SymbolIdentities;
+
+    /// <inheritdoc />
+    public IEnumerable<SymbolDefinition> ArgumentSymbols => CreateContext.ArgumentSymbols;
+
+    /// <inheritdoc />
+    public IEnumerable<SymbolDefinition> SwitchSymbols => CreateContext.SwitchSymbols;
+
+    /// <inheritdoc />
+    public IEnumerable<SymbolDefinition> OptionSymbols => CreateContext.OptionSymbols;
+
+    /// <inheritdoc />
+    public SymbolDefinition? HelpOptionSymbol => CreateContext.HelpOptionSymbol;
+    
+    private Func<TResult> WrapCallSite<TModel>(TModel model) where TModel : class
     {
         var commandDefinition = (ICommandDefinition<TModel, TResult>)Subject;
         var handler = commandDefinition.Handler;
 
         return () => handler!(model);
     }
-
-    /// <inheritdoc />
-    public IReadOnlyDictionary<Type, ValueConverter> ConverterDictionary => CommandPath.ConverterDictionary;
-
-    /// <inheritdoc />
-    public IReadOnlyDictionary<Type, Validator> ValidatorDictionary => CommandPath.ValidatorDictionary;
-
-    /// <inheritdoc />
-    public IReadOnlyCollection<string> SymbolIdentities => CommandPath.SymbolIdentities;
-
-    /// <inheritdoc />
-    public IEnumerable<SymbolDefinition> ArgumentSymbols => CommandPath.ArgumentSymbols;
-
-    /// <inheritdoc />
-    public IEnumerable<SymbolDefinition> SwitchSymbols => CommandPath.SwitchSymbols;
-
-    /// <inheritdoc />
-    public IEnumerable<SymbolDefinition> OptionSymbols => CommandPath.OptionSymbols;
 }

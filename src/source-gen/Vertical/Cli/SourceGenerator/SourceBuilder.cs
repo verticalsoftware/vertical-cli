@@ -58,7 +58,10 @@ public static class SourceBuilder
         code.AppendLine($"{indent.Indent}throw new global::System.ArgumentNullException(nameof(args));");
         code.AppendLine($"{indent}}}");
         code.AppendLine();
-        code.AppendLine($"{indent}var context = global::Vertical.Cli.Binding.BindingContext.Create(rootCommand, args);");
+        code.AppendLine($"{indent}var context = global::Vertical.Cli.Binding.BindingContext.Create(");
+        code.AppendLine($"{indent.Indent}rootCommand,");
+        code.AppendLine($"{indent.Indent}args,");
+        code.AppendLine($"{indent.Indent}{model.DefaultValue});");
         code.AppendLine();
         code.AppendLine($"{indent}context.ThrowBindingExceptions();");
         code.AppendLine();
@@ -74,7 +77,7 @@ public static class SourceBuilder
         code.AppendLine($"{tab}private static global::System.Func<{model.ResultTypeName}> GetCallSite(");
         code.AppendLine($"{indent}{model.BindingContextTypeName} context)");
         code.AppendLine($"{tab}{{");
-        code.AppendLine($"{indent}var modelType = context.Subject.ModelType;");
+        code.AppendLine($"{indent}var modelType = context.CallSiteModelType;");
         code.AppendLine();
         
         model.ModelTypes.ForEach((modelType, index) =>

@@ -5,6 +5,8 @@
 /// </summary>
 internal sealed class PositionReference
 {
+    internal static PositionReference None { get; } = new() { _next = -1 };
+    
     private int _next;
 
     /// <summary>

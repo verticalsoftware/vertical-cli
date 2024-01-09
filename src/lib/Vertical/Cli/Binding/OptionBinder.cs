@@ -8,21 +8,21 @@ namespace Vertical.Cli.Binding;
 /// Binds semantic arguments to options.
 /// </summary>
 /// <typeparam name="T">Value type.</typeparam>
-internal sealed class OptionBinder<T> : IBinder where T : notnull
+internal sealed class OptionBinder<T> : IBinder
 {
     internal static OptionBinder<T> Instance { get; } = new();
 
     /// <inheritdoc />
-    public ArgumentBinding CreateBinding(IBindingPath bindingPath, SymbolDefinition symbol)
+    public ArgumentBinding CreateBinding(IBindingCreateContext bindingCreateContext, SymbolDefinition symbol)
     {
-        var arguments = bindingPath
+        var arguments = bindingCreateContext
             .SemanticArguments
             .GetOptionArguments(symbol);
 
         var typedSymbol = (SymbolDefinition<T>)symbol;
 
         var values = arguments
-            .Select(argument => GetValue(bindingPath, typedSymbol, argument))
+            .Select(argument => GetValue(bindingCreateContext, typedSymbol, argument))
             .ToArray();
 
         if (values.Length == 0 && typedSymbol.DefaultProvider != null)
@@ -36,7 +36,7 @@ internal sealed class OptionBinder<T> : IBinder where T : notnull
     }
     
     private static T GetValue(
-        IBindingPath bindingPath,
+        IBindingCreateContext bindingCreateContext,
         SymbolDefinition<T> symbol,
         SemanticArgument argument)
     {
@@ -46,15 +46,15 @@ internal sealed class OptionBinder<T> : IBinder where T : notnull
             {
                 case { ArgumentSyntax.HasOperand: true }:
 
-                    return bindingPath.GetBindingValue(symbol, argument.ArgumentSyntax.OperandValue);
+                    return bindingCreateContext.GetBindingValue(symbol, argument.ArgumentSyntax.OperandValue);
                 
-                case { CandidateOperandSyntax: not null } when !bindingPath
+                case { CandidateOperandSyntax: not null } when !bindingCreateContext
                     .SymbolIdentities
                     .Contains(argument.CandidateOperandSyntax.Text):
                     
                     argument.AcceptOperand();
 
-                    return bindingPath.GetBindingValue(symbol, argument.CandidateOperandSyntax.Text);
+                    return bindingCreateContext.GetBindingValue(symbol, argument.CandidateOperandSyntax.Text);
                 
                 default:
                     throw InvocationExceptions.OptionMissingOperand(symbol);

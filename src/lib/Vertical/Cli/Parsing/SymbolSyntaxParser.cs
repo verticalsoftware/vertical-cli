@@ -44,7 +44,7 @@ public static class SymbolSyntaxParser
 
         var prefix = ptr > 0 ? str.Substring(0, ptr) : string.Empty;
         var nonIdentifier = (ptr < str.Length && !char.IsLetterOrDigit(str[ptr])) ||
-                            (ptr < str.Length - 1 && !char.IsLetterOrDigit(str[str.Length-1]));
+                            (ptr < str.Length - 1 && !char.IsLetterOrDigit(str[^1]));
 
         // Short-circuit #1
         if (nonIdentifier)
@@ -111,14 +111,14 @@ public static class SymbolSyntaxParser
             // Each character is an identifier
             for (var i = identifierStartIndex; i != identifierEndIndex; i++)
             {
-                identifiers.Add($"{ParseCharacterTokens.Hyphen}{str[i]}");
+                identifiers.Add($"{str[i]}");
             }
         }
         else
         {
-            identifiers.Add($"{prefix}{str.Substring(
+            identifiers.Add(str.Substring(
                 identifierStartIndex,
-                identifierEndIndex-identifierStartIndex)}");
+                identifierEndIndex-identifierStartIndex));
         }
 
         var operandAssignmentToken = operandAssignmentTokenIndex > -1
@@ -129,10 +129,15 @@ public static class SymbolSyntaxParser
             ? str.Substring(operandAssignmentTokenIndex + 1)
             : string.Empty;
 
+        var prefixedIdentifiers = identifiers
+            .Select(id => $"{prefix}{id}")
+            .ToArray();
+
         return new SymbolSyntax(
             syntaxType,
             str,
             prefix,
+            prefixedIdentifiers,
             identifiers.ToArray(),
             operandAssignmentToken,
             operandValue);

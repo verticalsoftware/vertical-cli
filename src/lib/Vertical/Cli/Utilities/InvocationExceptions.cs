@@ -46,14 +46,13 @@ internal static class InvocationExceptions
             count);
     }
 
-    public static Exception ValueConversionFailed<T>(SymbolDefinition<T> symbol, Exception exception, string value) 
-        where T : notnull
+    public static Exception ValueConversionFailed<T>(SymbolDefinition<T> symbol, Exception exception, string value)
     {
         return new CliValueConversionException(
             "{Symbol}: Could not convert \"{AttemptedValue}\" to {Type}.",
             new Dictionary<string, object>
             {
-                ["Symbol"] = symbol,
+                ["Symbol"] = symbol.GetDisplayString(),
                 ["AttemptedValue"] = value,
                 ["Type"] = typeof(T)
             },
@@ -62,23 +61,52 @@ internal static class InvocationExceptions
             exception);
     }
 
-    public static Exception ValidationFailed<T>(SymbolDefinition<T> symbol, T value, string[] toArray) where T : notnull
+    public static Exception ValidationFailed<T>(SymbolDefinition<T> symbol, T value, string[] errors)
     {
-        throw new NotImplementedException();
+        return new CliValidationFailedException(
+            "{Symbol}: Provided value \"{AttemptedValue}\" is invalid: {FirstError}",
+            new Dictionary<string, object>
+            {
+                ["Symbol"] = symbol.GetDisplayString(),
+                ["AttemptedValue"] = value?.ToString() ?? "(null)",
+                ["FirstError"] = errors.First()
+            },
+            symbol,
+            value,
+            errors);
     }
 
-    public static Exception ValidationFailed<T>(SymbolDefinition<T> symbol, T value, Exception toArray) where T : notnull
+    public static Exception ValidationFailed<T>(SymbolDefinition<T> symbol, T value, Exception exception)
     {
-        throw new NotImplementedException();
+        return new CliValidationFailedException(
+            "{Symbol}: Provided value \"{AttemptedValue}\" is invalid.",
+            new Dictionary<string, object>
+            {
+                ["Symbol"] = symbol.GetDisplayString(),
+                ["AttemptedValue"] = value?.ToString() ?? "(null)"
+            },
+            symbol,
+            value,
+            Array.Empty<string>(),
+            exception);
     }
 
-    public static Exception OptionMissingOperand<T>(SymbolDefinition<T> symbol) where T : notnull
+    public static Exception OptionMissingOperand<T>(SymbolDefinition<T> symbol)
     {
-        throw new NotImplementedException();
+        return new CliMissingOperandException(
+            "{Symbol}: Required value not provided.",
+            new Dictionary<string, object>
+            {
+                ["Symbol"] = symbol.GetDisplayString()
+            },
+            symbol);
     }
 
-    public static Exception InvalidArguments(SemanticArgumentCollection bindingPathSemanticArguments)
+    public static Exception InvalidArguments(SemanticArgumentCollection arguments)
     {
-        throw new NotImplementedException();
+        return new CliInvalidArgumentException(
+            "Invalid option, argument, or switch: \"{Argument}\".",
+            new Dictionary<string, object> { ["Argument"] = arguments.First().ArgumentSyntax.Text },
+            arguments.ToArray());
     }
 }

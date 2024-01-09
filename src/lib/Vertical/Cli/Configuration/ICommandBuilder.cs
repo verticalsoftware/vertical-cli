@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Conversion;
+using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;
@@ -66,8 +67,23 @@ public interface ICommandBuilder<out TModel, TResult> where TModel : class
         SymbolScope scope = SymbolScope.Self,
         Func<T>? defaultProvider = null,
         ValueConverter<T>? converter = null,
-        Validator<T>? validator = null)
-        where T : notnull;
+        Validator<T>? validator = null);
+
+    /// <summary>
+    /// Adds a help option.
+    /// </summary>
+    /// <param name="id">The primary identity for the option.</param>
+    /// <param name="aliases">An optional array of alias identities.</param>
+    /// <param name="scope">The scope of the symbol within the command path.</param>
+    /// <param name="helpRenderer">A service that presents the help content.</param>
+    /// <param name="returnValue">The value to return from the command handler.</param>
+    /// <returns>A reference to this instance.</returns>
+    ICommandBuilder<TModel, TResult> AddHelpOption(
+        string? id = null,
+        string[]? aliases = null,
+        SymbolScope scope = SymbolScope.Self,
+        IHelpRenderer? helpRenderer = null,
+        TResult returnValue = default!);
 
     /// <summary>
     /// Adds an option definition.
@@ -84,7 +100,7 @@ public interface ICommandBuilder<out TModel, TResult> where TModel : class
         string? description = null,
         SymbolScope scope = SymbolScope.Self,
         Func<bool>? defaultProvider = null);
-    
+
     /// <summary>
     /// Adds an option definition.
     /// </summary>
@@ -104,8 +120,7 @@ public interface ICommandBuilder<out TModel, TResult> where TModel : class
         SymbolScope scope = SymbolScope.Self,
         Func<T>? defaultProvider = null,
         ValueConverter<T>? converter = null,
-        Validator<T>? validator = null)
-        where T : notnull;
+        Validator<T>? validator = null);
 
     /// <summary>
     /// Adds a converter service available to this command and any sub command in the path.
@@ -113,7 +128,7 @@ public interface ICommandBuilder<out TModel, TResult> where TModel : class
     /// <param name="converter">Converter instance.</param>
     /// <typeparam name="T">Value type the converter supports.</typeparam>
     /// <returns>A reference to this instance.</returns>
-    ICommandBuilder<TModel, TResult> AddConverter<T>(ValueConverter<T> converter) where T : notnull;
+    ICommandBuilder<TModel, TResult> AddConverter<T>(ValueConverter<T> converter);
     
     /// <summary>
     /// Adds a validator service available to this command and any sub command in the path.
@@ -121,5 +136,12 @@ public interface ICommandBuilder<out TModel, TResult> where TModel : class
     /// <param name="validator">Validator instance.</param>
     /// <typeparam name="T">Value type the validator supports.</typeparam>
     /// <returns>A reference to this instance.</returns>
-    ICommandBuilder<TModel, TResult> AddValidator<T>(Validator<T> validator) where T : notnull;
+    ICommandBuilder<TModel, TResult> AddValidator<T>(Validator<T> validator);
+
+    /// <summary>
+    /// Adds the description to display in the help content.
+    /// </summary>
+    /// <param name="description">Description.</param>
+    /// <returns>A reference to this instance.</returns>
+    ICommandBuilder<TModel, TResult> AddDescription(string description);
 }

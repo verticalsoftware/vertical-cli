@@ -9,7 +9,7 @@ namespace Vertical.Cli.Utilities;
 /// Defines the data and commands of an execution path.
 /// </summary>
 /// <typeparam name="TResult">Command result type.</typeparam>
-public class CommandPath<TResult>
+public class CommandPathContext<TResult>
 {
     private record LazyData(
         IReadOnlyCollection<SymbolDefinition> Symbols,
@@ -18,19 +18,19 @@ public class CommandPath<TResult>
 
     private readonly Lazy<LazyData> _lazyData;
     
-    internal CommandPath(ICommandDefinition<TResult> command)
+    internal CommandPathContext(ICommandDefinition<TResult> command)
         : this(null, command)
     {
     }
 
-    internal CommandPath(ImmutableArray<ICommandDefinition<TResult>> commands)
+    internal CommandPathContext(ImmutableArray<ICommandDefinition<TResult>> commands)
     {
         Commands = commands;
         Subject = Commands.Last();
         _lazyData = new Lazy<LazyData>(InitializeLazyData);
     }
 
-    private CommandPath(CommandPath<TResult>? basePath, ICommandDefinition<TResult> command)
+    private CommandPathContext(CommandPathContext<TResult>? basePath, ICommandDefinition<TResult> command)
         : this(basePath?.Commands.Add(command) ?? ImmutableArray.Create(command))
     {
     }
@@ -38,9 +38,9 @@ public class CommandPath<TResult>
     /// <summary>
     /// Gets the sub-paths for the subject command.
     /// </summary>
-    public IEnumerable<CommandPath<TResult>> SubPaths => Subject
+    public IEnumerable<CommandPathContext<TResult>> SubPaths => Subject
         .SubCommands
-        .Select(command => new CommandPath<TResult>(this, command));
+        .Select(command => new CommandPathContext<TResult>(this, command));
 
     /// <summary>
     /// Gets an array of command definitions that represents the current command path.
@@ -55,7 +55,7 @@ public class CommandPath<TResult>
     /// <summary>
     /// Gets an instance of this type that contains only the subject.
     /// </summary>
-    public CommandPath<TResult> SubjectPath => new(null, Subject);
+    public CommandPathContext<TResult> SubjectPathContext => new(null, Subject);
 
     /// <summary>
     /// Gets the symbols in the command path.

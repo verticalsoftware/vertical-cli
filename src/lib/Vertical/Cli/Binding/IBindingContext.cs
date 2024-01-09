@@ -7,7 +7,7 @@ namespace Vertical.Cli.Binding;
 /// <summary>
 /// Contains argument bindings that can be used to construct parameter models.
 /// </summary>
-public interface IBindingContext<TResult> : IBindingPath
+public interface IBindingContext<TResult> : IBindingCreateContext
 {
     /// <summary>
     /// Gets the bindings available in the context.
@@ -58,6 +58,16 @@ public interface IBindingContext<TResult> : IBindingPath
     /// Throws any binding exceptions. 
     /// </summary>
     void ThrowBindingExceptions();
+    
+    /// <summary>
+    /// Gets whether the call site is a help handler.
+    /// </summary>
+    bool IsHelpCallSite { get; }
+    
+    /// <summary>
+    /// Gets the call site model type to bind to.
+    /// </summary>
+    Type CallSiteModelType { get; }
 
     /// <summary>
     /// Creates a call site.
@@ -66,4 +76,9 @@ public interface IBindingContext<TResult> : IBindingPath
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <returns>A function that invokes the subject's handler with the created model instance.</returns>
     Func<TResult> CreateCallSite<TModel>(TModel model) where TModel : class;
+    
+    /// <summary>
+    /// Gets the help call site.
+    /// </summary>
+    Func<TResult>? HelpCallSite { get; }
 }

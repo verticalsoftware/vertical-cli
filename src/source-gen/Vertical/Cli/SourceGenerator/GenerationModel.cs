@@ -36,6 +36,20 @@ public class GenerationModel
     
     public string InvokeMethodName => IsAsyncFlow ? "InvokeAsync" : "Invoke";
 
+    public string DefaultValue
+    {
+        get
+        {
+            if (!IsAsyncFlow)
+            {
+                return $"global::Vertical.Cli.Binding.Default<{ResultTypeName}>.Value";
+            }
+
+            var valueType = ((INamedTypeSymbol)ResultType).TypeArguments.First();
+            return $"global::Vertical.Cli.Binding.AsyncDefault<{valueType.ToFullName()}>.Value";
+        }
+    }
+
     public IEnumerable<ITypeSymbol> ModelTypes => new HashSet<ITypeSymbol>(
         _models.Select(model => model.ModelType),
         SymbolEqualityComparer.Default);

@@ -39,6 +39,9 @@ internal class CommandDefinition<TModel, TResult> : ICommandDefinition<TModel, T
     public bool HasHandler => Definition.HasHandler;
 
     /// <inheritdoc />
+    public string? Description => Definition.Description;
+
+    /// <inheritdoc />
     public ICommandDefinition? Parent => Definition.Parent;
 
     /// <inheritdoc />
@@ -50,6 +53,12 @@ internal class CommandDefinition<TModel, TResult> : ICommandDefinition<TModel, T
 
     /// <inheritdoc />
     public IEnumerable<string> SubCommandIdentities => Definition.SubCommandIdentities;
+
+    /// <inheritdoc />
+    public IEnumerable<ICommandDefinition> CreateChildDefinitions() => Definition.CreateChildDefinitions();
+
+    /// <inheritdoc />
+    public CliOptions Options => Definition.Options;
 
     /// <inheritdoc />
     public Func<TModel, TResult>? Handler => Definition.Handler;

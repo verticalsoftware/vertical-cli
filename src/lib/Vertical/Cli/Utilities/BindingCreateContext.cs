@@ -6,10 +6,10 @@ using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Utilities;
 
-public sealed class BindingCommandPath<TResult> : CommandPath<TResult>, IBindingPath
+public sealed class BindingCreateContext<TResult> : CommandPathContext<TResult>, IBindingCreateContext
 {
     /// <inheritdoc />
-    internal BindingCommandPath(
+    internal BindingCreateContext(
         IEnumerable<ICommandDefinition<TResult>> commands,
         IEnumerable<string> rawArguments,
         IEnumerable<string> subjectArguments) 
@@ -22,37 +22,40 @@ public sealed class BindingCommandPath<TResult> : CommandPath<TResult>, IBinding
         ConverterDictionary = Converters.ToMergedDictionary(converter => converter.ValueType);
         ValidatorDictionary = Validators.ToMergedDictionary(validator => validator.ValueType);
         SymbolIdentities = new HashSet<string>(Symbols.SelectMany(symbol => symbol.Identities));
+        SymbolTypeLookup = Symbols.ToLookup(symbol => symbol.Type);
     }
+
+    private ILookup<SymbolType, SymbolDefinition> SymbolTypeLookup { get; }
 
     /// <summary>
     /// Gets the raw arguments.
     /// </summary>
-    public string[] RawArguments { get; set; }
+    public string[] RawArguments { get; }
 
     /// <summary>
     /// Gets the arguments appropriate for the command subject.
     /// </summary>
-    public string[] SubjectArguments { get; set; }
+    public string[] SubjectArguments { get; }
 
     /// <summary>
     /// Gets the subject argument syntax.
     /// </summary>
-    public SymbolSyntax[] ArgumentSyntax { get; set; }
+    public SymbolSyntax[] ArgumentSyntax { get; }
 
     /// <summary>
     /// Gets the semantic arguments.
     /// </summary>
-    public SemanticArgumentCollection SemanticArguments { get; set; }
+    public SemanticArgumentCollection SemanticArguments { get; }
 
     /// <summary>
     /// Gets the converter dictionary.
     /// </summary>
-    public IReadOnlyDictionary<Type, ValueConverter> ConverterDictionary { get; set; }
+    public IReadOnlyDictionary<Type, ValueConverter> ConverterDictionary { get; }
     
     /// <summary>
     /// Gets the validators dictionary.
     /// </summary>
-    public IReadOnlyDictionary<Type, Validator> ValidatorDictionary { get; set; }
+    public IReadOnlyDictionary<Type, Validator> ValidatorDictionary { get; }
 
     /// <inheritdoc />
     public IReadOnlyCollection<string> SymbolIdentities { get; }
@@ -60,15 +63,19 @@ public sealed class BindingCommandPath<TResult> : CommandPath<TResult>, IBinding
     /// <summary>
     /// Gets the argument symbols.
     /// </summary>
-    public IEnumerable<SymbolDefinition> ArgumentSymbols => Symbols.Where(symbol => symbol.Type == SymbolType.Argument);
+    public IEnumerable<SymbolDefinition> ArgumentSymbols => SymbolTypeLookup[SymbolType.Argument];
 
     /// <summary>
     /// Gets the switch symbols.
     /// </summary>
-    public IEnumerable<SymbolDefinition> SwitchSymbols => Symbols.Where(symbol => symbol.Type == SymbolType.Switch);
+    public IEnumerable<SymbolDefinition> SwitchSymbols => SymbolTypeLookup[SymbolType.Switch];
 
     /// <summary>
     /// Gets the option symbols.
     /// </summary>
-    public IEnumerable<SymbolDefinition> OptionSymbols => Symbols.Where(symbol => symbol.Type == SymbolType.Option);
+    public IEnumerable<SymbolDefinition> OptionSymbols => SymbolTypeLookup[SymbolType.Option];
+
+    /// <inheritdoc />
+    public SymbolDefinition? HelpOptionSymbol => SymbolTypeLookup[SymbolType.HelpOption]
+        .SingleOrDefault();
 }

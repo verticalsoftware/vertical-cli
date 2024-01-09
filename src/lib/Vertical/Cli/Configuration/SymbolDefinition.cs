@@ -13,7 +13,7 @@ public abstract class SymbolDefinition
     internal SymbolDefinition(
         SymbolType type,
         ICommandDefinition parent,
-        Func<IBinder> binderFactory,
+        Func<IBinder> bindingProvider,
         int position,
         string id,
         string[] aliases,
@@ -23,7 +23,7 @@ public abstract class SymbolDefinition
     {
         Type = type;
         Parent = parent;
-        BinderFactory = binderFactory;
+        BindingProvider = bindingProvider;
         Position = position;
         Id = id;
         Aliases = aliases;
@@ -45,7 +45,7 @@ public abstract class SymbolDefinition
     /// <summary>
     /// Gets an <see cref="IBinder"/> provider.
     /// </summary>
-    public Func<IBinder> BinderFactory { get; }
+    public Func<IBinder> BindingProvider { get; }
 
     /// <summary>
     /// Gets the position of this symbol relative to the other symbol's in the path.
@@ -92,13 +92,13 @@ public abstract class SymbolDefinition
 /// Defines a strongly-typed symbol.
 /// </summary>
 /// <typeparam name="T">Value type.</typeparam>
-public sealed class SymbolDefinition<T> : SymbolDefinition where T : notnull
+public class SymbolDefinition<T> : SymbolDefinition
 {
     /// <inheritdoc />
     internal SymbolDefinition(
         SymbolType type,
         ICommandDefinition parent,
-        Func<IBinder> binderFactory,
+        Func<IBinder> bindingProvider,
         int position,
         string id, 
         string[] aliases, 
@@ -108,7 +108,7 @@ public sealed class SymbolDefinition<T> : SymbolDefinition where T : notnull
         Func<T>? defaultProvider,
         ValueConverter<T>? converter,
         Validator<T>? validator) 
-        : base(type, parent, binderFactory, position, id, aliases, arity, description, scope)
+        : base(type, parent, bindingProvider, position, id, aliases, arity, description, scope)
     {
         DefaultProvider = defaultProvider;
         Converter = converter;

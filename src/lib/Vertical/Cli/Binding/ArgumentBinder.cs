@@ -7,14 +7,14 @@ namespace Vertical.Cli.Binding;
 /// Binds semantic arguments to argument symbols.
 /// </summary>
 /// <typeparam name="T">Value type.</typeparam>
-internal sealed class ArgumentBinder<T> : IBinder where T : notnull
+internal sealed class ArgumentBinder<T> : IBinder
 {
     internal static ArgumentBinder<T> Instance { get; } = new();
 
     /// <inheritdoc />
-    public ArgumentBinding CreateBinding(IBindingPath bindingPath, SymbolDefinition symbol)
+    public ArgumentBinding CreateBinding(IBindingCreateContext bindingCreateContext, SymbolDefinition symbol)
     {
-        var arguments = bindingPath
+        var arguments = bindingCreateContext
             .SemanticArguments
             .GetValueArguments(symbol);
 
@@ -24,7 +24,7 @@ internal sealed class ArgumentBinder<T> : IBinder where T : notnull
             .Select(argument =>
             {
                 argument.Accept();
-                return bindingPath.GetBindingValue(typedSymbol, argument.ArgumentSyntax.Text);
+                return bindingCreateContext.GetBindingValue(typedSymbol, argument.ArgumentSyntax.Text);
             })
             .ToArray();
 

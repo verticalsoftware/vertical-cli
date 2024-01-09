@@ -2,12 +2,12 @@
 
 namespace Vertical.Cli.Utilities;
 
-internal sealed class MessageBuilder
+internal sealed class TextBuilder
 {
     private readonly List<string> _rows = new();
     private readonly StringBuilder _buffer = new();
 
-    internal MessageBuilder Clear()
+    internal TextBuilder Clear()
     {
         _rows.Clear();
         _buffer.Clear();
@@ -38,6 +38,11 @@ internal sealed class MessageBuilder
         FlushRow();
         return string.Join(Environment.NewLine, _rows);
     }
+
+    /// <summary>
+    /// Gets the rows in the text builder.
+    /// </summary>
+    public IReadOnlyList<string> Rows => _rows;
 
     private void FlushRow()
     {

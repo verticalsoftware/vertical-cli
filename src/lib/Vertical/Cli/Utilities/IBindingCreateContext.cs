@@ -8,7 +8,7 @@ namespace Vertical.Cli.Utilities;
 /// <summary>
 /// Provides binding data for a command path.
 /// </summary>
-public interface IBindingPath
+public interface IBindingCreateContext
 {
     /// <summary>
     /// Gets the raw arguments.
@@ -59,4 +59,9 @@ public interface IBindingPath
     /// Gets the option symbols.
     /// </summary>
     IEnumerable<SymbolDefinition> OptionSymbols { get; }
+    
+    /// <summary>
+    /// Gets the help option symbol, or <c>null</c>.
+    /// </summary>
+    SymbolDefinition? HelpOptionSymbol { get; }
 }
