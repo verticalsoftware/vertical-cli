@@ -15,7 +15,7 @@
 using Vertical.Cli.Binding;
 
 public record Parameters(
-    string Root,
+    FileInfo Root,
     bool NoCompile,
     bool NoSymbols)
 {

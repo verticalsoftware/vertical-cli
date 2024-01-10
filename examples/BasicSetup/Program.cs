@@ -1,12 +1,15 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Text.Json;
 using Vertical.Cli;
-using Vertical.Cli.Configuration;
 
-var rootCommand = RootCommand.Create<Task<int>>("program", root =>
+var options = new CliOptions();
+
+var rootCommand = RootCommand.Create<int>("program", root =>
 {
-    root.AddArgument<string>("root", scope: SymbolScope.Descendents);
+    root.AddArgument<FileInfo>("root", 
+        scope: SymbolScope.Descendents
+        //, validator: Validator.Configure<FileInfo>(x => x.FileExists())
+        );
 
     root.AddDescription("Manage builds in .Net");
     
@@ -23,11 +26,10 @@ var rootCommand = RootCommand.Create<Task<int>>("program", root =>
 
         cmd.AddDescription("Pushes a nuget package to a managed repository source.");
         
-        cmd.SetHandler(async parameters =>
+        cmd.SetHandler(parameters =>
         {
-            await Task.CompletedTask;
-            var json = JsonSerializer.Serialize(parameters, new JsonSerializerOptions{WriteIndented = true});
-            Console.WriteLine("parameters = " + json);
+            //var json = JsonSerializer.Serialize(parameters, new JsonSerializerOptions{WriteIndented = true});
+            //Console.WriteLine("parameters = " + json);
             return 0;
         });
     });
@@ -41,14 +43,7 @@ var rootCommand = RootCommand.Create<Task<int>>("program", root =>
     });
 });
 
-try
-{
-    rootCommand.ThrowIfInvalid();
-    var debugArgs = new[] { "push", "--help" };
-    await rootCommand.InvokeAsync(args);
-}
-catch (Exception exception)
-{
-    Console.WriteLine(exception.Message);
-    throw;
-}
+var dbgArgs = "biscuits|gravy"
+    .Split('|'); 
+
+rootCommand.Invoke(dbgArgs);
