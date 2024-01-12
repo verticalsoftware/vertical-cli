@@ -62,7 +62,7 @@ public sealed class HelpTextWriter
         ++_x;
     }
 
-    public void IndentToMargin(int margin) => WriteNewLineLeftMargin(margin);
+    public void Indent(int margin) => WriteNewLineLeftMargin(margin);
 
     public void WriteLineIfNotAtLineOrigin()
     {

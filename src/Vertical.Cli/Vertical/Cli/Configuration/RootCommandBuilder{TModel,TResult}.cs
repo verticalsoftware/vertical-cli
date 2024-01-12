@@ -14,7 +14,6 @@ internal sealed class RootCommandBuilder<TModel, TResult> :
     public ICommandBuilder<TModel, TResult> AddHelpOption(
         string? id = null,
         string[]? aliases = null,
-        SymbolScope scope = SymbolScope.Parent,
         TResult returnValue = default!)
     {
         AddSymbol(new HelpSymbolDefinition<TResult>(
@@ -22,7 +21,7 @@ internal sealed class RootCommandBuilder<TModel, TResult> :
             GetInsertPosition(),
             id ?? "--help",
             aliases ?? Array.Empty<string>(),
-            scope,
+            SymbolScope.ParentAndDescendents,
             returnValue));
         
         return this;

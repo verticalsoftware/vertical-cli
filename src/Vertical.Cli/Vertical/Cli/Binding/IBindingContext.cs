@@ -31,6 +31,11 @@ public interface IBindingContext
     /// Gets the semantic arguments.
     /// </summary>
     SemanticArgumentCollection SemanticArguments { get; }
+    
+    /// <summary>
+    /// Gets a collection of the original semantic arguments not consumed by parsing.
+    /// </summary>
+    SemanticArgumentCollection OriginalSemanticArguments { get; }
 
     /// <summary>
     /// Gets the converter dictionary.
@@ -73,6 +78,11 @@ public interface IBindingContext
     IReadOnlyDictionary<string, ArgumentBinding> BindingDictionary { get; }
     
     /// <summary>
+    /// Gets a lookup of binding values where the key is the symbol identity.
+    /// </summary>
+    BindingLookup BindingValueLookup { get; }
+    
+    /// <summary>
     /// Gets a binding that matches the given id.
     /// </summary>
     /// <param name="bindingId">Binding id to match.</param>
@@ -96,9 +106,4 @@ public interface IBindingContext
     /// <typeparam name="T">Expected value type.</typeparam>
     /// <returns>The binding values.</returns>
     IEnumerable<T> GetValues<T>(string bindingId);
-    
-    /// <summary>
-    /// Gets a collection of the original semantic arguments not consumed by parsing.
-    /// </summary>
-    SemanticArgumentCollection OriginalSemanticArguments { get; }
 }

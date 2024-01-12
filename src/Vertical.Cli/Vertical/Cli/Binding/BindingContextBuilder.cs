@@ -25,7 +25,7 @@ internal sealed class BindingContextBuilder : IBindingContext
         ConverterDictionary = options.Converters.ToDictionary(converter => converter.ValueType);
         ValidatorDictionary = options.Validators.ToDictionary(validator => validator.ValueType);
 
-        var symbols = subject.GetInheritedSymbols().Concat(subject.GetScopedSymbols());
+        var symbols = subject.GetAllSymbols();
         SymbolLookup = symbols.ToLookup(symbol => symbol.Type);
         SymbolIdentities = new HashSet<string>(symbols.SelectMany(symbol => symbol.Identities));
     }
@@ -75,6 +75,11 @@ internal sealed class BindingContextBuilder : IBindingContext
 
     /// <inheritdoc />
     public IReadOnlyDictionary<string, ArgumentBinding> BindingDictionary => _bindings;
+
+    /// <inheritdoc />
+    public BindingLookup BindingValueLookup => new(BindingDictionary
+        .SelectMany(kv => kv.Value.Select(obj => (kv.Key, Value: obj)))
+        .ToLookup(kv => kv.Key, kv => kv.Value));
 
     /// <inheritdoc />
     public ArgumentBinding<T> GetBinding<T>(string bindingId)

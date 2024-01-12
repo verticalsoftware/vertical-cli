@@ -154,7 +154,7 @@ internal class CommandBuilder<TModel, TResult> :
     }
 
     /// <inheritdoc />
-    public ICommandBuilder<TModel, TResult> Family(
+    public ICommandBuilder<TModel, TResult> AddSwitch(
         string id,
         string[]? aliases = null,
         string? description = null,

@@ -18,12 +18,6 @@ public sealed class SemanticArgumentCollection : IEnumerable<SemanticArgument>
         _flags = Enumerable.Range(0, _expandedArguments.Count).Select(_ => true).ToArray();
     }
 
-    internal SemanticArgumentCollection(SemanticArgumentCollection other)
-    {
-        _expandedArguments = other._expandedArguments.ToArray();
-        _flags = Enumerable.Range(0, _expandedArguments.Count).Select(_ => true).ToArray();
-    }
-
     /// <summary>
     /// Gets available arguments that match any identifiers of the given symbol.
     /// </summary>

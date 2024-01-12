@@ -7,7 +7,7 @@ using Vertical.Cli.Utilities;
 namespace Vertical.Cli.Invocation;
 
 /// <summary>
-/// Creates a <see cref="IBindingContext{TResult}"/> from a root command definition and program arguments.
+/// Creates a <see cref="ICallSiteContext{TResult}"/> from a root command definition and program arguments.
 /// </summary>
 public static class CallSiteContext
 {

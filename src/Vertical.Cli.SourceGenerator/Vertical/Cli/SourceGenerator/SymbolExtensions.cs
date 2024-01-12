@@ -99,7 +99,8 @@ public static class SymbolExtensions
         return sb.ToString();
     }
 
-    public static string ToFullName(this ITypeSymbol symbol) => symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    public static string ToFullName(this ITypeSymbol symbol) => symbol.ToDisplayString(
+        SymbolDisplayFormat.FullyQualifiedFormat);
 
     public static IReadOnlyCollection<ParameterBinding> GetBindings(this ITypeSymbol symbol)
     {
@@ -127,38 +128,41 @@ public static class SymbolExtensions
             }
         }
 
-        foreach (var member in symbol.GetMembers())
+        for (var type = symbol; type != null; type = type.BaseType)
         {
-            switch (member)
+            foreach (var member in type.GetMembers())
             {
-                case { Kind: not (SymbolKind.Property or SymbolKind.Field)}:
-                    continue;
+                switch (member)
+                {
+                    case { Kind: not (SymbolKind.Property or SymbolKind.Field)}:
+                        continue;
+                    
+                    case { DeclaredAccessibility: not Accessibility.Public }:
+                        continue;
                 
-                case { DeclaredAccessibility: not Accessibility.Public }:
-                    continue;
+                    case IPropertySymbol { SetMethod: null }:
+                        continue;
                 
-                case IPropertySymbol { SetMethod: null }:
-                    continue;
-                
-                case IFieldSymbol { IsReadOnly: true }:
-                    continue;
-            }
+                    case IFieldSymbol { IsReadOnly: true }:
+                        continue;
+                }
 
-            if (constructorParams.Contains(member.Name))
-                continue;
+                if (constructorParams.Contains(member.Name))
+                    continue;
 
-            var memberType = member switch
-            {
-                IPropertySymbol property => property.Type,
-                IFieldSymbol field => field.Type,
-                _ => throw new InvalidOperationException()
-            };
+                var memberType = member switch
+                {
+                    IPropertySymbol property => property.Type,
+                    IFieldSymbol field => field.Type,
+                    _ => throw new InvalidOperationException()
+                };
             
-            bindings.Add(new ParameterBinding(
-                ParameterTarget.Member, 
-                memberType, 
-                member.GetBindingId(),
-                member.Name));
+                bindings.Add(new ParameterBinding(
+                    ParameterTarget.Member, 
+                    memberType, 
+                    member.GetBindingId(),
+                    member.Name));
+            }
         }
         
         return bindings;

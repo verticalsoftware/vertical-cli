@@ -264,6 +264,65 @@ var rootCommand = RootCommand.Create<ProgramArgs, int>(
     });
 ```
 
+### Displaying help
+
+The library has built-in functionality to display help to the user. The default formatter displays a command grammar statement and the symbol list. This experience can be improved by specifying descriptions for commands and options. The following example demonstrates enabling the help system. when the user starts the application and specifies the `--help` option, help content will be displayed.
+
+```csharp
+record Model(double[] Values);
+
+var rootCommand = RootCommand.Create<int>(
+    id: "program",
+    configure: root =>
+    {
+        root.AddDescription("Finds the lowest value of a set of numbers.");
+
+        root.AddArgument<double[]>(
+            id: "values", 
+            arity: new Arity(minCount: 2, maxCount: 16),
+            description: "The number whose square root is to be found.");
+
+        // Enable the help system, the default symbol is --help, but a different id
+        // and aliases can be used.
+        root.AddHelpOption();
+
+        root.SetHandler(param => 
+        {
+            Console.WriteLine(param.Values.Min());
+            return 0;
+        });
+    });
+```
+
+
+### Testing the configuration
+
+A root command object can be checked for configuration errors by using the `ConfigurationValidator` class as followings:
+
+```csharp
+// Get the errors in the configuration
+IReadOnlyCollection<string> errors = rootCommand.GetErrors();
+
+// Throws an exception if errors are found (great for unit tests)
+rootCommand.ThrowIfInvalid();
+```
+
+> 🗈 Note
+>
+> The generated source code will automatically call the `ThrowIfInvalid` method when the build is in the `DEBUG` configuration. In the `RELEASE` configuration, this method is removed from the `Invoke` and `InvokeAsync` method bodies. This behavior can be controlled further by defining `ENABLE_CLI_VALIDATION` or `DISABLE_CLI_VALIDATION symbols`.
+
+Validation ensures the following:
+- Options object does not have ambigous value converters, validators, and model binders.
+- All identifiers comply with naming rules
+- Symbol identifiers are all unique with each command path
+- Symbol value types can be converted from `string`
+- Binding models have a single, public constructor
+- All binding model constructor parameters, properties, and fields are matched with an option or argument
+- Binding model types are compatible with the symbol value type
+- Handlers are set on the required commands
+
+## Running the application
+
 ### Using the root command
 
 After a root command is defined, program control can be delegated to the library by calling `Invoke` or `InvokeAsync` on the object and passing along the application's `args`. The string arguments will be parsed and bound to the model type and the appropriate command handler will be invoked.
@@ -279,3 +338,4 @@ var rootCommand = RootCommand.Create<CliArgs, int>(
 
 rootCommand.Invoke(args);
 ```
+

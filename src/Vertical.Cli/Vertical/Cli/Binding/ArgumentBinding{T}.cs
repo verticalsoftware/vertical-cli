@@ -19,6 +19,9 @@ public sealed class ArgumentBinding<T> : ArgumentBinding
     /// <inheritdoc />
     public override string BindingId => Symbol.Id;
 
+    /// <inheritdoc />
+    public override IEnumerator<object> GetEnumerator() => Values.Cast<object>().GetEnumerator();
+
     /// <summary>
     /// Gets the symbol definition for the binding.
     /// </summary>

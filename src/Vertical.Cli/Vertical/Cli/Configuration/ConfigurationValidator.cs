@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Reflection;
+using System.Text;
 using CommunityToolkit.Diagnostics;
 using Vertical.Cli.Binding;
 using Vertical.Cli.Configuration.Metadata;
@@ -60,11 +61,18 @@ public static class ConfigurationValidator
     {
         var errors = rootCommand.GetErrors();
 
-        switch (errors.Count)
+        if (errors.Count == 0)
+            return;
+
+        var sb = new StringBuilder(5000);
+        sb.AppendLine("Configuration error(s) found.");
+
+        foreach (var error in errors)
         {
-            case 1: throw new InvalidOperationException(errors.Single());
-            case > 1: throw new AggregateException(errors.Select(error => new InvalidOperationException(error)));
+            sb.AppendLine(error);
         }
+
+        throw new InvalidOperationException(sb.ToString());
     }
 
     private static void ValidateOptions(CliOptions options, StateHelper state)

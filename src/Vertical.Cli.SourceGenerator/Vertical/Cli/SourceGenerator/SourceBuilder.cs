@@ -94,8 +94,14 @@ public static class SourceBuilder
         code.AppendLine($"{indent}var callSite = context.CallSite;");
         code.AppendLine($"{indent}var modelType = callSite.ModelType;");
         code.AppendLine();
+
+        code.AppendLine($"{indent}if (modelType == typeof(global::Vertical.Cli.None))");
+        code.AppendLine($"{indent}{{");
+        code.AppendLine($"{indent.Indent}return context.BindModelParameter(_ => global::Vertical.Cli.None.Default);");
+        code.AppendLine($"{indent}}}");
+        code.AppendLine();
         
-        model.ModelTypes.ForEach((modelType, index) =>
+        model.ModelTypes.Where(type => !type.IsNoneModelType()).ForEach((modelType, index) =>
         {
             if (index > 0) code.AppendLine();
             code.AppendLine($"{indent}if (modelType == typeof({modelType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}))");
@@ -103,7 +109,7 @@ public static class SourceBuilder
             WriteCreateModelCase(code, modelType, indent.Indent);
             code.AppendLine($"{indent}}}");
         });
-
+        
         code.AppendLine();
         code.AppendLine($"{indent}throw new global::System.InvalidOperationException();");
         code.AppendLine($"{tab}}}");
@@ -114,9 +120,9 @@ public static class SourceBuilder
         ITypeSymbol modelType,
         Tab tab)
     {
-        if (modelType.IsNoneModelType())
+        if (modelType.ToDisplayString() == "Vertical.Cli.Binding.BindingLookup")
         {
-            code.AppendLine($"{tab}return context.BindModelParameter(_ => global::Vertical.Cli.None.Default);");
+            code.AppendLine($"{tab}return context.BindModelParameter(bindingContext => bindingContext.BindingValueLookup);");
             return;
         }
 

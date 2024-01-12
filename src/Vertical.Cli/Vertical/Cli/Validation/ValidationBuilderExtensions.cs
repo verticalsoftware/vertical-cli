@@ -386,6 +386,23 @@ public static class ValidationBuilderExtensions
     }
     
     /// <summary>
+    /// Adds a validator that ensures a <see cref="FileInfo"/> value reference a valid path.
+    /// </summary>
+    /// <param name="builder">The builder instance.</param>
+    /// <param name="message">A function that returns the message to display if validation fails.</param>
+    /// <returns>A reference to the provided instance.</returns>
+    public static ValidationBuilder<FileInfo> FilePathExists(
+        this ValidationBuilder<FileInfo> builder,
+        Func<string>? message = null)
+    {
+        Guard.IsNotNull(builder);
+
+        return builder.Must(
+            fileInfo => Directory.Exists(Path.GetDirectoryName(fileInfo.FullName)),
+            message ?? (() => "Directory not found."));
+    }
+    
+    /// <summary>
     /// Adds a validator that ensures a <see cref="FileInfo"/> value reference a valid path when the
     /// argument is not null.
     /// </summary>
@@ -401,6 +418,23 @@ public static class ValidationBuilderExtensions
         return builder.Must(
             fileInfo => fileInfo == null || fileInfo.Exists,
             message ?? (() => "File not found."));
+    }
+    
+    /// <summary>
+    /// Adds a validator that ensures a <see cref="FileInfo"/> value reference a valid path.
+    /// </summary>
+    /// <param name="builder">The builder instance.</param>
+    /// <param name="message">A function that returns the message to display if validation fails.</param>
+    /// <returns>A reference to the provided instance.</returns>
+    public static ValidationBuilder<FileInfo?> FilePathExistsIfNotNull(
+        this ValidationBuilder<FileInfo?> builder,
+        Func<string>? message = null)
+    {
+        Guard.IsNotNull(builder);
+
+        return builder.Must(
+            fileInfo => fileInfo == null || Directory.Exists(Path.GetDirectoryName(fileInfo.FullName)),
+            message ?? (() => "Directory not found."));
     }
     
     /// <summary>

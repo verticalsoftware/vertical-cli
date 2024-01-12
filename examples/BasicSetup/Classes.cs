@@ -1,44 +1,30 @@
-﻿// using Vertical.Cli.Conversion;
-//
-// namespace BasicSetup;
-//
-// public class Converter<T> : ValueConverter<T> where T : notnull
-// {
-//     /// <inheritdoc />
-//     public override T Convert(ConversionContext<T> context)
-//     {
-//         throw new NotImplementedException();
-//     }
-// }
-//
+﻿namespace BasicSetup;
 
-using Vertical.Cli.Binding;
-
-public record Parameters(
-    FileInfo Root,
-    bool NoCompile,
-    bool NoSymbols)
+public enum Compression
 {
-    public string? ApiKey { get; set; }
-    public string? Source { get; set; }
-    public TimeSpan? Timeout { get; set; }
+    None,
+    GZip
 }
 
-public class ParametersBinder : ModelBinder<Parameters>
+public class FileCopyParameters
 {
-    /// <inheritdoc />
-    public override Parameters BindInstance(IBindingContext bindingContext)
+    public FileCopyParameters(    
+        FileInfo source,
+        FileInfo dest,
+        Compression compression,
+        bool overwrite)
     {
-        return new Parameters(
-            bindingContext.GetValue<FileInfo>("root"),
-            bindingContext.GetValue<bool>("--no-compile"),
-            bindingContext.GetValue<bool>("--no-symbols"))
-        {
-            ApiKey = bindingContext.GetValue<string>("ApiKey"),
-            Source = bindingContext.GetValue<string>("Source"),
-            Timeout = bindingContext.GetValue<TimeSpan?>("Timeout")
-        };
+        Source = source;
+        Dest = dest;
+        Compression = compression;
+        Overwrite = overwrite;
     }
-}
 
-public readonly record struct Point(int X, int y);
+    public FileInfo Source { get; }
+
+    public FileInfo Dest { get; }
+
+    public Compression Compression { get; }
+
+    public bool Overwrite { get; }
+}

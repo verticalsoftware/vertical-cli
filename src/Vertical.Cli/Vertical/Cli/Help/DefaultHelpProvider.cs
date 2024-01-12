@@ -18,9 +18,6 @@ public class DefaultHelpProvider : IHelpProvider
     public string? GetCommandDescription(ICommandDefinition command) => command.Description;
 
     /// <inheritdoc />
-    public string GetApplicationName(ICommandDefinition rootCommand) => rootCommand.Id;
-
-    /// <inheritdoc />
     public string GetCommandName(ICommandDefinition command) => command.Id;
 
     /// <inheritdoc />
@@ -44,13 +41,36 @@ public class DefaultHelpProvider : IHelpProvider
     /// <inheritdoc />
     public string? GetArgumentsUsageGrammar(ICommandDefinition command, IEnumerable<SymbolDefinition> symbols)
     {
-        return symbols.Any() ? "arguments" : null;
+        var count = symbols.Count();
+        
+        if (count == 0)
+            return null;
+
+        if (count > 2)
+            return "[arguments]";
+
+        var sb = _reusableStringBuilder.GetInstance();
+        try
+        {
+            var pos = 0;
+            foreach (var argument in symbols.OrderBy(sym => sym.Position))
+            {
+                if (pos++ > 0) sb.Append(' ');
+                sb.Append(GetSymbolGrammar(argument));
+            }
+
+            return sb.ToString();
+        }
+        finally
+        {
+            _reusableStringBuilder.Return(sb);
+        }
     }
 
     /// <inheritdoc />
     public string? GetOptionsUsageGrammar(ICommandDefinition command, IEnumerable<SymbolDefinition> symbols)
     {
-        return symbols.Any() ? "options" : null;
+        return symbols.Any() ? "[options]" : null;
     }
 
     /// <inheritdoc />
@@ -66,26 +86,13 @@ public class DefaultHelpProvider : IHelpProvider
 
         try
         {
-            var count = 0;
-            foreach (var identity in symbol.Identities)
+            if (symbol.Type == SymbolType.Argument)
             {
-                if (count++ > 0) sb.Append(',');
-                sb.Append(identity);
+                FormatArgumentGrammar(symbol, sb);
             }
-
-            var argumentName = GetSymbolArgumentName(symbol);
-
-            if (!string.IsNullOrWhiteSpace(argumentName))
+            else
             {
-                sb.Append(' ');
-                sb.Append('<');
-                sb.Append(argumentName);
-                sb.Append('>');
-            }
-
-            if (symbol.Arity.MaxCount is null or > 0)
-            {
-                sb.Append("...");
+                FormatOptionGrammar(symbol, sb);
             }
 
             return sb.ToString();
@@ -99,7 +106,16 @@ public class DefaultHelpProvider : IHelpProvider
     /// <inheritdoc />
     public string GetSymbolSortKey(SymbolDefinition symbol)
     {
-        return SymbolSyntax.Parse(symbol.Id).SimpleIdentifiers![0];
+        if (symbol.Type == SymbolType.Argument)
+        {
+            return $"{symbol.Position:0000}";
+        }
+
+        return SymbolSyntax
+            .Parse(symbol.Id)
+            .SimpleIdentifiers!
+            .OrderBy(id => id)
+            .First();
     }
 
     /// <inheritdoc />
@@ -113,5 +129,45 @@ public class DefaultHelpProvider : IHelpProvider
             .Where(char.IsLetter)
             .Select(char.ToUpper)
             .ToArray());
+    }
+
+    private void FormatArgumentGrammar(SymbolDefinition symbol, StringBuilder sb)
+    {
+        var annotations = symbol.Arity.MinCount > 0
+            ? RequiredGrammarTokens
+            : OptionalGrammarTokens;
+
+        sb.Append(annotations.First);
+        sb.Append(GetSymbolArgumentName(symbol));
+        sb.Append(annotations.Last);
+    }
+    
+    private void FormatOptionGrammar(SymbolDefinition symbol, StringBuilder sb)
+    {
+        var identifierSyntax = symbol
+            .Identities
+            .Select(SymbolSyntax.Parse)
+            .OrderBy(syntax => syntax.SimpleIdentifiers![0]);
+        
+        var pos = 0;
+        foreach (var syntax in identifierSyntax)
+        {
+            if (pos++ > 0) sb.Append(", ");
+            sb.Append(syntax.Identifiers[0]);
+        }
+
+        var argument = GetSymbolArgumentName(symbol);
+        if (!string.IsNullOrWhiteSpace(argument))
+        {
+            sb.Append(' ');
+            sb.Append(RequiredGrammarTokens.First);
+            sb.Append(argument);
+            sb.Append(RequiredGrammarTokens.Last);
+        }
+        
+        if (symbol.Arity.IsMultiValue)
+        {
+            sb.Append("...");
+        }
     }
 }

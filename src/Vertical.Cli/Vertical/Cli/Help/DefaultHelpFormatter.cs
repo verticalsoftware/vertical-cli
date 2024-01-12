@@ -25,8 +25,7 @@ public class DefaultHelpFormatter : IHelpFormatter
     public void WriteContent(ICommandDefinition command)
     {
         var symbols = command
-            .GetScopedSymbols()
-            .Concat(command.GetInheritedSymbols())
+            .GetAllSymbols()
             .Where(symbol => _provider.SymbolSelector(symbol));
 
         var commands = command
@@ -64,6 +63,7 @@ public class DefaultHelpFormatter : IHelpFormatter
             symbol => symbol.Type is SymbolType.Option or SymbolType.Switch));
         
         _helpWriter.WriteLine("Usage:");
+        _helpWriter.Indent(DefaultMargin.Left);
 
         foreach (var command in subject.GetContainingCommands())
         {

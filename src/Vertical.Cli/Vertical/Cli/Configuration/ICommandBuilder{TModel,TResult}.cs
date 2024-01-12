@@ -83,7 +83,7 @@ public interface ICommandBuilder<out TModel, TResult> where TModel : class
     /// <param name="scope">The scope of the symbol within the command path.</param>
     /// <param name="defaultProvider">A function that provides a default value.</param>
     /// <returns>A reference to this instance.</returns>
-    ICommandBuilder<TModel, TResult> Family(
+    ICommandBuilder<TModel, TResult> AddSwitch(
         string id,
         string[]? aliases = null,
         string? description = null,
