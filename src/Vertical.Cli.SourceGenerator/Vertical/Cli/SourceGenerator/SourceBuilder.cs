@@ -66,18 +66,17 @@ public static class SourceBuilder
         code.AppendLine($"{indent.Indent}throw new global::System.ArgumentNullException(nameof(args));");
         code.AppendLine($"{indent}}}");
         code.AppendLine();
-        code.AppendLine("#if (DEBUG || ENABLE_CLI_VALIDATION)");
+        code.AppendLine("#if ((DEBUG || ENABLE_CLI_VALIDATION) && !DISABLE_CLI_VALIDATION)");
         code.AppendLine($"{indent}global::Vertical.Cli.Configuration.ConfigurationValidator.ThrowIfInvalid(rootCommand);");
         code.AppendLine("#endif");
         code.AppendLine();
-        code.AppendLine($"{indent}var context = global::Vertical.Cli.Binding.BindingContext.Create(");
+        code.AppendLine($"{indent}var context = global::Vertical.Cli.Invocation.CallSiteContext.Create(");
         code.AppendLine($"{indent.Indent}rootCommand,");
         code.AppendLine($"{indent.Indent}args,");
         code.AppendLine($"{indent.Indent}{model.DefaultValue});");
         code.AppendLine();
-        code.Append($"{indent}var callsite = GetCallSite(context");
-        code.AppendLine(model.IsAsyncFlow ? ", cancellationToken);" : ");");
-        code.Append($"{indent}return {model.AwaitKeyword}callsite(");
+        code.AppendLine($"{indent}var callsite = GetCallSite(context);");
+        code.Append($"{indent}{model.ReturnsKeyword}{model.AwaitKeyword}callsite(");
         code.AppendLine(model.IsAsyncFlow ? "cancellationToken);" : "global::System.Threading.CancellationToken.None);");
         code.AppendLine($"{tab}}}");
     }
@@ -88,8 +87,9 @@ public static class SourceBuilder
 
         code.AppendLine($"{tab}private static global::System.Func<");
         code.AppendLine($"{indent}global::System.Threading.CancellationToken,");
-        code.AppendLine($"{indent}{model.ResultTypeName}> GetCallSite(");
-        code.AppendLine($"{indent}{model.BindingContextTypeName} context)");
+        code.AppendLine($"{indent}{model.ResultTypeName}>");
+        code.Append($"{indent}GetCallSite(");
+        code.AppendLine($"{model.CallSiteContextTypeName} context)");
         code.AppendLine($"{tab}{{");
         code.AppendLine($"{indent}var callSite = context.CallSite;");
         code.AppendLine($"{indent}var modelType = callSite.ModelType;");
@@ -100,7 +100,7 @@ public static class SourceBuilder
             if (index > 0) code.AppendLine();
             code.AppendLine($"{indent}if (modelType == typeof({modelType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}))");
             code.AppendLine($"{indent}{{");
-            WriteCreateModelCase(code, model, modelType, indent.Indent);
+            WriteCreateModelCase(code, modelType, indent.Indent);
             code.AppendLine($"{indent}}}");
         });
 
@@ -111,28 +111,37 @@ public static class SourceBuilder
 
     private static void WriteCreateModelCase(
         StringBuilder code,
-        GenerationModel model,
         ITypeSymbol modelType,
         Tab tab)
     {
         if (modelType.IsNoneModelType())
         {
-            code.Append($"{tab}return callSite.WrapParameter<{modelType.ToFullName()}>(");
-            code.AppendLine("global::Vertical.Cli.None.Default);");
+            code.AppendLine($"{tab}return context.BindModelParameter(_ => global::Vertical.Cli.None.Default);");
             return;
         }
 
+        if (modelType.IsApplicationBound())
+        {
+            code.AppendLine($"{tab}// Class marked with [ModelBinder<>] attribute");
+            code.AppendLine($"{tab}return context.BindModelParameter<{modelType.ToFullName()}>();");
+            return;
+        }
+
+        code.AppendLine($"{tab}return context.BindModelParameter(bindingContext =>");
+        
+        const string bindingContextVar = "bindingContext";
         var indent = tab.Indent;
+        var indent2 = indent.Indent;
         var bindings = modelType.GetBindings();
-        var modelVariable = model.GenerateModelVariableName(modelType);
-        code.Append($"{tab}var {modelVariable} = new {modelType.ToFullName()}(");
+        
+        code.Append($"{indent}new {modelType.ToFullName()}(");
 
         bindings
             .Where(b => b.Target == ParameterTarget.ConstructorParameter)
             .ForEach((binding, iter) =>
             {
                 code.AppendLine(iter > 0 ? "," : string.Empty);
-                code.Append($"{indent}{binding.MetadataName}: {binding.GetContextMethod("context")}");
+                code.Append($"{indent2}{binding.MetadataName}: {binding.GetContextMethod(bindingContextVar)}");
             });
 
         code.Append(")");
@@ -141,19 +150,17 @@ public static class SourceBuilder
         if (memberBindings.Length > 0)
         {
             code.AppendLine();
-            code.AppendLine($"{tab}{{");
+            code.AppendLine($"{indent}{{");
             memberBindings.ForEach((binding, iter) =>
             {
                 if (iter > 0) code.AppendLine(",");
-                code.Append($"{indent}{binding.MetadataName} = {binding.GetContextMethod("context")}");
+                code.Append($"{indent2}{binding.MetadataName} = {binding.GetContextMethod(bindingContextVar)}");
             });
             code.AppendLine();
-            code.Append($"{tab}}}");
+            code.Append($"{indent}}}");
         }
 
-        code.AppendLine(";");
-        code.AppendLine();
-        code.AppendLine($"{tab}return callSite.WrapParameter<{modelType.ToFullName()}>({modelVariable});");
+        code.AppendLine(");");
     }
 
     private static void WriteNullableAnnotations(StringBuilder code, Compilation compilation)

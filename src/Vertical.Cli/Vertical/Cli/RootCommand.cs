@@ -24,7 +24,7 @@ public static class RootCommand
     /// <returns>The root command instance.</returns>
     public static IRootCommand<None, TResult> Create<TResult>(
         string id,
-        Action<ICommandBuilder<None, TResult>> configure,
+        Action<IRootCommandBuilder<None, TResult>> configure,
         CliOptions? options = null)
     {
         return Create<None, TResult>(id, configure, options);
@@ -43,16 +43,16 @@ public static class RootCommand
     /// <returns>The root command instance.</returns>
     public static IRootCommand<TModel, TResult> Create<TModel, TResult>(
         string id,
-        Action<ICommandBuilder<TModel, TResult>> configure,
+        Action<IRootCommandBuilder<TModel, TResult>> configure,
         CliOptions? options = null)
         where TModel : class
     {
         Guard.IsNotNull(id);
         Guard.IsNotNull(configure);
 
-        var builder = new CommandBuilder<TModel, TResult>(id, options ?? new CliOptions());
+        var builder = new RootCommandBuilder<TModel, TResult>(id);
         configure(builder);
         
-        return new RootCommandDefinition<TModel, TResult>(builder);
+        return new RootCommandDefinition<TModel, TResult>(options ?? new CliOptions(), builder);
     }
 }

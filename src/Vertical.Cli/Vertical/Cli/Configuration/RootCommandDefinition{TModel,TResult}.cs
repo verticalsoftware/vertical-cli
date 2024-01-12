@@ -10,7 +10,12 @@ internal sealed class RootCommandDefinition<TModel, TResult> :
     IRootCommand<TModel, TResult>
     where TModel : class
 {
-    internal RootCommandDefinition(ICommandDefinition<TModel, TResult> definition) : base(definition)
+    internal RootCommandDefinition(CliOptions options, ICommandDefinition<TModel, TResult> definition) 
+        : base(definition)
     {
+        Options = options;
     }
+
+    /// <inheritdoc />
+    public CliOptions Options { get; }
 }

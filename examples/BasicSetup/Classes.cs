@@ -23,3 +23,22 @@ public record Parameters(
     public string? Source { get; set; }
     public TimeSpan? Timeout { get; set; }
 }
+
+public class ParametersBinder : ModelBinder<Parameters>
+{
+    /// <inheritdoc />
+    public override Parameters BindInstance(IBindingContext bindingContext)
+    {
+        return new Parameters(
+            bindingContext.GetValue<FileInfo>("root"),
+            bindingContext.GetValue<bool>("--no-compile"),
+            bindingContext.GetValue<bool>("--no-symbols"))
+        {
+            ApiKey = bindingContext.GetValue<string>("ApiKey"),
+            Source = bindingContext.GetValue<string>("Source"),
+            Timeout = bindingContext.GetValue<TimeSpan?>("Timeout")
+        };
+    }
+}
+
+public readonly record struct Point(int X, int y);

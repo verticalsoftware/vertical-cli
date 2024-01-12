@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Diagnostics;
 using Vertical.Cli.Binding;
-using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
 using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;
 
-internal sealed class CommandBuilder<TModel, TResult> : 
+internal class CommandBuilder<TModel, TResult> : 
     ICommandBuilder<TModel, TResult>,
     ICommandDefinition<TModel, TResult> 
     where TModel : class
@@ -16,20 +15,18 @@ internal sealed class CommandBuilder<TModel, TResult> :
     private readonly List<SymbolDefinition> _symbols = new(16);
     private readonly List<(string Id, Func<ICommandDefinition<TResult>> Provider)> _commandFactories = new();
 
-    internal CommandBuilder(string id, CliOptions options) : this(new PositionReference(), id, parent: null, options)
+    protected CommandBuilder(string id) : this(new PositionReference(), id, parent: null)
     {
     }
 
-    internal CommandBuilder(
+    private CommandBuilder(
         PositionReference positionReference, 
         string id, 
-        ICommandDefinition? parent,
-        CliOptions options)
+        ICommandDefinition? parent)
     {
         _positionReference = positionReference;
         Id = id;
         Parent = parent;
-        Options = options;
     }
 
     /// <inheritdoc />
@@ -91,9 +88,6 @@ internal sealed class CommandBuilder<TModel, TResult> :
     }
 
     /// <inheritdoc />
-    public CliOptions Options { get; }
-
-    /// <inheritdoc />
     public ICommandBuilder<TModel, TResult> ConfigureSubCommand(
         string id,
         Action<ICommandBuilder<TModel, TResult>> configure)
@@ -112,7 +106,7 @@ internal sealed class CommandBuilder<TModel, TResult> :
 
         var factory = new Func<ICommandDefinition<TResult>>(() =>
         {
-            var builder = new CommandBuilder<TChildModel, TResult>(_positionReference, id, this, Options);
+            var builder = new CommandBuilder<TChildModel, TResult>(_positionReference, id, this);
             configure(builder);
             return builder.Build();
         });
@@ -143,7 +137,7 @@ internal sealed class CommandBuilder<TModel, TResult> :
         string[]? aliases = null,
         Arity? arity = null,
         string? description = null,
-        SymbolScope scope = SymbolScope.Self,
+        SymbolScope scope = SymbolScope.Parent,
         Func<T>? defaultProvider = null,
         Validator<T>? validator = null)
     {
@@ -160,30 +154,11 @@ internal sealed class CommandBuilder<TModel, TResult> :
     }
 
     /// <inheritdoc />
-    public ICommandBuilder<TModel, TResult> AddHelpOption(
-        string? id = null,
-        string[]? aliases = null,
-        SymbolScope scope = SymbolScope.Self,
-        IHelpFormatter? helpRenderer = null,
-        TResult returnValue = default!)
-    {
-        _symbols.Add(new HelpSymbolDefinition<TResult>(
-            this,
-            _positionReference.Next(),
-            id ?? "--help",
-            aliases ?? Array.Empty<string>(),
-            scope,
-            returnValue));
-
-        return this;
-    }
-
-    /// <inheritdoc />
-    public ICommandBuilder<TModel, TResult> AddSwitch(
+    public ICommandBuilder<TModel, TResult> Family(
         string id,
         string[]? aliases = null,
         string? description = null,
-        SymbolScope scope = SymbolScope.Self,
+        SymbolScope scope = SymbolScope.Parent,
         Func<bool>? defaultProvider = null)
     {
         return AddSymbol(
@@ -202,7 +177,7 @@ internal sealed class CommandBuilder<TModel, TResult> :
         string id,
         Arity? arity = null,
         string? description = null,
-        SymbolScope scope = SymbolScope.Self,
+        SymbolScope scope = SymbolScope.Parent,
         Func<T>? defaultProvider = null,
         Validator<T>? validator = null)
     {
@@ -227,6 +202,21 @@ internal sealed class CommandBuilder<TModel, TResult> :
         return this;
     }
 
+    /// <summary>
+    /// Adds a symbol.
+    /// </summary>
+    /// <param name="symbol">The symbol definition.</param>
+    protected void AddSymbol(SymbolDefinition symbol)
+    {
+        _symbols.Add(symbol);
+    }
+
+    /// <summary>
+    /// Gets the position reference.
+    /// </summary>
+    /// <returns></returns>
+    protected int GetInsertPosition() => _positionReference.Next();
+
     private ICommandBuilder<TModel, TResult> AddSymbol<T>(
         SymbolType type,
         Func<IBinder> binderFactory,
@@ -234,7 +224,7 @@ internal sealed class CommandBuilder<TModel, TResult> :
         string[]? aliases,
         Arity arity,
         string? description = null,
-        SymbolScope scope = SymbolScope.Self,
+        SymbolScope scope = SymbolScope.Parent,
         Func<T>? defaultProvider = null,
         Validator<T>? validator = null)
     {

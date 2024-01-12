@@ -4,7 +4,7 @@ internal sealed class Reusable<T> where T : class
 {
     private readonly Func<T> _factory;
     private readonly Action<T> _recycle;
-    private object? _value = default;
+    private object? _value;
 
     internal Reusable(Func<T> factory, Action<T> recycle)
     {

@@ -3,13 +3,15 @@ using Vertical.Cli.Conversion;
 using Vertical.Cli.Parsing;
 using Vertical.Cli.Validation;
 
-namespace Vertical.Cli.Invocation;
+namespace Vertical.Cli.Binding;
 
-/// <summary>
-/// Provides binding data for a command path.
-/// </summary>
-public interface IBindingCreateContext
+public interface IBindingContext
 {
+    /// <summary>
+    /// Gets the command subject.
+    /// </summary>
+    ICommandDefinition Subject { get; }
+    
     /// <summary>
     /// Gets the raw arguments.
     /// </summary>
@@ -64,4 +66,39 @@ public interface IBindingCreateContext
     /// Gets the help option symbol, or <c>null</c>.
     /// </summary>
     SymbolDefinition? HelpOptionSymbol { get; }
+    
+    /// <summary>
+    /// Gets the bindings available in the context.
+    /// </summary>
+    IReadOnlyDictionary<string, ArgumentBinding> BindingDictionary { get; }
+    
+    /// <summary>
+    /// Gets a binding that matches the given id.
+    /// </summary>
+    /// <param name="bindingId">Binding id to match.</param>
+    /// <typeparam name="T">Expected value type.</typeparam>
+    /// <returns><see cref="ArgumentBinding{T}"/></returns>
+    /// <exception cref="InvalidOperationException">The binding is not found.</exception>
+    ArgumentBinding<T> GetBinding<T>(string bindingId);
+
+    /// <summary>
+    /// Gets the single binding value.
+    /// </summary>
+    /// <param name="bindingId">Binding id to match.</param>
+    /// <typeparam name="T">Expected value type.</typeparam>
+    /// <returns>The single value.</returns>
+    T GetValue<T>(string bindingId);
+
+    /// <summary>
+    /// Gets multiple binding values.
+    /// </summary>
+    /// <param name="bindingId">Binding id to match.</param>
+    /// <typeparam name="T">Expected value type.</typeparam>
+    /// <returns>The binding values.</returns>
+    IEnumerable<T> GetValues<T>(string bindingId);
+    
+    /// <summary>
+    /// Gets a collection of the original semantic arguments not consumed by parsing.
+    /// </summary>
+    SemanticArgumentCollection OriginalSemanticArguments { get; }
 }

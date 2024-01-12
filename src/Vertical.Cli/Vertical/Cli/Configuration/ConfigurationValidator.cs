@@ -1,7 +1,9 @@
-﻿using CommunityToolkit.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Reflection;
+using CommunityToolkit.Diagnostics;
+using Vertical.Cli.Binding;
 using Vertical.Cli.Configuration.Metadata;
-using Vertical.Cli.Conversion;
-using Vertical.Cli.Invocation;
+using Vertical.Cli.Conversion; 
 using Vertical.Cli.Parsing;
 using Vertical.Cli.Utilities;
 
@@ -16,6 +18,8 @@ public static class ConfigurationValidator
     
     private sealed class StateHelper
     {
+        internal StateHelper(CliOptions options) => Options = options;
+        public CliOptions Options { get; set; }
         internal ErrorMessageCollection Errors { get; } = new();
         internal HashSet<ICommandDefinition> VisitedCommands { get; } = new();
         internal Dictionary<Type, BindingModel> ModelMetadata { get; } = new();
@@ -28,17 +32,18 @@ public static class ConfigurationValidator
     /// <typeparam name="TModel">The type of model used by the root handler implementation.</typeparam>
     /// <typeparam name="TResult">The type of result produced by the command handler.</typeparam>
     /// <returns>A collection of error messages, or empty if the configuration is valid.</returns>
-    public static IReadOnlyCollection<string> ValidateConfiguration<TModel, TResult>(
+    public static IReadOnlyCollection<string> GetErrors<TModel, TResult>(
         this IRootCommand<TModel, TResult> rootCommand)
         where TModel : class
     {
         Guard.IsNotNull(rootCommand);
 
-        var state = new StateHelper();
+        var state = new StateHelper(rootCommand.Options);
+        var path = ImmutableList.Create((ICommandDefinition<TResult>)rootCommand);
         
         ValidateOptions(rootCommand.Options, state);
         
-        return Visit(new CommandPathContext<TResult>(rootCommand), state)
+        return Visit(path, state)
             .Errors
             .ToArray();
     }
@@ -53,7 +58,7 @@ public static class ConfigurationValidator
     public static void ThrowIfInvalid<TModel, TResult>(this IRootCommand<TModel, TResult> rootCommand)
         where TModel : class
     {
-        var errors = rootCommand.ValidateConfiguration();
+        var errors = rootCommand.GetErrors();
 
         switch (errors.Count)
         {
@@ -93,47 +98,52 @@ public static class ConfigurationValidator
         });
     }
 
-    private static StateHelper Visit<TResult>(CommandPathContext<TResult> pathContext, StateHelper state)
+    private static StateHelper Visit<TResult>(ImmutableList<ICommandDefinition<TResult>> path, StateHelper state)
     {
-        if (state.VisitedCommands.Add(pathContext.Subject))
+        var subject = path.Last();
+        
+        if (state.VisitedCommands.Add(subject))
         {
-            ValidateCommandSubject(pathContext, state);
+            ValidateCommandSubject(subject, state);
         }
 
-        ValidatePath(pathContext, state);
+        ValidatePath(subject, state);
 
-        foreach (var subPath in pathContext.SubPaths)
+        foreach (var id in subject.SubCommandIdentities)
         {
-            Visit(subPath, state);
+            _ = subject.TryCreateChild(id, out var child);
+            Visit(path.Add(child!), state);
         }
 
         return state;
     }
 
-    private static void ValidateCommandSubject<TResult>(CommandPathContext<TResult> pathContext, StateHelper state)
+    private static void ValidateCommandSubject(
+        ICommandDefinition subject,
+        StateHelper state)
     {
-        ValidateSubjectSymbolIdentities(pathContext.Subject, state);
-        ValidateSubjectCommandChildIdentitySyntax(pathContext.Subject, state);
-        ValidateSubjectCommandChildIdentitySet(pathContext.Subject, state);
-        ValidateHandler(pathContext.Subject, state);
+        ValidateSubjectSymbolIdentities(subject, state);
+        ValidateSubjectCommandChildIdentitySyntax(subject, state);
+        ValidateSubjectCommandChildIdentitySet(subject, state);
+        ValidateHandler(subject, state);
     }
 
-    private static void ValidatePath<TResult>(CommandPathContext<TResult> pathContext, StateHelper state)
+    private static void ValidatePath(ICommandDefinition subject, StateHelper state)
     {
-        ValidatePathSymbols(pathContext, state);
-        ValidatePathArgumentArity(pathContext, state);
-        ValidatePathConverters(pathContext, state);
-        ValidateBindingModel(pathContext, state);
-        ValidateHelpSymbols(pathContext, state);
+        ValidatePathSymbols(subject, state);
+        ValidatePathArgumentArity(subject, state);
+        ValidatePathConverters(subject, state);
+        ValidateBindingModel(subject, state);
+        ValidateHelpSymbols(subject, state);
     }
 
-    private static void ValidatePathArgumentArity<TResult>(CommandPathContext<TResult> pathContext, StateHelper state)
+    private static void ValidatePathArgumentArity(ICommandDefinition subject, StateHelper state)
     {
         // 1. There can only be one argument with a multi-valued arity
         // 2. If there is such an argument, it has to be the last definition in the set of argument definitions. 
-        
-        var argumentSymbols = pathContext
-            .Symbols
+
+        var argumentSymbols = subject
+            .GetAllSymbols()
             .Where(symbol => symbol.Type == SymbolType.Argument)
             .OrderBy(symbol => symbol.Position)
             .ToArray();
@@ -149,7 +159,7 @@ public static class ConfigurationValidator
         {
             state.Errors.Add(message =>
             {
-                message.AppendLine($"Command path {pathContext.Subject.GetPathString()} has more than one multi-valued " +
+                message.AppendLine($"Command path {subject.GetPathString()} has more than one multi-valued " +
                                    "argument symbol defined:");
                 foreach (var symbol in multiArityArgumentSymbols)
                 {
@@ -166,7 +176,7 @@ public static class ConfigurationValidator
         
         state.Errors.Add(message =>
         {
-            message.AppendLine($"The multi-arity argument symbol in {pathContext.Subject.GetPathString()} must be defined " +
+            message.AppendLine($"The multi-arity argument symbol in {subject.GetPathString()} must be defined " +
                                "last among the arguments:");
 
             foreach (var symbol in argumentSymbols.SkipWhile(item => !ReferenceEquals(item, multiAritySymbol)))
@@ -179,9 +189,8 @@ public static class ConfigurationValidator
         });
     }
 
-    private static void ValidateBindingModel<TResult>(CommandPathContext<TResult> pathContext, StateHelper state)
+    private static void ValidateBindingModel(ICommandDefinition subject, StateHelper state)
     {
-        var subject = pathContext.Subject;
         var modelType = subject.ModelType;
 
         if (modelType == typeof(None))
@@ -192,13 +201,39 @@ public static class ConfigurationValidator
             modelMetadata = new BindingModel(modelType);
             state.ModelMetadata.Add(modelType, modelMetadata);
             ValidateBindingModelConstructors(modelMetadata, state);
+            ValidateBindingModelAttributes(modelMetadata, state);
         }
-
-        ValidateBindingModelParameters(pathContext, modelMetadata, state);
+        
+        ValidateBindingModelParameters(subject, modelMetadata, state);
     }
 
-    private static void ValidateBindingModelParameters<TResult>(
-        CommandPathContext<TResult> pathContext,
+    private static void ValidateBindingModelAttributes(BindingModel modelMetadata, StateHelper state)
+    {
+        var binderAttribute = modelMetadata
+            .Type
+            .GetCustomAttributes()
+            .FirstOrDefault(attribute =>
+            {
+                var type = attribute.GetType();
+                return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ModelBinderAttribute<>);
+            });
+
+        if (binderAttribute == null)
+            return;
+
+        var binderType = binderAttribute.GetType().GetGenericArguments()[0];
+        if (state.Options.ModelBinders.Any(binder => binderType == binder.GetType()))
+            return;
+        
+        state.Errors.Add(message =>
+        {
+            message.AppendLine($"Class {modelMetadata.Type} is marked for custom binding, but there is not registered " +
+                               "binder in CliOptions.");
+        });
+    }
+
+    private static void ValidateBindingModelParameters(
+        ICommandDefinition subject,
         BindingModel model,
         StateHelper state)
     {
@@ -212,7 +247,7 @@ public static class ConfigurationValidator
         var errors = new List<string>();
         var matchedParameters = new HashSet<BindingParameter>();
         
-        foreach (var symbol in pathContext.Symbols)
+        foreach (var symbol in subject.GetAllSymbols())
         {
             if (symbol.Type == SymbolType.HelpOption)
                 continue;
@@ -232,7 +267,7 @@ public static class ConfigurationValidator
             {
                 matchedParameters.Add(parameter);
 
-                var collectionType = parameter.Type.GetGenericCollectionType();
+                var collectionType = GetGenericCollectionType(parameter.Type);
                 var isCollectionTypeParameter = collectionType != null;
 
                 if (hasMultiValuedArity)
@@ -271,7 +306,7 @@ public static class ConfigurationValidator
         state.Errors.Add(message =>
         {
             message.AppendLine($"Parameter model type {model.Type.FullName} cannot be bound " + 
-                               $"in path \"{pathContext.Subject.GetPathString()}\" for the following reason(s):");
+                               $"in path \"{subject.GetPathString()}\" for the following reason(s):");
             message.AppendLines(errors);
         });
     }
@@ -297,16 +332,16 @@ public static class ConfigurationValidator
         }
     }
 
-    private static void ValidatePathConverters<TResult>(CommandPathContext<TResult> pathContext, StateHelper state)
+    private static void ValidatePathConverters(ICommandDefinition subject, StateHelper state)
     {
         // Verify there are converters available for every type of symbol definition.
-        
-        var requiredConverterGroups = pathContext
-            .Symbols
+        var requiredConverterGroups = subject
+            .GetAllSymbols()
             .Select(symbol => (symbol, converterType: symbol.ValueType))
             .GroupBy(item => item.converterType, item => item.symbol);
 
-        var availableConvertersTypes = pathContext
+        var availableConvertersTypes = state
+            .Options
             .Converters
             .Select(converter => converter.ValueType)
             .ToArray();
@@ -320,7 +355,7 @@ public static class ConfigurationValidator
         
         state.Errors.Add(message =>
         {
-            message.AppendLine($"One or more symbols aren't bindable in path {pathContext} because their value types " +
+            message.AppendLine($"One or more symbols aren't bindable in path {subject.GetPathString()} because their value types " +
                                "aren't supported by a ValueConverter:");
 
             foreach (var group in missingConverterGroups)
@@ -334,16 +369,16 @@ public static class ConfigurationValidator
         });
     }
 
-    private static void ValidateHandler(ICommandDefinition command, StateHelper state)
+    private static void ValidateHandler(ICommandDefinition subject, StateHelper state)
     {
         // A command requires a handler if it has scoped symbol definitions in the path
         
-        if (command.HasHandler)
+        if (subject.HasHandler)
             return;
         
-        var hasSymbols = command.Symbols.Any(symbol => symbol is
+        var hasSymbols = subject.Symbols.Any(symbol => symbol is
         {
-            Scope: SymbolScope.Self or SymbolScope.SelfAndDescendents,
+            Scope: SymbolScope.Parent or SymbolScope.ParentAndDescendents,
             Type: not SymbolType.HelpOption
         });
 
@@ -352,16 +387,16 @@ public static class ConfigurationValidator
         
         state.Errors.Add(message =>
         {
-            message.AppendLine($"Command {command.GetPathString()} must implement a handler because it has " +
+            message.AppendLine($"Command {subject.GetPathString()} must implement a handler because it has " +
                                "symbols in scope.");
         });
     }
 
-    private static void ValidatePathSymbols<TResult>(CommandPathContext<TResult> pathContext, StateHelper state)
+    private static void ValidatePathSymbols(ICommandDefinition subject, StateHelper state)
     {
         // Verify all identities of all symbols are unique in a path
-        
-        var symbols = pathContext.Symbols;
+
+        var symbols = subject.GetAllSymbols();
         var identityGroups = symbols
             .SelectMany(symbol => symbol.Identities.Select(identity => (symbol, identity)))
             .GroupBy(item => item.identity, item => item.symbol)
@@ -385,10 +420,10 @@ public static class ConfigurationValidator
         });
     }
 
-    private static void ValidateHelpSymbols<TResult>(CommandPathContext<TResult> pathContext, StateHelper state)
+    private static void ValidateHelpSymbols(ICommandDefinition subject, StateHelper state)
     {
-        var helpSymbols = pathContext
-            .Symbols
+        var helpSymbols = subject
+            .GetAllSymbols()
             .Where(symbol => symbol.Type == SymbolType.HelpOption)
             .ToArray();
 
@@ -405,8 +440,8 @@ public static class ConfigurationValidator
         });
     }
 
-    private static void ValidateSubjectCommandChildIdentitySyntax<TResult>(
-        ICommandDefinition<TResult> command, 
+    private static void ValidateSubjectCommandChildIdentitySyntax(
+        ICommandDefinition command, 
         StateHelper state)
     {
         // Commands must have simple identity names 
@@ -429,8 +464,8 @@ public static class ConfigurationValidator
         });
     }
 
-    private static void ValidateSubjectCommandChildIdentitySet<TResult>(
-        ICommandDefinition<TResult> command,
+    private static void ValidateSubjectCommandChildIdentitySet(
+        ICommandDefinition command,
         StateHelper state)
     {
         // All sub-commands must have a unique identity to peers
@@ -452,8 +487,8 @@ public static class ConfigurationValidator
         });
     }
 
-    private static void ValidateSubjectSymbolIdentities<TResult>(
-        ICommandDefinition<TResult> command, 
+    private static void ValidateSubjectSymbolIdentities(
+        ICommandDefinition command, 
         StateHelper state)
     {
         // 1. Argument identities must have simple syntax
@@ -494,5 +529,28 @@ public static class ConfigurationValidator
             .Where(symbol => typePredicate(symbol.Type))
             .SelectMany(symbol => symbol.Identities.Select(identity => (symbol, identity)))
             .Where(item => !syntaxPredicate(SymbolSyntax.Parse(item.identity)));
+    }
+    
+    private static Type? GetGenericCollectionType(Type type)
+    {
+        if (type.IsArray)
+        {
+            return type.GetElementType();
+        }
+
+        if (!type.IsGenericType)
+            return null;
+
+        var genericArguments = type.GetGenericArguments();
+        
+        // Could be Dictionary, KeyValuePair, etc..
+        if (genericArguments.Length != 1)
+            return null;
+
+        var genericDefinition = type.GetGenericTypeDefinition();
+        
+        return !SupportedCollectionTypes.Contains(genericDefinition) 
+            ? null 
+            : genericArguments[0];
     }
 }

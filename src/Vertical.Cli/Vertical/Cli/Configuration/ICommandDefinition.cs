@@ -50,9 +50,4 @@ public interface ICommandDefinition
     /// </summary>
     /// <returns>Enumeration of <see cref="ICommandDefinition"/></returns>
     IEnumerable<ICommandDefinition> GetChildDefinitions();
-    
-    /// <summary>
-    /// Gets options that control command line processing.
-    /// </summary>
-    CliOptions Options { get; }
 }

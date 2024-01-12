@@ -7,22 +7,21 @@ internal sealed class TextBuilder
     private readonly List<string> _rows = new();
     private readonly StringBuilder _buffer = new();
 
-    internal TextBuilder Clear()
+    internal void Clear()
     {
         _rows.Clear();
         _buffer.Clear();
-        return this;
     }
 
     internal void Append(string str) => _buffer.Append(str);
-
-    internal void AppendLine() => FlushRow();
 
     internal void AppendLine(string str)
     {
         Append(str);
         FlushRow();
     }
+
+    internal void AppendLine() => FlushRow();
 
     internal void AppendLines(IEnumerable<string> lines)
     {

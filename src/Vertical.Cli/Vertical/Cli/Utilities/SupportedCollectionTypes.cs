@@ -2,7 +2,7 @@
 
 internal static class SupportedCollectionTypes
 {
-    private static HashSet<Type> Types = new HashSet<Type>
+    private static readonly HashSet<Type> Entries = new()
     {
         typeof(List<>),
         typeof(IList<>),
@@ -21,5 +21,5 @@ internal static class SupportedCollectionTypes
 #endif
     };
 
-    internal static bool Contains(Type type) => Types.Contains(type);
+    internal static bool Contains(Type type) => Entries.Contains(type);
 }

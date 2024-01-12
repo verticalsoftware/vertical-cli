@@ -16,9 +16,11 @@ public class GenerationModel
         IsAsyncFlow = ResultType.IsTaskType();
         RootCommandInterfaceName = $"global::Vertical.Cli.IRootCommand<{RootCommandModel.ModelTypeName}, {RootCommandModel.ResultTypeName}>";
         BindingContextTypeName = $"global::Vertical.Cli.Binding.IBindingContext<{ResultTypeName}>";
+        CallSiteContextTypeName = $"global::Vertical.Cli.Invocation.ICallSiteContext<{ResultTypeName}>";
     }
 
     public string BindingContextTypeName { get; set; }
+    public string CallSiteContextTypeName { get; set; }
 
     public string RootCommandInterfaceName { get; set; }
 
@@ -29,6 +31,10 @@ public class GenerationModel
     public CommandModel RootCommandModel { get; }
     
     public ITypeSymbol ResultType { get; }
+
+    public string ReturnsKeyword => ResultType.ToDisplayString() == "System.Threading.Tasks.Task"
+        ? string.Empty
+        : "return ";
 
     public string AsyncKeyword => IsAsyncFlow ? "async " : string.Empty;
 
@@ -45,8 +51,10 @@ public class GenerationModel
                 return $"global::Vertical.Cli.Binding.Default<{ResultTypeName}>.Value";
             }
 
-            var valueType = ((INamedTypeSymbol)ResultType).TypeArguments.First();
-            return $"global::Vertical.Cli.Binding.AsyncDefault<{valueType.ToFullName()}>.Value";
+            var valueType = ((INamedTypeSymbol)ResultType).TypeArguments.FirstOrDefault();
+            return valueType != null
+                ? $"global::Vertical.Cli.Binding.AsyncDefault<{valueType.ToFullName()}>.Value"
+                : "global::System.Threading.Tasks.Task.CompletedTask";
         }
     }
 

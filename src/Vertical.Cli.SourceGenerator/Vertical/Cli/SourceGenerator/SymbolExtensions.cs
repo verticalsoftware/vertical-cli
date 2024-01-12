@@ -42,9 +42,16 @@ public static class SymbolExtensions
             return false;
 
         var actionArgumentType = actionType.TypeArguments[0];
-        
-        if (actionArgumentType.GetGenericTypeName() != "Vertical.Cli.Configuration.ICommandBuilder")
+
+        var actionArgumentTypeName = actionArgumentType.GetGenericTypeName();
+
+        if (actionArgumentTypeName is not (
+            "Vertical.Cli.Configuration.ICommandBuilder"
+            or 
+            "Vertical.Cli.Configuration.IRootCommandBuilder"))
+        {
             return false;
+        }
 
         var builderType = (INamedTypeSymbol)actionArgumentType;
 
@@ -61,6 +68,14 @@ public static class SymbolExtensions
     {
         return symbol.ContainingNamespace.ToDisplayString() == "System.Collections.Generic" &&
                SupportedCollectionTypes.Contains(symbol.Name);
+    }
+
+    public static bool IsApplicationBound(this ITypeSymbol symbol)
+    {
+        return symbol
+            .GetAttributes()
+            .Select(attribute => attribute.AttributeClass)
+            .Any(attribute => attribute!.GetGenericTypeName() == "Vertical.Cli.Binding.ModelBinderAttribute");
     }
     
     public static string CreateVariableName(this ITypeSymbol symbol)

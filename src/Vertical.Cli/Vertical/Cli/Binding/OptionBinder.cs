@@ -14,16 +14,16 @@ internal sealed class OptionBinder<T> : IBinder
     internal static OptionBinder<T> Instance { get; } = new();
 
     /// <inheritdoc />
-    public ArgumentBinding CreateBinding(IBindingCreateContext bindingCreateContext, SymbolDefinition symbol)
+    public ArgumentBinding CreateBinding(IBindingContext bindingContext, SymbolDefinition symbol)
     {
-        var arguments = bindingCreateContext
+        var arguments = bindingContext
             .SemanticArguments
             .GetOptionArguments(symbol);
 
         var typedSymbol = (SymbolDefinition<T>)symbol;
 
         var values = arguments
-            .Select(argument => GetValue(bindingCreateContext, typedSymbol, argument))
+            .Select(argument => GetValue(bindingContext, typedSymbol, argument))
             .ToArray();
 
         if (values.Length == 0 && typedSymbol.DefaultProvider != null)
@@ -37,7 +37,7 @@ internal sealed class OptionBinder<T> : IBinder
     }
     
     private static T GetValue(
-        IBindingCreateContext bindingCreateContext,
+        IBindingContext bindingContext,
         SymbolDefinition<T> symbol,
         SemanticArgument argument)
     {
@@ -47,17 +47,17 @@ internal sealed class OptionBinder<T> : IBinder
             {
                 case { ArgumentSyntax.HasOperand: true }:
 
-                    return bindingCreateContext.GetBindingValue(
+                    return bindingContext.GetBindingValue(
                         symbol, 
                         argument.ArgumentSyntax.OperandValue);
                 
-                case { CandidateOperandSyntax: not null } when !bindingCreateContext
+                case { CandidateOperandSyntax: not null } when !bindingContext
                     .SymbolIdentities
                     .Contains(argument.CandidateOperandSyntax.Text):
                     
                     argument.AcceptOperand();
 
-                    return bindingCreateContext.GetBindingValue(
+                    return bindingContext.GetBindingValue(
                         symbol, 
                         argument.CandidateOperandSyntax.Text);
                 

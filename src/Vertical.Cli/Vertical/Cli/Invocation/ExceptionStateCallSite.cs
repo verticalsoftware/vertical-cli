@@ -1,14 +1,20 @@
-﻿namespace Vertical.Cli.Invocation;
+﻿using Vertical.Cli.Configuration;
+
+namespace Vertical.Cli.Invocation;
 
 internal static class ExceptionStateCallSite
 {
-    internal static CallSite<TResult> Create<TResult>(
+    internal static ICallSite<TResult> Create<TResult>(
         Exception exception,
         CliOptions options,
         TResult value)
     {
-        return CallSite.Create((None _, CancellationToken _) => HandleExceptionSite(exception, options, value),
-            isHelpSite: false);
+        var proxyCommand = new EmptyCommandDefinition<TResult>(options);
+
+        return CallSite<TResult>.Create(
+            proxyCommand,
+            (_, _) => HandleExceptionSite(exception, options, value),
+            CallState.Faulted);
     }
 
     private static TResult HandleExceptionSite<TResult>(Exception exception, CliOptions options, TResult value)

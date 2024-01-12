@@ -9,35 +9,41 @@ namespace Vertical.Cli.Help;
 internal static class HelpCallSite
 {
     internal static bool TryCreate<TResult>(
-        BindingCreateContext<TResult> createContext,
-        ICollection<ArgumentBinding> argumentBindings,
+        BindingContextBuilder bindingContext,
+        CliOptions options,
         TResult defaultValue,
         [NotNullWhen(true)] out ICallSite<TResult>? callSite)
     {
         callSite = null;
 
-        if (createContext.HelpOptionSymbol == null)
+        if (bindingContext.HelpOptionSymbol == null)
             return false;
 
-        var helpSymbol = (HelpSymbolDefinition<TResult>)createContext.HelpOptionSymbol;
-        var binding = (ArgumentBinding<bool>)helpSymbol.CreateBinding(createContext);
+        var helpSymbol = (HelpSymbolDefinition<TResult>)bindingContext.HelpOptionSymbol;
+        var binding = (ArgumentBinding<bool>)helpSymbol.CreateBinding(bindingContext);
 
         if (!binding.Values.Any(set => set))
             return false;
 
-        argumentBindings.Add(binding);
+        bindingContext.AddBinding(binding);
 
-        var callSiteDelegate = (None _, CancellationToken _) =>
-        {
-            var options = createContext.Subject.Options;
-            var renderer = options.CreateHelpEngine();
-            renderer.WriteContent(createContext.Subject);
-
-            return helpSymbol.ReturnValue ?? defaultValue;
-        };
-
-        callSite = CallSite.Create(callSiteDelegate, isHelpSite: true);
+        callSite =CallSite<TResult>.Create(
+            new EmptyCommandDefinition<TResult>(options),
+            (_, _) => InvokeHelp(options, helpSymbol, bindingContext, defaultValue),
+            CallState.Help);
 
         return true;
+    }
+
+    private static TResult InvokeHelp<TResult>(
+        CliOptions options,
+        HelpSymbolDefinition<TResult> helpSymbol,
+        IBindingContext bindingContext,
+        TResult defaultValue)
+    {
+        var formatter = options.CreateHelpFormatter();
+        formatter.WriteContent(bindingContext.Subject);
+
+        return helpSymbol.ReturnValue ?? defaultValue;
     }
 }

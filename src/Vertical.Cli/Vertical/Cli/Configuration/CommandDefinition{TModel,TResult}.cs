@@ -13,8 +13,8 @@ internal class CommandDefinition<TModel, TResult> : ICommandDefinition<TModel, T
     where TModel : class
 {
     internal CommandDefinition(ICommandDefinition<TModel, TResult> definition) => Definition = definition;
-    
-    internal ICommandDefinition<TModel, TResult> Definition { get; }
+
+    private ICommandDefinition<TModel, TResult> Definition { get; }
 
     /// <inheritdoc />
     public string Id => Definition.Id;
@@ -47,7 +47,8 @@ internal class CommandDefinition<TModel, TResult> : ICommandDefinition<TModel, T
     /// <inheritdoc />
     public ICallSite<TResult> CreateCallSite()
     {
-        return CallSite.Create(Handler!, isHelpSite: false);
+        var handler = Handler ?? throw new InvalidOperationException();
+        return CallSite<TResult>.Create(this, handler, CallState.Command);
     }
     
     /// <inheritdoc />
@@ -55,9 +56,6 @@ internal class CommandDefinition<TModel, TResult> : ICommandDefinition<TModel, T
 
     /// <inheritdoc />
     public IEnumerable<ICommandDefinition> GetChildDefinitions() => Definition.GetChildDefinitions();
-
-    /// <inheritdoc />
-    public CliOptions Options => Definition.Options;
 
     /// <inheritdoc />
     public Func<TModel, CancellationToken, TResult>? Handler => Definition.Handler;

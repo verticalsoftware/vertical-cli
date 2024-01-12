@@ -1,5 +1,4 @@
 ﻿using Vertical.Cli.Binding;
-using Vertical.Cli.Invocation;
 
 namespace Vertical.Cli.Configuration;
 
@@ -45,12 +44,12 @@ public abstract class SymbolDefinition
     /// <summary>
     /// Creates an argument binding.
     /// </summary>
-    /// <param name="bindingCreateContext">The binding create context.</param>
+    /// <param name="bindingContext">The binding create context.</param>
     /// <returns><see cref="ArgumentBinding"/></returns>
-    public ArgumentBinding CreateBinding(IBindingCreateContext bindingCreateContext)
+    public ArgumentBinding CreateBinding(IBindingContext bindingContext)
     {
         var binder = BindingProvider();
-        return binder.CreateBinding(bindingCreateContext, this);
+        return binder.CreateBinding(bindingContext, this);
     }
 
     /// <summary>

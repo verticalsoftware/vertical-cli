@@ -61,6 +61,23 @@ public static class CliOptionsExtensions
         return options;
     }
 #endif
+    
+    /// <summary>
+    /// Adds a validator built using the configuration delegate.
+    /// </summary>
+    /// <param name="options">Options instance.</param>
+    /// <param name="validator">The validator instance.</param>
+    /// <typeparam name="T">Value type.</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public static CliOptions AddValidator<T>(
+        this CliOptions options,
+        Validator<T> validator)
+    {
+        Guard.IsNotNull(options);
+
+        options.Validators.Add(validator);
+        return options;
+    }
 
     /// <summary>
     /// Adds a validator built using the configuration delegate.

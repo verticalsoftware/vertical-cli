@@ -1,5 +1,4 @@
 ﻿using Vertical.Cli.Configuration;
-using Vertical.Cli.Invocation;
 using Vertical.Cli.Parsing;
 using Vertical.Cli.Utilities;
 
@@ -13,9 +12,9 @@ internal sealed class SwitchBinder : IBinder
     internal static SwitchBinder Instance { get; } = new();
 
     /// <inheritdoc />
-    public ArgumentBinding CreateBinding(IBindingCreateContext bindingCreateContext, SymbolDefinition symbol)
+    public ArgumentBinding CreateBinding(IBindingContext bindingContext, SymbolDefinition symbol)
     {
-        var arguments = bindingCreateContext
+        var arguments = bindingContext
             .SemanticArguments
             .GetOptionArguments(symbol);
 

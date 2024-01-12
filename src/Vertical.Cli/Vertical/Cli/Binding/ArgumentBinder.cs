@@ -13,9 +13,9 @@ internal sealed class ArgumentBinder<T> : IBinder
     internal static ArgumentBinder<T> Instance { get; } = new();
 
     /// <inheritdoc />
-    public ArgumentBinding CreateBinding(IBindingCreateContext bindingCreateContext, SymbolDefinition symbol)
+    public ArgumentBinding CreateBinding(IBindingContext bindingContext, SymbolDefinition symbol)
     {
-        var arguments = bindingCreateContext
+        var arguments = bindingContext
             .SemanticArguments
             .GetValueArguments(symbol);
 
@@ -26,7 +26,7 @@ internal sealed class ArgumentBinder<T> : IBinder
             {
                 argument.Accept();
                 
-                return bindingCreateContext.GetBindingValue(
+                return bindingContext.GetBindingValue(
                     typedSymbol, 
                     argument.ArgumentSyntax.Text);
             })

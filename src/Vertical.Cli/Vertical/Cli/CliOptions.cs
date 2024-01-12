@@ -1,4 +1,5 @@
-﻿using Vertical.Cli.Conversion;
+﻿using Vertical.Cli.Binding;
+using Vertical.Cli.Conversion;
 using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
 
@@ -17,6 +18,11 @@ public sealed class CliOptions
     public ICollection<Validator> Validators { get; } = new List<Validator>();
 
     /// <summary>
+    /// Gets a collection of application defined model binders.
+    /// </summary>
+    public ICollection<ModelBinder> ModelBinders { get; } = new List<ModelBinder>();
+
+    /// <summary>
     /// Gets whether to automatically display argument exceptions.
     /// </summary>
     public bool DisplayExceptions { get; set; } = true;
@@ -31,7 +37,7 @@ public sealed class CliOptions
     /// </summary>
     public Func<IHelpFormatter>? HelpFormatterFactory { get; set; }
 
-    internal IHelpFormatter CreateHelpEngine()
+    internal IHelpFormatter CreateHelpFormatter()
     {
         return HelpFormatterFactory?.Invoke()
                ?? new DefaultHelpFormatter(

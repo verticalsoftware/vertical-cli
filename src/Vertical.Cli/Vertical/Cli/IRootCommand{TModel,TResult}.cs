@@ -10,4 +10,8 @@ namespace Vertical.Cli;
 public interface IRootCommand<in TModel, TResult> : ICommandDefinition<TModel, TResult>
     where TModel : class
 {
+    /// <summary>
+    /// Gets the root options.
+    /// </summary>
+    CliOptions Options { get; }
 }

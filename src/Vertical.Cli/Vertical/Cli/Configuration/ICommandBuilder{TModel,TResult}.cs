@@ -70,25 +70,9 @@ public interface ICommandBuilder<out TModel, TResult> where TModel : class
         string[]? aliases = null,
         Arity? arity = null,
         string? description = null,
-        SymbolScope scope = SymbolScope.Self,
+        SymbolScope scope = SymbolScope.Parent,
         Func<T>? defaultProvider = null,
         Validator<T>? validator = null);
-
-    /// <summary>
-    /// Adds a help option.
-    /// </summary>
-    /// <param name="id">The primary identity for the option.</param>
-    /// <param name="aliases">An optional array of alias identities.</param>
-    /// <param name="scope">The scope of the symbol within the command path.</param>
-    /// <param name="helpRenderer">A service that presents the help content.</param>
-    /// <param name="returnValue">The value to return from the command handler.</param>
-    /// <returns>A reference to this instance.</returns>
-    ICommandBuilder<TModel, TResult> AddHelpOption(
-        string? id = null,
-        string[]? aliases = null,
-        SymbolScope scope = SymbolScope.Self,
-        IHelpFormatter? helpRenderer = null,
-        TResult returnValue = default!);
 
     /// <summary>
     /// Adds an option definition.
@@ -99,11 +83,11 @@ public interface ICommandBuilder<out TModel, TResult> where TModel : class
     /// <param name="scope">The scope of the symbol within the command path.</param>
     /// <param name="defaultProvider">A function that provides a default value.</param>
     /// <returns>A reference to this instance.</returns>
-    ICommandBuilder<TModel, TResult> AddSwitch(
+    ICommandBuilder<TModel, TResult> Family(
         string id,
         string[]? aliases = null,
         string? description = null,
-        SymbolScope scope = SymbolScope.Self,
+        SymbolScope scope = SymbolScope.Parent,
         Func<bool>? defaultProvider = null);
 
     /// <summary>
@@ -121,7 +105,7 @@ public interface ICommandBuilder<out TModel, TResult> where TModel : class
         string id,
         Arity? arity = null,
         string? description = null,
-        SymbolScope scope = SymbolScope.Self,
+        SymbolScope scope = SymbolScope.Parent,
         Func<T>? defaultProvider = null,
         Validator<T>? validator = null);
 

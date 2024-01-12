@@ -1,20 +1,27 @@
-﻿namespace Vertical.Cli.Invocation;
+﻿using Vertical.Cli.Configuration;
+
+namespace Vertical.Cli.Invocation;
 
 /// <summary>
 /// A wrapper around a command, help, or error handler.
 /// </summary>
 /// <typeparam name="TResult">The result type.</typeparam>
-public interface ICallSite<out TResult>
+public interface ICallSite<TResult>
 {
     /// <summary>
-    /// Gets whether the underlying handler invokes help.
+    /// Gets the state of the call site.
     /// </summary>
-    bool IsHelpSite { get; }
+    CallState State { get; }
     
     /// <summary>
     /// Gets the model type.
     /// </summary>
     Type ModelType { get; }
+    
+    /// <summary>
+    /// Gets the call site subject.
+    /// </summary>
+    ICommandDefinition<TResult> Subject { get; }
 
     /// <summary>
     /// Creates a function that passes the given parameter to the
