@@ -23,7 +23,7 @@ jobs:
       - name: Build source generator
         run: dotnet build -c Release --no-restore -o lib src/Vertical.Cli.SourceGenerator/
       - name: Stage source generator assembly
-        run: mkdir -p /src/Vertical.Cli/bin/Release && cp lib/Vertical.Cli.SourceGenerator.dll /src/Vertical.Cli/bin/Release
+        run: mkdir -p src/Vertical.Cli/bin/Release && cp lib/Vertical.Cli.SourceGenerator.dll src/Vertical.Cli/bin/Release
       - name: Build pre-release package
         run: dotnet pack src/Vertical.Cli -c Release --no-restore -p:VersionSuffix=dev.${{ env.DEVLABEL }}.${{ github.run_number }} -o ./pack
       #- name: Publish packages to NuGet
