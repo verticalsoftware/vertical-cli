@@ -1,0 +1,4 @@
+﻿[  
+(1) Invalid symbol identities found in command "root":
+    "*invalid" in switch *invalid
+]

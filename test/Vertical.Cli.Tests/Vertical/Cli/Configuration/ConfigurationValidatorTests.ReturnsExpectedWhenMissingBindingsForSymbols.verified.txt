@@ -1,0 +1,4 @@
+﻿[  
+(1) Parameter model type Vertical.Cli.Configuration.ConfigurationValidatorTests+EmptyModel cannot be bound in path "root" for the following reason(s):
+    Symbol "root -> argument" is not bound to any constructor parameter, property, or field.
+]

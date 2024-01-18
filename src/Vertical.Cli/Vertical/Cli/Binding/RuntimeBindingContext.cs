@@ -5,11 +5,11 @@ using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Binding;
 
-internal sealed class BindingContextBuilder : IBindingContext
+internal sealed class RuntimeBindingContext : IBindingContext
 {
     private readonly Dictionary<string, ArgumentBinding> _bindings = new(BindingIdComparer.Default);
     
-    internal BindingContextBuilder(
+    internal RuntimeBindingContext(
         CliOptions options,
         ICommandDefinition subject,
         IEnumerable<string> rawArguments,
@@ -20,8 +20,7 @@ internal sealed class BindingContextBuilder : IBindingContext
         RawArguments = rawArguments.ToArray();
         SubjectArguments = subjectArguments.ToArray();
         ArgumentSyntax = SubjectArguments.Select(SymbolSyntax.Parse).ToArray();
-        SemanticArguments = new SemanticArgumentCollection(ArgumentSyntax);
-        OriginalSemanticArguments = new SemanticArgumentCollection(ArgumentSyntax);
+        SemanticArguments = new SemanticArgumentCollection(subject.GetAllSymbols(), ArgumentSyntax);
         ConverterDictionary = options.Converters.ToDictionary(converter => converter.ValueType);
         ValidatorDictionary = options.Validators.ToDictionary(validator => validator.ValueType);
 
@@ -98,9 +97,6 @@ internal sealed class BindingContextBuilder : IBindingContext
     {
         return GetBinding<T>(bindingId).Values;
     }
-
-    /// <inheritdoc />
-    public SemanticArgumentCollection OriginalSemanticArguments { get; }
 
     internal void AddBinding(ArgumentBinding binding)
     {

@@ -6,7 +6,23 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace />
-  </PropertyGroup>
+    <Title>vertical-cli</Title>
+    <Description>Command line argument parsing and binding framework.</Description>
+    <Authors>Vertical Software Contributors</Authors>
+    <PackageId>vertical-cli</PackageId>
+    <PackageTags>utilities;commandline</PackageTags>
+    <PackageIcon>package-logo.png</PackageIcon>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <PackageProjectUrl>https://github.com/verticalsoftware/vertical-cli</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/verticalsoftware/vertical-cli</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GenerateAssemblyAttribute>false</GenerateAssemblyAttribute>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolsPackageFormat>snupkg</SymbolsPackageFormat>
+    <SignAssembly>false</SignAssembly>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>  
   
   <ItemGroup>
     <PackageReference Include="communitytoolkit.diagnostics" Version="8.2.2" />
@@ -21,6 +37,18 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Vertical.Cli.Tests</_Parameter1>
     </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\package-logo.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(OutputPath)\Vertical.Cli.SourceGenerator.dll"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs"
+          Visible="false" />
   </ItemGroup>
 
 </Project>

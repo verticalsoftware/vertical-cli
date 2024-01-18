@@ -5,6 +5,9 @@ using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Help;
 
+/// <summary>
+/// Renders help content.
+/// </summary>
 public class DefaultHelpProvider : IHelpProvider
 {
     private static readonly (string First, string Last) RequiredGrammarTokens = ("<", ">");
@@ -111,11 +114,7 @@ public class DefaultHelpProvider : IHelpProvider
             return $"{symbol.Position:0000}";
         }
 
-        return SymbolSyntax
-            .Parse(symbol.Id)
-            .SimpleIdentifiers!
-            .OrderBy(id => id)
-            .First();
+        return SortOptionIdentifiers(symbol).First().sortKey;
     }
 
     /// <inheritdoc />
@@ -124,8 +123,11 @@ public class DefaultHelpProvider : IHelpProvider
         if (symbol.Type == SymbolType.Switch)
             return null;
 
-        return new string(symbol
-            .Id
+        var identities = symbol.Identities;
+        var bestId = identities.FirstOrDefault(id => id.Length > 2);
+        bestId ??= identities.First();
+
+        return new string(bestId
             .Where(char.IsLetter)
             .Select(char.ToUpper)
             .ToArray());
@@ -144,16 +146,14 @@ public class DefaultHelpProvider : IHelpProvider
     
     private void FormatOptionGrammar(SymbolDefinition symbol, StringBuilder sb)
     {
-        var identifierSyntax = symbol
-            .Identities
-            .Select(SymbolSyntax.Parse)
-            .OrderBy(syntax => syntax.SimpleIdentifiers![0]);
+        var sortedIdentifiers = SortOptionIdentifiers(symbol)
+            .Select(item => item.identity);
         
         var pos = 0;
-        foreach (var syntax in identifierSyntax)
+        foreach (var identifier in sortedIdentifiers)
         {
             if (pos++ > 0) sb.Append(", ");
-            sb.Append(syntax.Identifiers[0]);
+            sb.Append(identifier);
         }
 
         var argument = GetSymbolArgumentName(symbol);
@@ -169,5 +169,13 @@ public class DefaultHelpProvider : IHelpProvider
         {
             sb.Append("...");
         }
+    }
+
+    private static IEnumerable<(string identity, string sortKey)> SortOptionIdentifiers(SymbolDefinition symbol)
+    {
+        return symbol
+            .Identities
+            .Select(identity => (identity, sortKey: SymbolSyntax.Parse(identity).SimpleIdentifiers[0]))
+            .OrderBy(item => item.sortKey);
     }
 }

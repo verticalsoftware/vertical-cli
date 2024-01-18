@@ -1,0 +1,478 @@
+﻿namespace Vertical.Cli
+{
+    public readonly struct Arity
+    {
+        public Arity(int minCount, int? maxCount) { }
+        public bool IsMultiValue { get; }
+        public int? MaxCount { get; }
+        public int MinCount { get; }
+        public static Vertical.Cli.Arity One { get; }
+        public static Vertical.Cli.Arity OneOrMany { get; }
+        public static Vertical.Cli.Arity ZeroOrMany { get; }
+        public static Vertical.Cli.Arity ZeroOrOne { get; }
+        public override string ToString() { }
+        public static Vertical.Cli.Arity Exactly(int count) { }
+    }
+    public abstract class CliArgumentException : System.Exception
+    {
+        public System.Collections.Generic.IDictionary<string, object> MessageArguments { get; }
+        public string OriginalFormat { get; set; }
+    }
+    public sealed class CliArityException : Vertical.Cli.CliArgumentException
+    {
+        public int ReceivedCount { get; }
+        public Vertical.Cli.Configuration.SymbolDefinition Symbol { get; }
+    }
+    public sealed class CliInvalidArgumentException : Vertical.Cli.CliArgumentException
+    {
+        public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Parsing.SemanticArgument> InvalidArguments { get; }
+    }
+    public sealed class CliInvalidSwitchValueException : Vertical.Cli.CliArgumentException
+    {
+        public string AttemptedValue { get; }
+        public Vertical.Cli.Configuration.SymbolDefinition Symbol { get; }
+    }
+    public sealed class CliMissingOperandException : Vertical.Cli.CliArgumentException
+    {
+        public Vertical.Cli.Configuration.SymbolDefinition Symbol { get; }
+    }
+    public sealed class CliOptions
+    {
+        public CliOptions() { }
+        public System.Collections.Generic.IReadOnlyCollection<System.Type> BinderTypes { get; }
+        public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Conversion.ValueConverter> Converters { get; }
+        public bool DisplayExceptions { get; set; }
+        public System.Func<Vertical.Cli.Help.IHelpFormatter>? HelpFormatterFactory { get; set; }
+        public bool ThrowExceptions { get; set; }
+        public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Validation.Validator> Validators { get; }
+        public Vertical.Cli.CliOptions AddBinder<T>(System.Func<Vertical.Cli.Binding.ModelBinder<T>> provider)
+            where T :  class { }
+        public Vertical.Cli.CliOptions AddConverter<T>()
+            where T : System.IParsable<T> { }
+        public Vertical.Cli.CliOptions AddConverter<T>(System.Func<string, T> converter) { }
+        public Vertical.Cli.CliOptions AddConverter<T>(System.Func<Vertical.Cli.Conversion.ConversionContext<T>, T> converter) { }
+        public Vertical.Cli.CliOptions AddValidator<T>(System.Action<Vertical.Cli.Validation.ValidationBuilder<T>> configure) { }
+        public Vertical.Cli.CliOptions AddValidator<T>(Vertical.Cli.Validation.Validator<T> validator) { }
+    }
+    public sealed class CliValidationFailedException : Vertical.Cli.CliArgumentException
+    {
+        public object? AttemptedValue { get; }
+        public string[] Errors { get; }
+        public Vertical.Cli.Configuration.SymbolDefinition Symbol { get; }
+    }
+    public sealed class CliValueConversionException : Vertical.Cli.CliArgumentException
+    {
+        public string AttemptedValue { get; }
+        public Vertical.Cli.Configuration.SymbolDefinition Symbol { get; }
+    }
+    public interface IRootCommand<in TModel, TResult> : Vertical.Cli.Configuration.ICommandDefinition, Vertical.Cli.Configuration.ICommandDefinition<TResult>, Vertical.Cli.Configuration.ICommandDefinition<TModel, TResult>
+        where in TModel :  class
+    {
+        Vertical.Cli.CliOptions Options { get; }
+    }
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public class None
+    {
+        public static Vertical.Cli.None Default { get; }
+    }
+    public static class RootCommand
+    {
+        public static Vertical.Cli.IRootCommand<Vertical.Cli.None, TResult> Create<TResult>(string id, System.Action<Vertical.Cli.Configuration.IRootCommandBuilder<Vertical.Cli.None, TResult>> configure, Vertical.Cli.CliOptions? options = null) { }
+        public static Vertical.Cli.IRootCommand<TModel, TResult> Create<TModel, TResult>(string id, System.Action<Vertical.Cli.Configuration.IRootCommandBuilder<TModel, TResult>> configure, Vertical.Cli.CliOptions? options = null)
+            where TModel :  class { }
+    }
+    public enum SymbolScope
+    {
+        Parent = 0,
+        ParentAndDescendents = 1,
+        Descendents = 2,
+    }
+}
+namespace Vertical.Cli.Binding
+{
+    public abstract class ArgumentBinding : System.Collections.Generic.IEnumerable<object>, System.Collections.IEnumerable
+    {
+        public abstract string BindingId { get; }
+        public abstract System.Collections.Generic.IEnumerator<object> GetEnumerator();
+    }
+    public sealed class ArgumentBinding<T> : Vertical.Cli.Binding.ArgumentBinding
+    {
+        public override string BindingId { get; }
+        public Vertical.Cli.Configuration.SymbolDefinition Symbol { get; }
+        public System.Collections.Generic.IEnumerable<T> Values { get; }
+        public override System.Collections.Generic.IEnumerator<object> GetEnumerator() { }
+        public override string ToString() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
+    public sealed class BindToAttribute : System.Attribute
+    {
+        public BindToAttribute(string bindingId) { }
+        public string BindingId { get; }
+    }
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public sealed class BindingLookup : System.Collections.Generic.IEnumerable<System.Linq.IGrouping<string, object>>, System.Collections.IEnumerable, System.Linq.ILookup<string, object>
+    {
+        public int Count { get; }
+        public System.Collections.Generic.IEnumerable<object> this[string key] { get; }
+        public bool Contains(string key) { }
+        public System.Collections.Generic.IEnumerator<System.Linq.IGrouping<string, object>> GetEnumerator() { }
+    }
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public readonly struct DefaultOf<T>
+    {
+        public static System.Threading.Tasks.Task<T> TaskValue { get; }
+        public static T Value { get; }
+    }
+    public interface IBinder
+    {
+        Vertical.Cli.Binding.ArgumentBinding CreateBinding(Vertical.Cli.Binding.IBindingContext bindingContext, Vertical.Cli.Configuration.SymbolDefinition symbol);
+    }
+    public interface IBindingContext
+    {
+        System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.SymbolDefinition> ArgumentSymbols { get; }
+        Vertical.Cli.Parsing.SymbolSyntax[] ArgumentSyntax { get; }
+        System.Collections.Generic.IReadOnlyDictionary<string, Vertical.Cli.Binding.ArgumentBinding> BindingDictionary { get; }
+        Vertical.Cli.Binding.BindingLookup BindingValueLookup { get; }
+        System.Collections.Generic.IReadOnlyDictionary<System.Type, Vertical.Cli.Conversion.ValueConverter> ConverterDictionary { get; }
+        Vertical.Cli.Configuration.SymbolDefinition? HelpOptionSymbol { get; }
+        System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.SymbolDefinition> OptionSymbols { get; }
+        string[] RawArguments { get; }
+        Vertical.Cli.Parsing.SemanticArgumentCollection SemanticArguments { get; }
+        Vertical.Cli.Configuration.ICommandDefinition Subject { get; }
+        string[] SubjectArguments { get; }
+        System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.SymbolDefinition> SwitchSymbols { get; }
+        System.Collections.Generic.IReadOnlyCollection<string> SymbolIdentities { get; }
+        System.Collections.Generic.IReadOnlyDictionary<System.Type, Vertical.Cli.Validation.Validator> ValidatorDictionary { get; }
+        Vertical.Cli.Binding.ArgumentBinding<T> GetBinding<T>(string bindingId);
+        T GetValue<T>(string bindingId);
+        System.Collections.Generic.IEnumerable<T> GetValues<T>(string bindingId);
+    }
+    public abstract class ModelBinder
+    {
+        protected ModelBinder() { }
+        public abstract System.Type ModelType { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public class ModelBinderAttribute<TBinder> : System.Attribute
+        where TBinder : Vertical.Cli.Binding.ModelBinder
+    {
+        public ModelBinderAttribute() { }
+    }
+    public abstract class ModelBinder<TModel> : Vertical.Cli.Binding.ModelBinder
+    {
+        protected ModelBinder() { }
+        public virtual System.Type ModelType { get; }
+        public abstract TModel BindInstance(Vertical.Cli.Binding.IBindingContext bindingContext);
+    }
+}
+namespace Vertical.Cli.Configuration
+{
+    public static class ConfigurationValidator
+    {
+        public static System.Collections.Generic.IReadOnlyCollection<string> GetErrors<TModel, TResult>(this Vertical.Cli.IRootCommand<TModel, TResult> rootCommand)
+            where TModel :  class { }
+        public static void ThrowIfInvalid<TModel, TResult>(this Vertical.Cli.IRootCommand<TModel, TResult> rootCommand)
+            where TModel :  class { }
+    }
+    public sealed class HelpSymbolDefinition<TResult> : Vertical.Cli.Configuration.SymbolDefinition<bool>
+    {
+        public TResult ReturnValue { get; }
+        public override System.Type ValueType { get; }
+    }
+    public interface ICommandBuilder<out TModel, TResult>
+        where out TModel :  class
+    {
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> AddArgument<T>(string id, Vertical.Cli.Arity? arity = default, string? description = null, Vertical.Cli.SymbolScope scope = 0, System.Func<T>? defaultProvider = null, Vertical.Cli.Validation.Validator<T>? validator = null);
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> AddDescription(string description);
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> AddOption<T>(string id, string[]? aliases = null, Vertical.Cli.Arity? arity = default, string? description = null, Vertical.Cli.SymbolScope scope = 0, System.Func<T>? defaultProvider = null, Vertical.Cli.Validation.Validator<T>? validator = null);
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> AddSwitch(string id, string[]? aliases = null, string? description = null, Vertical.Cli.SymbolScope scope = 0, System.Func<bool>? defaultProvider = null);
+        Vertical.Cli.Configuration.ICommandDefinition<TResult> Build();
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> ConfigureSubCommand(string id, System.Action<Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult>> configure);
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> ConfigureSubCommand<TChildModel>(string id, System.Action<Vertical.Cli.Configuration.ICommandBuilder<TChildModel, TResult>> configure)
+            where TChildModel :  class;
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> SetHandler(System.Func<TModel, TResult> function);
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> SetHandler(System.Func<TModel, System.Threading.CancellationToken, TResult> function);
+    }
+    public interface ICommandDefinition
+    {
+        string? Description { get; }
+        bool HasHandler { get; }
+        string Id { get; }
+        System.Type ModelType { get; }
+        Vertical.Cli.Configuration.ICommandDefinition? Parent { get; }
+        System.Type ResultType { get; }
+        System.Collections.Generic.IEnumerable<string> SubCommandIdentities { get; }
+        System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Configuration.SymbolDefinition> Symbols { get; }
+        System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.ICommandDefinition> GetChildDefinitions();
+    }
+    public interface ICommandDefinition<TResult> : Vertical.Cli.Configuration.ICommandDefinition
+    {
+        System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.ICommandDefinition<TResult>> SubCommands { get; }
+        Vertical.Cli.Invocation.ICallSite<TResult> CreateCallSite();
+        bool TryCreateChild(string id, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Vertical.Cli.Configuration.ICommandDefinition<TResult>? child);
+    }
+    public interface ICommandDefinition<in TModel, TResult> : Vertical.Cli.Configuration.ICommandDefinition, Vertical.Cli.Configuration.ICommandDefinition<TResult>
+        where in TModel :  class
+    {
+        System.Func<TModel, System.Threading.CancellationToken, TResult>? Handler { get; }
+    }
+    public interface IRootCommandBuilder<out TModel, TResult> : Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult>
+        where out TModel :  class
+    {
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> AddHelpOption(string? id = null, string[]? aliases = null, TResult returnValue = default);
+    }
+    public abstract class SymbolDefinition
+    {
+        public string[] Aliases { get; }
+        public Vertical.Cli.Arity Arity { get; }
+        public string? Description { get; }
+        public string Id { get; }
+        public System.Collections.Generic.IEnumerable<string> Identities { get; }
+        public Vertical.Cli.Configuration.ICommandDefinition Parent { get; }
+        public int Position { get; }
+        public Vertical.Cli.SymbolScope Scope { get; }
+        public Vertical.Cli.Configuration.SymbolType Type { get; }
+        public abstract System.Type ValueType { get; }
+        public Vertical.Cli.Binding.ArgumentBinding CreateBinding(Vertical.Cli.Binding.IBindingContext bindingContext) { }
+    }
+    public class SymbolDefinition<T> : Vertical.Cli.Configuration.SymbolDefinition
+    {
+        public System.Func<T>? DefaultProvider { get; }
+        public Vertical.Cli.Validation.Validator<T>? Validator { get; }
+        public override System.Type ValueType { get; }
+        public override string ToString() { }
+    }
+    public enum SymbolType
+    {
+        Argument = 0,
+        Option = 1,
+        Switch = 2,
+        HelpOption = 3,
+    }
+}
+namespace Vertical.Cli.Conversion
+{
+    public readonly struct ConversionContext<T> : System.IEquatable<Vertical.Cli.Conversion.ConversionContext<T>>
+    {
+        public ConversionContext(Vertical.Cli.Configuration.SymbolDefinition<T> Symbol, string Value) { }
+        public Vertical.Cli.Configuration.SymbolDefinition<T> Symbol { get; init; }
+        public string Value { get; init; }
+    }
+    public abstract class ValueConverter
+    {
+        protected ValueConverter() { }
+        public abstract System.Type ValueType { get; }
+    }
+    public abstract class ValueConverter<T> : Vertical.Cli.Conversion.ValueConverter
+    {
+        protected ValueConverter() { }
+        public override System.Type ValueType { get; }
+        public abstract T Convert(Vertical.Cli.Conversion.ConversionContext<T> context);
+    }
+}
+namespace Vertical.Cli.Help
+{
+    public class DefaultHelpFormatter : Vertical.Cli.Help.IHelpFormatter
+    {
+        public void WriteContent(Vertical.Cli.Configuration.ICommandDefinition command) { }
+    }
+    public class DefaultHelpProvider : Vertical.Cli.Help.IHelpProvider
+    {
+        public DefaultHelpProvider() { }
+        public System.Predicate<Vertical.Cli.Configuration.ICommandDefinition> CommandSelector { get; }
+        public System.Predicate<Vertical.Cli.Configuration.SymbolDefinition> SymbolSelector { get; }
+        public string? GetArgumentsUsageGrammar(Vertical.Cli.Configuration.ICommandDefinition command, System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.SymbolDefinition> symbols) { }
+        public string? GetCommandDescription(Vertical.Cli.Configuration.ICommandDefinition command) { }
+        public string GetCommandName(Vertical.Cli.Configuration.ICommandDefinition command) { }
+        public string? GetCommandUsageGrammar(Vertical.Cli.Configuration.ICommandDefinition command, System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Configuration.ICommandDefinition> subCommands) { }
+        public string? GetOptionsUsageGrammar(Vertical.Cli.Configuration.ICommandDefinition command, System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.SymbolDefinition> symbols) { }
+        public string? GetSymbolArgumentName(Vertical.Cli.Configuration.SymbolDefinition symbol) { }
+        public string? GetSymbolDescription(Vertical.Cli.Configuration.SymbolDefinition symbol) { }
+        public string GetSymbolGrammar(Vertical.Cli.Configuration.SymbolDefinition symbol) { }
+        public string GetSymbolSortKey(Vertical.Cli.Configuration.SymbolDefinition symbol) { }
+    }
+    public sealed class HelpFormatInfo
+    {
+        public Vertical.Cli.Configuration.ICommandDefinition[] SubCommands { get; }
+        public System.Linq.ILookup<Vertical.Cli.Configuration.SymbolType, Vertical.Cli.Configuration.SymbolDefinition> SymbolLookup { get; set; }
+        public Vertical.Cli.Configuration.SymbolDefinition[] Symbols { get; }
+    }
+    public sealed class HelpTextWriter
+    {
+        public HelpTextWriter(System.IO.TextWriter textWriter, int width) { }
+        public void Flush() { }
+        public void Indent(int margin) { }
+        public void Write(char c) { }
+        public void Write(System.ReadOnlySpan<char> span, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "Left",
+                "Right"})] System.ValueTuple<int, int>? margin = default) { }
+        public void WriteLine(int count = 1) { }
+        public void WriteLine(System.ReadOnlySpan<char> span, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "Left",
+                "Right"})] System.ValueTuple<int, int>? margin = default) { }
+        public void WriteLineIfNotAtLineOrigin() { }
+        public void WriteSpace() { }
+    }
+    public interface IHelpFormatter
+    {
+        void WriteContent(Vertical.Cli.Configuration.ICommandDefinition command);
+    }
+    public interface IHelpProvider
+    {
+        System.Predicate<Vertical.Cli.Configuration.ICommandDefinition> CommandSelector { get; }
+        System.Predicate<Vertical.Cli.Configuration.SymbolDefinition> SymbolSelector { get; }
+        string? GetArgumentsUsageGrammar(Vertical.Cli.Configuration.ICommandDefinition command, System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.SymbolDefinition> symbols);
+        string? GetCommandDescription(Vertical.Cli.Configuration.ICommandDefinition command);
+        string GetCommandName(Vertical.Cli.Configuration.ICommandDefinition command);
+        string? GetCommandUsageGrammar(Vertical.Cli.Configuration.ICommandDefinition command, System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Configuration.ICommandDefinition> subCommands);
+        string? GetOptionsUsageGrammar(Vertical.Cli.Configuration.ICommandDefinition command, System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.SymbolDefinition> symbols);
+        string? GetSymbolArgumentName(Vertical.Cli.Configuration.SymbolDefinition symbol);
+        string? GetSymbolDescription(Vertical.Cli.Configuration.SymbolDefinition symbol);
+        string GetSymbolGrammar(Vertical.Cli.Configuration.SymbolDefinition symbol);
+        string GetSymbolSortKey(Vertical.Cli.Configuration.SymbolDefinition symbol);
+    }
+}
+namespace Vertical.Cli.Invocation
+{
+    public static class CallSiteContext
+    {
+        public static Vertical.Cli.Invocation.ICallSiteContext<TResult> Create<TModel, TResult>(Vertical.Cli.IRootCommand<TModel, TResult> rootCommand, System.Collections.Generic.IEnumerable<string> args, TResult defaultValue)
+            where TModel :  class { }
+    }
+    public enum CallState
+    {
+        Command = 0,
+        Help = 1,
+        Faulted = 2,
+    }
+    public interface ICallSiteContext<TResult>
+    {
+        Vertical.Cli.Binding.IBindingContext BindingContext { get; }
+        System.Exception? BindingException { get; }
+        Vertical.Cli.Invocation.ICallSite<TResult> CallSite { get; }
+        Vertical.Cli.CliOptions Options { get; }
+        System.Func<System.Threading.CancellationToken, TResult> BindModelToCallSite<TModel>(System.Func<Vertical.Cli.Binding.IBindingContext, TModel>? bindingFunction = null)
+            where TModel :  class;
+    }
+    public interface ICallSite<TResult>
+    {
+        System.Type ModelType { get; }
+        Vertical.Cli.Invocation.CallState State { get; }
+        Vertical.Cli.Configuration.ICommandDefinition<TResult> Subject { get; }
+        System.Func<System.Threading.CancellationToken, TResult> WrapParameter<TModel>(TModel model);
+    }
+}
+namespace Vertical.Cli.Parsing
+{
+    public sealed class SemanticArgument
+    {
+        public Vertical.Cli.Parsing.SymbolSyntax ArgumentSyntax { get; }
+        public bool HasOperand { get; }
+        public Vertical.Cli.Parsing.SymbolSyntax? OperandSourceSyntax { get; }
+        public string OperandValue { get; }
+        public Vertical.Cli.Configuration.SymbolDefinition? OptionSymbol { get; }
+        public int OrdinalPosition { get; }
+        public bool Terminated { get; }
+        public void Accept() { }
+        public void AcceptOperand() { }
+        public override string ToString() { }
+    }
+    public class SemanticArgumentCollection : System.Collections.Generic.IEnumerable<Vertical.Cli.Parsing.SemanticArgument>, System.Collections.IEnumerable
+    {
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Parsing.SemanticArgument> Unaccepted { get; }
+        public System.Collections.Generic.IEnumerator<Vertical.Cli.Parsing.SemanticArgument> GetEnumerator() { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Parsing.SemanticArgument> GetOptionArguments(Vertical.Cli.Configuration.SymbolDefinition symbol) { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Parsing.SemanticArgument> GetValueArguments(Vertical.Cli.Configuration.SymbolDefinition symbol) { }
+    }
+    public sealed class SymbolSyntax : System.IEquatable<Vertical.Cli.Parsing.SymbolSyntax>
+    {
+        public bool HasIdentifiers { get; }
+        public bool HasOperand { get; }
+        public bool HasSingleIdentifier { get; }
+        public string[] Identifiers { get; }
+        public bool IsPrefixed { get; }
+        public char OperandAssignmentToken { get; }
+        public string OperandExpression { get; }
+        public string OperandValue { get; }
+        public string Prefix { get; }
+        public string[] SimpleIdentifiers { get; }
+        public string Text { get; }
+        public Vertical.Cli.Parsing.SymbolSyntaxType Type { get; }
+        public bool Equals(Vertical.Cli.Parsing.SymbolSyntax? other) { }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
+        public override string ToString() { }
+        public static Vertical.Cli.Parsing.SymbolSyntax Parse(string str) { }
+        public static bool operator !=(Vertical.Cli.Parsing.SymbolSyntax x, Vertical.Cli.Parsing.SymbolSyntax y) { }
+        public static bool operator ==(Vertical.Cli.Parsing.SymbolSyntax x, Vertical.Cli.Parsing.SymbolSyntax y) { }
+    }
+    public static class SymbolSyntaxParser { }
+    public enum SymbolSyntaxType
+    {
+        Simple = 0,
+        PosixPrefixed = 1,
+        GnuPrefixed = 2,
+        SlashPrefixed = 3,
+        ArgumentTerminator = 4,
+        NonIdentifier = 5,
+    }
+}
+namespace Vertical.Cli.Validation
+{
+    public static class ValidationBuilderExtensions
+    {
+        public static Vertical.Cli.Validation.ValidationBuilder<string> Contains(this Vertical.Cli.Validation.ValidationBuilder<string> builder, string subString, System.StringComparison comparisonType = 4, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<System.IO.DirectoryInfo> DirectoryExists(this Vertical.Cli.Validation.ValidationBuilder<System.IO.DirectoryInfo> builder, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<System.IO.DirectoryInfo?> DirectoryExistsIfNotNull(this Vertical.Cli.Validation.ValidationBuilder<System.IO.DirectoryInfo?> builder, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<string> EndsWith(this Vertical.Cli.Validation.ValidationBuilder<string> builder, string subString, System.StringComparison comparisonType = 4, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<string> ExactLength(this Vertical.Cli.Validation.ValidationBuilder<string> builder, int length, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<System.IO.FileInfo> FileExists(this Vertical.Cli.Validation.ValidationBuilder<System.IO.FileInfo> builder, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<System.IO.FileInfo?> FileExistsIfNotNull(this Vertical.Cli.Validation.ValidationBuilder<System.IO.FileInfo?> builder, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<System.IO.FileInfo> FilePathExists(this Vertical.Cli.Validation.ValidationBuilder<System.IO.FileInfo> builder, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<System.IO.FileInfo?> FilePathExistsIfNotNull(this Vertical.Cli.Validation.ValidationBuilder<System.IO.FileInfo?> builder, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<T> GreaterThan<T>(this Vertical.Cli.Validation.ValidationBuilder<T> builder, T value, System.Collections.Generic.IComparer<T>? comparer = null, System.Func<string>? message = null)
+            where T : System.IComparable<T> { }
+        public static Vertical.Cli.Validation.ValidationBuilder<T> GreaterThanOrEquals<T>(this Vertical.Cli.Validation.ValidationBuilder<T> builder, T value, System.Collections.Generic.IComparer<T>? comparer = null, System.Func<string>? message = null)
+            where T : System.IComparable<T> { }
+        public static Vertical.Cli.Validation.ValidationBuilder<T> In<T>(this Vertical.Cli.Validation.ValidationBuilder<T> builder, System.Collections.Generic.IEnumerable<T> values, System.Collections.Generic.IEqualityComparer<T>? comparer = null, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<string> LengthBetween(this Vertical.Cli.Validation.ValidationBuilder<string> builder, int minimumLength, int maximumLength, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<T> LessThan<T>(this Vertical.Cli.Validation.ValidationBuilder<T> builder, T value, System.Collections.Generic.IComparer<T>? comparer = null, System.Func<string>? message = null)
+            where T : System.IComparable<T> { }
+        public static Vertical.Cli.Validation.ValidationBuilder<T> LessThanOrEquals<T>(this Vertical.Cli.Validation.ValidationBuilder<T> builder, T value, System.Collections.Generic.IComparer<T>? comparer = null, System.Func<string>? message = null)
+            where T : System.IComparable<T> { }
+        public static Vertical.Cli.Validation.ValidationBuilder<string> Matches(this Vertical.Cli.Validation.ValidationBuilder<string> builder, string pattern, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<string> Matches(this Vertical.Cli.Validation.ValidationBuilder<string> builder, System.Text.RegularExpressions.Regex regex, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<string> MaximumLength(this Vertical.Cli.Validation.ValidationBuilder<string> builder, int length, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<string> MinimumLength(this Vertical.Cli.Validation.ValidationBuilder<string> builder, int length, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<T> Not<T>(this Vertical.Cli.Validation.ValidationBuilder<T> builder, T value, System.Collections.Generic.IEqualityComparer<T>? comparer = null, System.Func<string>? message = null)
+            where T : System.IComparable<T> { }
+        public static Vertical.Cli.Validation.ValidationBuilder<T> NotIn<T>(this Vertical.Cli.Validation.ValidationBuilder<T> builder, System.Collections.Generic.IEnumerable<T> values, System.Collections.Generic.IEqualityComparer<T>? comparer = null, System.Func<string>? message = null) { }
+        public static Vertical.Cli.Validation.ValidationBuilder<string> StartsWith(this Vertical.Cli.Validation.ValidationBuilder<string> builder, string subString, System.StringComparison comparisonType = 4, System.Func<string>? message = null) { }
+    }
+    public class ValidationBuilder<T>
+    {
+        public ValidationBuilder() { }
+        public Vertical.Cli.Validation.ValidationBuilder<T> AddValidator(Vertical.Cli.Validation.Validator<T> validator) { }
+        public Vertical.Cli.Validation.Validator<T> Build() { }
+        public Vertical.Cli.Validation.ValidationBuilder<T> Must(System.Func<T, bool> predicate, System.Func<string>? errorMessage = null) { }
+    }
+    public sealed class ValidationContext<T>
+    {
+        public bool IsValidState { get; }
+        public Vertical.Cli.Configuration.SymbolDefinition Symbol { get; }
+        public T Value { get; }
+        public void AddError(string message) { }
+        public override string ToString() { }
+    }
+    public abstract class Validator
+    {
+        public abstract System.Type ValueType { get; }
+        public static Vertical.Cli.Validation.Validator<T> Configure<T>(System.Action<Vertical.Cli.Validation.ValidationBuilder<T>> configure) { }
+    }
+    public abstract class Validator<T> : Vertical.Cli.Validation.Validator
+    {
+        protected Validator() { }
+        public override System.Type ValueType { get; }
+        public abstract void Validate(Vertical.Cli.Validation.ValidationContext<T> context);
+    }
+}

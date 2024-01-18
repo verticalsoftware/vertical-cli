@@ -5,6 +5,9 @@ using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Binding;
 
+/// <summary>
+/// Represents data using in model binding.
+/// </summary>
 public interface IBindingContext
 {
     /// <summary>
@@ -31,11 +34,6 @@ public interface IBindingContext
     /// Gets the semantic arguments.
     /// </summary>
     SemanticArgumentCollection SemanticArguments { get; }
-    
-    /// <summary>
-    /// Gets a collection of the original semantic arguments not consumed by parsing.
-    /// </summary>
-    SemanticArgumentCollection OriginalSemanticArguments { get; }
 
     /// <summary>
     /// Gets the converter dictionary.

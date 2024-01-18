@@ -1,4 +1,5 @@
-﻿using Vertical.Cli.Configuration;
+﻿using System.Diagnostics.CodeAnalysis;
+using Vertical.Cli.Configuration;
 
 namespace Vertical.Cli.Invocation;
 
@@ -17,6 +18,7 @@ internal static class ExceptionStateCallSite
             CallState.Faulted);
     }
 
+    [ExcludeFromCodeCoverage]
     private static TResult HandleExceptionSite<TResult>(Exception exception, CliOptions options, TResult value)
     {
         if (options.DisplayExceptions)

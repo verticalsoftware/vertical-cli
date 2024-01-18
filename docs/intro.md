@@ -2,19 +2,19 @@
 
 ## Overview
 
-Use this library to parse application command line arguments, bind the values to a type, and pass control to a handler that implements the application's functionality.
+Use this library to parse application command line arguments, bind the values to a record or class, and pass control to a delegate that implements the application's functionality.
 
 ## Configuration
 
 ### Commands
 
-Console applications can perform a single function or multiple functions. These functions are represented in the library as commands. A Vertical.Cli application requires a root command, but application's can also be defined that have a hierarchy of sub commands. An example of such a hierarchy is `dotnet nuget push`. While `dotnet` is the utility's executable program name, `nuget` is a sub command, and `push` is sub command of `nuget`.
+Console applications can perform a single function or multiple functions. These functions are represented in the library as commands. A Vertical.Cli application requires a root command, but an application can also define a hierarchy of sub commands. An example of such a hierarchy is `dotnet nuget push`. While `dotnet` is the program name, `nuget` is a sub command, and `push` is a sub command of `nuget`.
 The following example demonstrates both scenarios. The generic argument indicates the commands will return an `int` value.
 
 ```csharp
 // Single command application
 var rootCommand = RootCommand.Create<int>(
-    id: "<prgram>",
+    id: "<program-name>",
     root => 
     {
         // Configure the root command
@@ -49,7 +49,7 @@ var rootCommand = RootCommand.Create<int>(
 
 ### Defining arguments and options
 
-Arguments, options, and switches are defined using the configuration delegate and the methods available in the fluent builder object. Use the `AddOption<T>`, `AddArgument<T>`, and `AddSwitch` methods. The `<T>` generic argument dictates the value type of the option or argument. The code example shows a verbose example of configuring an option:
+Arguments, options, and switches are defined using the configuration delegate and the methods available in the fluent builder object. Use the `AddOption<T>`, `AddArgument<T>`, and `AddSwitch` methods. The `<T>` generic argument enforces the value type expected by the option or argument. The code example shows a verbose example of configuring an option:
 
 ```csharp
     // Command configuration delegate
@@ -79,13 +79,9 @@ Parameter descriptions:
 |defaultProvider|A function that provides a default value when one is not otherwise provided.|
 |validator|A `Validator` object, that determines the validity of the provided argument.|
 
-> 🗈 Note
->
-> Any identities assigned to options and arguments must be unique in the command path.
-
 ### Binding to models
 
-Arguments received on the CLI that are semantically matched with a command's symbols must be mapped to a model. The easiest way this can be implemented is to define a `record` with properties whose names align to each symbol's identity. At runtime, the library will create a new instance of the model and populate it with values. Binding is automatically performed to constructor parameters, public properties with a set accessor, and publc non read-only fields. The model type is then specified as a generic argument to the configuration method. The handler receives the model type and performs the command's function.
+Arguments received on the CLI that are semantically matched with a command's symbols must be mapped to a model. The easiest way this can be implemented is to define a `record` with properties whose names align to each symbol's identity. At runtime, the library will create a new instance of the model and populate it with values. Binding is automatically performed to constructor parameters, public properties with a set accessor, and publc non read-only fields. The model type is then specified as a generic argument to the configuration method along with the return type. The handler receives the model type, performs the command's function, and returns a value if appropriate.
 
 ```csharp
 // Model:
@@ -119,7 +115,7 @@ var rootCommand = new RootCommand.Create<FileCopyParams, Task>(
 );    
 ```
 
-The matching behavior to symbols can be explicitly controlled by using the `[BindTo]]` attribute. Apply the attribute to each model member that requires it.
+The matching behavior to symbols can be explicitly controlled by using the `[BindTo]` attribute. Apply the attribute to each model member that requires it and specify the symbol id in the constructor.
 
 ### Value conversion
 
@@ -129,7 +125,7 @@ CLI arguments must be converted to the type expected by the symbol. Out-of-box, 
 - `char` and `string`
 - Temporal types: `DateTime`, `DateTimeOffset`, `TimeSpan`, `TimeOnly`, `DateOnly`
 - Misc types: `FileInfo`, `DirectoryInfo`, `Uri` and `Guid`
-- Arrays and any non associative `System.Collections.Generic` collection type.
+- Arrays and any non associative types and interfaces found in the `System.Collections.Generic` namespace.
 
 An application can configure conversion for an unsupported type using one of the following approaches:
 - Register a conversion function
@@ -149,7 +145,7 @@ options.AddConverter(value =>
     return new Point(int.Parse(split[0], split[1]));
 });
 
-// option 2: Define a value converter
+// option 2: Define a value converter for more complex scenarios
 public sealed class PointConverter : ValueConverter<Point>
 {
     public override Convert(ConversionContext<Point> context)
@@ -161,7 +157,7 @@ public sealed class PointConverter : ValueConverter<Point>
 
 options.AddConverter(new PointConverter());
 
-// option 3: If the type implements IParsable<TSelf>
+// option 3: The type implements IParsable<TSelf>
 options.AddConverter<Point>();
 
 // Options can be specified when creating the root command
@@ -173,7 +169,7 @@ var rootCommand = RootCommand.Create<int>(
 
 ### Validation
 
-CLI arguments can be validated prior to binding them to a model. If validation fails, a message is written to the console. Validation is performed by the using implementations of the abstract `Validator<T>` type. This example shows extending the class to validate `TimeSpan` values:
+CLI arguments can be validated prior to binding with a model. If validation fails, a message is written to the console. Validation is performed using implementations of the `Validator<T>` type. This example shows extending the class to validate `TimeSpan` values:
 
 ```csharp
 // Application defined validator
@@ -199,7 +195,7 @@ var rootCommand = new RootCommand<int>(
     id: "program",
     configure: root =>
     {
-        // Values provided for this symbol will be validated (specific approach)
+        // Values provided for this symbol will be validated (symbol isolated approach)
         root.AddOption<TimeSpan>("--connect-timeout", validator: timeoutValidator);        
     });
 

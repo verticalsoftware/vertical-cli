@@ -1,6 +1,6 @@
 ﻿namespace Vertical.Cli.Parsing;
 
-public static class ParseSymbols
+internal static class ParseSymbols
 {
     public const string ArgumentTerminator = "--";
     public const string GnuPrefix = "--";

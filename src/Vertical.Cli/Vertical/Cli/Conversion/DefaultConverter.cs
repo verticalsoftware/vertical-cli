@@ -46,20 +46,21 @@ internal static class DefaultConverter
             [typeof(FileInfo)] = new DelegatedConverter<FileInfo>(path => new FileInfo(path)),
             [typeof(DirectoryInfo)] = new DelegatedConverter<DirectoryInfo>(path => new DirectoryInfo(path)),
             [typeof(Uri)] = new DelegatedConverter<Uri>(path => new Uri(path, UriKind.RelativeOrAbsolute))
-
 #if NET6_0_OR_GREATER
             ,
             [typeof(DateOnly?)] = new DelegatedConverter<DateOnly?>(str => DateOnly.Parse(str)),
             [typeof(TimeOnly?)] = new DelegatedConverter<TimeOnly?>(str => TimeOnly.Parse(str)),
+            [typeof(Half)] = new DelegatedConverter<Half>(Half.Parse),
             [typeof(Half?)] = new DelegatedConverter<Half?>(str => Half.Parse(str)),
             [typeof(DateOnly)] = new DelegatedConverter<DateOnly>(DateOnly.Parse),
             [typeof(TimeOnly)] = new DelegatedConverter<TimeOnly>(TimeOnly.Parse)
-#elif NET7_0_OR_GREATER
+#endif
+#if NET7_0_OR_GREATER
             ,
-            [typeof(UInt128?)] = new DelegateConverter<UInt128?>(str => UInt128.Parse(str)),
-            [typeof(Int128?)] = new DelegateConverter<Int128?>(str => Int128.Parse(str)),
-            [typeof(UInt128)] = new DelegateConverter<UInt128>(UInt128.Parse),
-            [typeof(Int128)] = new DelegateConverter<Int128>(Int128.Parse)
+            [typeof(UInt128?)] = new DelegatedConverter<UInt128?>(str => UInt128.Parse(str)),
+            [typeof(Int128?)] = new DelegatedConverter<Int128?>(str => Int128.Parse(str)),
+            [typeof(UInt128)] = new DelegatedConverter<UInt128>(UInt128.Parse),
+            [typeof(Int128)] = new DelegatedConverter<Int128>(Int128.Parse)
 #endif
         };
 

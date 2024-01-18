@@ -1,8 +1,11 @@
-﻿namespace Vertical.Cli;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Vertical.Cli;
 
 /// <summary>
 /// Represents an empty model.
 /// </summary>
+[ExcludeFromCodeCoverage] 
 public class None
 {
     /// <summary>

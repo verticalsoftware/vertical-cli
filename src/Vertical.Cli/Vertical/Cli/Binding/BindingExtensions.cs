@@ -52,6 +52,7 @@ internal static class BindingExtensions
             return value;
 
         var errorList = ReusableErrorList.GetInstance();
+        string[] throwableErrors;
 
         try
         {
@@ -60,7 +61,7 @@ internal static class BindingExtensions
             if (errorList.Count == 0)
                 return value;
 
-            throw InvocationExceptions.ValidationFailed(symbol, value, errorList.ToArray());
+            throwableErrors = errorList.ToArray();
         }
         catch (Exception exception)
         {
@@ -70,5 +71,12 @@ internal static class BindingExtensions
         {
             ReusableErrorList.Return(errorList);
         }
+
+        if (throwableErrors.Any())
+        {
+            throw InvocationExceptions.ValidationFailed(symbol, value, throwableErrors);
+        }
+
+        return value;
     }
 }

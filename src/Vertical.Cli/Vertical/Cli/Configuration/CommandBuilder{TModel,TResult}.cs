@@ -2,6 +2,7 @@
 using CommunityToolkit.Diagnostics;
 using Vertical.Cli.Binding;
 using Vertical.Cli.Invocation;
+using Vertical.Cli.Parsing;
 using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;

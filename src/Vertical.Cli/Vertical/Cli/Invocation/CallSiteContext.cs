@@ -44,7 +44,7 @@ public static class CallSiteContext
         }
 
         var subject = commands.Last();
-        var bindingContext = new BindingContextBuilder(rootCommand.Options, subject, args, queue);
+        var bindingContext = new RuntimeBindingContext(rootCommand.Options, subject, args, queue);
         var options = rootCommand.Options;
 
         try
@@ -56,10 +56,10 @@ public static class CallSiteContext
 
             var commandSite = CreateCommandCallSite<TResult>(bindingContext);
 
-            if (bindingContext.SemanticArguments.Any())
+            if (bindingContext.SemanticArguments.Unaccepted.Any())
             {
                 // Any arguments left not mapped to symbols are invalid
-                throw InvocationExceptions.InvalidArguments(bindingContext.SemanticArguments);
+                throw InvocationExceptions.InvalidArguments(bindingContext.SemanticArguments.Unaccepted);
             }
 
             return new CallSiteContext<TResult>(commandSite, options, bindingContext);
@@ -74,7 +74,7 @@ public static class CallSiteContext
         }
     }
 
-    private static ICallSite<TResult> CreateCommandCallSite<TResult>(BindingContextBuilder bindingContext)
+    private static ICallSite<TResult> CreateCommandCallSite<TResult>(RuntimeBindingContext bindingContext)
     {
         // These have to be done in a specific order so the arguments
         // are mapped and consumed properly

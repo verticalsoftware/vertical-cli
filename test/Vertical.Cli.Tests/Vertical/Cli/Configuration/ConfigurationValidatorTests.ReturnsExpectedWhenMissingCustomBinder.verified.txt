@@ -1,0 +1,3 @@
+﻿[
+  (1) Class Vertical.Cli.Configuration.ConfigurationValidatorTests+EmptyModel is marked for custom binding, but there is not a binder registered in options.
+]

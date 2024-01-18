@@ -1,5 +1,8 @@
 ﻿namespace Vertical.Cli.Parsing;
 
+/// <summary>
+/// Defines the syntax symbol types.
+/// </summary>
 public enum SymbolSyntaxType
 {
     /// <summary>

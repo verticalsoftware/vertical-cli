@@ -1,10 +1,12 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Vertical.Cli.Binding;
 
 /// <summary>
 /// Represents a lookup of binding values.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public sealed class BindingLookup : ILookup<string, object>
 {
     private readonly ILookup<string, object> _lookup;

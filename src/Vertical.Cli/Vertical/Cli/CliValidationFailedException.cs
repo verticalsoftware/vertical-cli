@@ -2,6 +2,9 @@
 
 namespace Vertical.Cli;
 
+/// <summary>
+/// Indicates a provided value failed validation.
+/// </summary>
 public sealed class CliValidationFailedException : CliArgumentException
 {
     /// <inheritdoc />

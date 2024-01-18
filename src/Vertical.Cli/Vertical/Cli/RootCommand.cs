@@ -9,11 +9,6 @@ namespace Vertical.Cli;
 public static class RootCommand
 {
     /// <summary>
-    /// Defines the root command id.
-    /// </summary>
-    public const string Id = "(root)";
-
-    /// <summary>
     /// Creates a root command that delegates application logic handling to sub commands.
     /// </summary>
     /// <param name="id">The name of the application.</param>

@@ -9,7 +9,7 @@ namespace Vertical.Cli.Help;
 internal static class HelpCallSite
 {
     internal static bool TryCreate<TResult>(
-        BindingContextBuilder bindingContext,
+        RuntimeBindingContext bindingContext,
         CliOptions options,
         TResult defaultValue,
         [NotNullWhen(true)] out ICallSite<TResult>? callSite)

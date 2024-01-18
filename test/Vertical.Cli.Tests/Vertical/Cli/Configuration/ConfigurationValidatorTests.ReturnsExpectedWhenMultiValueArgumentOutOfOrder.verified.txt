@@ -1,0 +1,6 @@
+﻿[  
+(1) The multi-arity argument symbol in "root" must be defined last among the arguments:
+    *remove >> root -> arg1
+    root -> arg2
+    *insert >> root -> arg1
+]

@@ -1,0 +1,3 @@
+﻿[
+  (1) Duplicate sub-command identities in command "root": "child"
+]

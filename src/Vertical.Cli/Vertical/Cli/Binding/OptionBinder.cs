@@ -41,25 +41,15 @@ internal sealed class OptionBinder<T> : IBinder
         SymbolDefinition<T> symbol,
         SemanticArgument argument)
     {
+        argument.Accept();
+        
         try
         {
             switch (argument)
             {
-                case { ArgumentSyntax.HasOperand: true }:
-
-                    return bindingContext.GetBindingValue(
-                        symbol, 
-                        argument.ArgumentSyntax.OperandValue);
-                
-                case { CandidateOperandSyntax: not null } when !bindingContext
-                    .SymbolIdentities
-                    .Contains(argument.CandidateOperandSyntax.Text):
-                    
+                case { HasOperand: true }:
                     argument.AcceptOperand();
-
-                    return bindingContext.GetBindingValue(
-                        symbol, 
-                        argument.CandidateOperandSyntax.Text);
+                    return bindingContext.GetBindingValue(symbol, argument.OperandValue);
                 
                 default:
                     throw InvocationExceptions.OptionMissingOperand(symbol);

@@ -1,6 +1,6 @@
 ﻿namespace Vertical.Cli.Parsing;
 
-public class ParseCharacterTokens
+internal class ParseCharacterTokens
 {
     public const char Hyphen = '-';
     public const char ForwardSlash = '/';

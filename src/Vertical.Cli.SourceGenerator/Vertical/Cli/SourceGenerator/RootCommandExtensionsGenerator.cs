@@ -38,17 +38,19 @@ public class RootCommandExtensionsGenerator : IIncrementalGenerator
 
     private static bool IsConfigurationSyntaxNode(SyntaxNode node)
     {
-        return IsRootCommandCreateExpression(node) || IsConfigureSubCommandExpression(node);
+        return node is MemberAccessExpressionSyntax &&
+               (IsRootCommandCreateExpression(node) || IsConfigureSubCommandExpression(node));
     }
 
     private static bool IsRootCommandCreateExpression(SyntaxNode node)
     {
         return node is MemberAccessExpressionSyntax
         {
-            Expression: IdentifierNameSyntax { Identifier.Text: "RootCommand" } or 
-            QualifiedNameSyntax { Right.Identifier.Text: "RootCommand" },
             Name.Identifier.Text: "Create"
-        };
+        } memberAccessExpressionSyntax && memberAccessExpressionSyntax
+            .Expression
+            .ToString()
+            .EndsWith("RootCommand");
     }
 
     private static bool IsConfigureSubCommandExpression(SyntaxNode node)

@@ -1,8 +1,6 @@
 ﻿using System.Collections.Immutable;
-using System.Reflection;
 using System.Text;
 using CommunityToolkit.Diagnostics;
-using Vertical.Cli.Binding;
 using Vertical.Cli.Configuration.Metadata;
 using Vertical.Cli.Conversion; 
 using Vertical.Cli.Parsing;
@@ -101,7 +99,7 @@ public static class ConfigurationValidator
             message.AppendLine($"Multiple {description} defined for the following types:");
             foreach (var type in types)
             {
-                message.AppendLine($"{Indent}{type} ({type.Count()} services)");
+                message.AppendLine($"{Indent}{type.Key} ({type.Count()} services)");
             }
         });
     }
@@ -142,7 +140,6 @@ public static class ConfigurationValidator
         ValidatePathArgumentArity(subject, state);
         ValidatePathConverters(subject, state);
         ValidateBindingModel(subject, state);
-        ValidateHelpSymbols(subject, state);
     }
 
     private static void ValidatePathArgumentArity(ICommandDefinition subject, StateHelper state)
@@ -167,7 +164,7 @@ public static class ConfigurationValidator
         {
             state.Errors.Add(message =>
             {
-                message.AppendLine($"Command path {subject.GetPathString()} has more than one multi-valued " +
+                message.AppendLine($"Command path \"{subject.GetPathString()}\" has more than one multi-valued " +
                                    "argument symbol defined:");
                 foreach (var symbol in multiArityArgumentSymbols)
                 {
@@ -184,16 +181,16 @@ public static class ConfigurationValidator
         
         state.Errors.Add(message =>
         {
-            message.AppendLine($"The multi-arity argument symbol in {subject.GetPathString()} must be defined " +
+            message.AppendLine($"The multi-arity argument symbol in \"{subject.GetPathString()}\" must be defined " +
                                "last among the arguments:");
 
             foreach (var symbol in argumentSymbols.SkipWhile(item => !ReferenceEquals(item, multiAritySymbol)))
             {
                 message.AppendLine(ReferenceEquals(symbol, multiAritySymbol)
-                    ? $"{Indent}*remove -> {symbol.GetFUllDisplayString()}"
+                    ? $"{Indent}*remove >> {symbol.GetFUllDisplayString()}"
                     : $"{Indent}{symbol.GetFUllDisplayString()}");
             }
-            message.AppendLine($"{Indent}*insert -> {multiAritySymbol.GetFUllDisplayString()}");
+            message.AppendLine($"{Indent}*insert >> {multiAritySymbol.GetFUllDisplayString()}");
         });
     }
 
@@ -217,26 +214,17 @@ public static class ConfigurationValidator
 
     private static void ValidateBindingModelAttributes(BindingModel modelMetadata, StateHelper state)
     {
-        var binderAttribute = modelMetadata
-            .Type
-            .GetCustomAttributes()
-            .FirstOrDefault(attribute =>
-            {
-                var type = attribute.GetType();
-                return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ModelBinderAttribute<>);
-            });
-
-        if (binderAttribute == null)
+        if (!MetadataHelpers.HasModelBinderAttribute(modelMetadata.Type))
             return;
 
-        var binderType = binderAttribute.GetType().GetGenericArguments()[0];
-        if (state.Options.ModelBinders.Any(binder => binderType == binder.GetType()))
+        
+        if (state.Options.ContainsBinderRegistration(modelMetadata.Type))
             return;
         
         state.Errors.Add(message =>
         {
-            message.AppendLine($"Class {modelMetadata.Type} is marked for custom binding, but there is not registered " +
-                               "binder in CliOptions.");
+            message.AppendLine($"Class {modelMetadata.Type} is marked for custom binding, but there is not a " +
+                               "binder registered in options.");
         });
     }
 
@@ -245,12 +233,14 @@ public static class ConfigurationValidator
         BindingModel model,
         StateHelper state)
     {
+        if (!subject.HasHandler)
+            return;
+        
         // Verify..
         // 1. each symbol is bound to a parameter
         // 2. each parameter is bound to a symbol
         // 3. parameter types are compatible with the symbol definition.
         // 4. the generic types of collections or element type of arrays are compatible with the symbol definition  
-        
         var parameters = model.BindingParameters;
         var errors = new List<string>();
         var matchedParameters = new HashSet<BindingParameter>();
@@ -264,7 +254,7 @@ public static class ConfigurationValidator
 
             if (matched.Length == 0)
             {
-                errors.Add($"{Indent}Symbol {symbol.GetFUllDisplayString()} is not bound to any constructor parameter, " +
+                errors.Add($"{Indent}Symbol \"{symbol.GetFUllDisplayString()}\" is not bound to any constructor parameter, " +
                            "property, or field.");
                 continue;
             }
@@ -275,21 +265,21 @@ public static class ConfigurationValidator
             {
                 matchedParameters.Add(parameter);
 
-                var collectionType = GetGenericCollectionType(parameter.Type);
+                var collectionType = MetadataHelpers.GetGenericCollectionType(parameter.Type);
                 var isCollectionTypeParameter = collectionType != null;
 
                 if (hasMultiValuedArity)
                 {
                     if (!isCollectionTypeParameter)
                     {
-                        errors.Add($"{Indent}Values for {symbol.GetDisplayString()} cannot be bound to " +
+                        errors.Add($"{Indent}Values for {symbol.GetDisplayString(quoteIdentities: true)} cannot be bound to " +
                                    $"{parameter} because it is not an array or supported collection type.");
                         continue;
                     }
 
                     if (!collectionType!.IsAssignableFrom(symbol.ValueType))
                     {
-                        errors.Add($"{Indent}Values for {symbol.GetDisplayString()} cannot be bound to " +
+                        errors.Add($"{Indent}Values for {symbol.GetDisplayString(quoteIdentities: true)} cannot be bound to " +
                                    $"{parameter} because {symbol.ValueType} is not assignable to the array " +
                                    $"or collection type {collectionType}.");
                     }
@@ -298,15 +288,22 @@ public static class ConfigurationValidator
 
                 if (!parameter.Type.IsAssignableFrom(symbol.ValueType))
                 {
-                    errors.Add($"{Indent}Values for {symbol.GetDisplayString()} cannot be bound to " +
-                                $"{parameter} because {symbol.ValueType} is not assignable to {parameter.Type}.");
+                    errors.Add($"{Indent}Values for {symbol.GetDisplayString(quoteIdentities: true)} cannot be bound to " +
+                                $"\"{parameter}\" because {symbol.ValueType} is not assignable to {parameter.Type}.");
                 }
             }
         }
-
+        
         errors.AddRange(parameters
             .Where(param => !matchedParameters.Contains(param))
-            .Select(parameter => $"{Indent}Binding {parameter} does not bind to any defined symbols."));
+            .Select(parameter =>
+            {
+                var customBinding = parameter.BindingId != parameter.MetadataName
+                    ? $" (BindTo=\"{parameter.BindingId}\")"
+                    : string.Empty;
+                
+                return $"{Indent}Binding {parameter}{customBinding} does not bind to any defined symbols.";
+            }));
 
         if (errors.Count == 0)
             return;
@@ -316,7 +313,7 @@ public static class ConfigurationValidator
             message.AppendLine($"Parameter model type {model.Type.FullName} cannot be bound " + 
                                $"in path \"{subject.GetPathString()}\" for the following reason(s):");
             message.AppendLines(errors);
-        });
+        }); 
     }
 
     private static void ValidateBindingModelConstructors(BindingModel model, StateHelper state)
@@ -363,7 +360,7 @@ public static class ConfigurationValidator
         
         state.Errors.Add(message =>
         {
-            message.AppendLine($"One or more symbols aren't bindable in path {subject.GetPathString()} because their value types " +
+            message.AppendLine($"One or more symbols aren't bindable in path \"{subject.GetPathString()}\" because their value types " +
                                "aren't supported by a ValueConverter:");
 
             foreach (var group in missingConverterGroups)
@@ -371,7 +368,7 @@ public static class ConfigurationValidator
                 message.AppendLine($"{Indent}{group.Key}");
                 foreach (var symbol in group)
                 {
-                    message.AppendLine($"{Indent}{Indent}used by {symbol.GetDisplayString()}");
+                    message.AppendLine($"{Indent}{Indent}used by {symbol.GetDisplayString(quoteIdentities: true)}");
                 }
             }
         });
@@ -395,7 +392,7 @@ public static class ConfigurationValidator
         
         state.Errors.Add(message =>
         {
-            message.AppendLine($"Command {subject.GetPathString()} must implement a handler because it has " +
+            message.AppendLine($"Command \"{subject.GetPathString()}\" must implement a handler because it has " +
                                "symbols in scope.");
         });
     }
@@ -428,26 +425,6 @@ public static class ConfigurationValidator
         });
     }
 
-    private static void ValidateHelpSymbols(ICommandDefinition subject, StateHelper state)
-    {
-        var helpSymbols = subject
-            .GetAllSymbols()
-            .Where(symbol => symbol.Type == SymbolType.HelpOption)
-            .ToArray();
-
-        if (helpSymbols.Length <= 1)
-            return;
-        
-        state.Errors.Add(message =>
-        {
-            message.AppendLine("Duplicate help symbols found in path:");
-            foreach (var symbol in helpSymbols)
-            {
-                message.AppendLine($"{Indent}{symbol.GetFUllDisplayString()}");
-            }
-        });
-    }
-
     private static void ValidateSubjectCommandChildIdentitySyntax(
         ICommandDefinition command, 
         StateHelper state)
@@ -464,7 +441,7 @@ public static class ConfigurationValidator
         
         state.Errors.Add(message =>
         {
-            message.AppendLine($"Invalid sub-command identities in command {command.GetPathString()}:");
+            message.AppendLine($"Invalid sub-command identities in command \"{command.GetPathString()}\":");
             foreach (var identity in invalidIdentities)
             {
                 message.AppendLine($"{Indent}\"{identity}\"");
@@ -491,7 +468,7 @@ public static class ConfigurationValidator
         state.Errors.Add(message =>
         {
             var csv = string.Join(", ", duplicateIdentities.Select(id => $"\"{id}\""));
-            message.AppendLine($"Duplicate sub-command identities in command {command.GetPathString()}: {csv}");
+            message.AppendLine($"Duplicate sub-command identities in command \"{command.GetPathString()}\": {csv}");
         });
     }
 
@@ -520,7 +497,7 @@ public static class ConfigurationValidator
         
         state.Errors.Add(message =>
         {
-            message.AppendLine($"Invalid symbol identities found in command {command.GetPathString()}:");
+            message.AppendLine($"Invalid symbol identities found in command \"{command.GetPathString()}\":");
             foreach (var (symbol, identity) in invalidEntries)
             {
                 message.AppendLine($"{Indent}\"{identity}\" in {symbol.GetDisplayString()}");
@@ -537,28 +514,5 @@ public static class ConfigurationValidator
             .Where(symbol => typePredicate(symbol.Type))
             .SelectMany(symbol => symbol.Identities.Select(identity => (symbol, identity)))
             .Where(item => !syntaxPredicate(SymbolSyntax.Parse(item.identity)));
-    }
-    
-    private static Type? GetGenericCollectionType(Type type)
-    {
-        if (type.IsArray)
-        {
-            return type.GetElementType();
-        }
-
-        if (!type.IsGenericType)
-            return null;
-
-        var genericArguments = type.GetGenericArguments();
-        
-        // Could be Dictionary, KeyValuePair, etc..
-        if (genericArguments.Length != 1)
-            return null;
-
-        var genericDefinition = type.GetGenericTypeDefinition();
-        
-        return !SupportedCollectionTypes.Contains(genericDefinition) 
-            ? null 
-            : genericArguments[0];
     }
 }

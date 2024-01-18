@@ -4,14 +4,14 @@
 /// Binds argument values to a model instance.
 /// </summary>
 /// <typeparam name="TModel">Model type.</typeparam>
-public abstract class ModelBinder<TModel> : ModelBinder where TModel : class
+public abstract class ModelBinder<TModel> : ModelBinder
 {
     /// <summary>
     /// Creates a new <typeparamref name="TModel"/> instance using data in the binding
     /// context.
     /// </summary>
     /// <param name="bindingContext">Binding context.</param>
-    /// <returns><see cref="TModel"/></returns>
+    /// <returns>The model of the model.</returns>
     public abstract TModel BindInstance(IBindingContext bindingContext);
 
     /// <inheritdoc />

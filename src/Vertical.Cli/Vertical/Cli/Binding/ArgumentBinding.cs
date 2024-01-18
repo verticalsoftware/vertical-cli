@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Vertical.Cli.Binding;
 
@@ -20,5 +21,6 @@ public abstract class ArgumentBinding : IEnumerable<object>
     public abstract IEnumerator<object> GetEnumerator();
 
     /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

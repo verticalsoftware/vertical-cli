@@ -2,6 +2,9 @@
 
 namespace Vertical.Cli;
 
+/// <summary>
+/// Indicates an argument failed conversion.
+/// </summary>
 public sealed class CliValueConversionException : CliArgumentException
 {
     /// <inheritdoc />

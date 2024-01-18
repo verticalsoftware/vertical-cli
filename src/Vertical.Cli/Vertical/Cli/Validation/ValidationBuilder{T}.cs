@@ -58,14 +58,4 @@ public class ValidationBuilder<T>
 
         return new CompositeValidator<T>(_validators);
     }
-
-    internal static Validator<T>? TryBuild(Action<ValidationBuilder<T>>? action)
-    {
-        if (action == null)
-            return null;
-
-        var builder = new ValidationBuilder<T>();
-        action(builder);
-        return builder.Build();
-    }
 }

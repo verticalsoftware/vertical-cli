@@ -1,0 +1,3 @@
+﻿[
+  (1) Parameter model type Vertical.Cli.Configuration.ConfigurationValidatorTests+ModelWithPrivateConstructor does not have an accessible constructor.
+]

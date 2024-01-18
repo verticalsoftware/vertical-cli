@@ -45,7 +45,9 @@ public static class SourceBuilder
         code.AppendLine($"{indent}/// <param name=\"args\">The collection of program arguments.</param>");
         code.AppendLine($"{indent}/// <returns>The result provided by the command handler implementation.</returns>");
         code.AppendLine($"{tab}public static {model.AsyncKeyword}{model.ResultTypeName} {model.InvokeMethodName}(");
-        code.AppendLine($"{indent}this {model.RootCommandInterfaceName} rootCommand,");
+        code.AppendLine($"{indent}this global::Vertical.Cli.IRootCommand<");
+        code.AppendLine($"{indent.Indent}{model.RootCommandModel.ModelTypeName},");
+        code.AppendLine($"{indent.Indent}{model.ResultTypeName}> rootCommand,");
         code.Append($"{indent}global::System.Collections.Generic.IEnumerable<string> args");
 
         if (model.IsAsyncFlow)
@@ -97,7 +99,7 @@ public static class SourceBuilder
 
         code.AppendLine($"{indent}if (modelType == typeof(global::Vertical.Cli.None))");
         code.AppendLine($"{indent}{{");
-        code.AppendLine($"{indent.Indent}return context.BindModelParameter(_ => global::Vertical.Cli.None.Default);");
+        code.AppendLine($"{indent.Indent}return context.BindModelToCallSite<global::Vertical.Cli.None>();");
         code.AppendLine($"{indent}}}");
         code.AppendLine();
         
@@ -122,18 +124,18 @@ public static class SourceBuilder
     {
         if (modelType.ToDisplayString() == "Vertical.Cli.Binding.BindingLookup")
         {
-            code.AppendLine($"{tab}return context.BindModelParameter(bindingContext => bindingContext.BindingValueLookup);");
+            code.AppendLine($"{tab}return context.BindModelToCallSite(bindingContext => bindingContext.BindingValueLookup);");
             return;
         }
 
         if (modelType.IsApplicationBound())
         {
             code.AppendLine($"{tab}// Class marked with [ModelBinder<>] attribute");
-            code.AppendLine($"{tab}return context.BindModelParameter<{modelType.ToFullName()}>();");
+            code.AppendLine($"{tab}return context.BindModelToCallSite<{modelType.ToFullName()}>();");
             return;
         }
 
-        code.AppendLine($"{tab}return context.BindModelParameter(bindingContext =>");
+        code.AppendLine($"{tab}return context.BindModelToCallSite(bindingContext =>");
         
         const string bindingContextVar = "bindingContext";
         var indent = tab.Indent;

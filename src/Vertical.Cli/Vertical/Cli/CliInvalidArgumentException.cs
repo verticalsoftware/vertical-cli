@@ -2,6 +2,10 @@
 
 namespace Vertical.Cli;
 
+/// <summary>
+/// Indicates the number of provided values for an argument does not satisfy
+/// the arity definition.
+/// </summary>
 public sealed class CliInvalidArgumentException : CliArgumentException
 {
     /// <inheritdoc />

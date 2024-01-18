@@ -1,21 +1,24 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Diagnostics;
 using Vertical.Cli.Configuration;
 
 namespace Vertical.Cli.Parsing;
 
 /// <summary>
-/// Represents a collection of semantic arguments.
+/// Represents a collection of <see cref="SemanticArgument"/> objects parsed from syntax input.
 /// </summary>
-public sealed class SemanticArgumentCollection : IEnumerable<SemanticArgument>
+public class SemanticArgumentCollection : IEnumerable<SemanticArgument>
 {
-    private readonly IReadOnlyList<SemanticArgument> _expandedArguments;
+    private readonly SemanticArgument[] _expandedArguments;
     private readonly bool[] _flags;
-    
-    internal SemanticArgumentCollection(IReadOnlyList<SymbolSyntax> argumentSyntax)
+
+    internal SemanticArgumentCollection(
+        IEnumerable<SymbolDefinition> symbols,
+        IReadOnlyList<SymbolSyntax> arguments)
     {
-        _expandedArguments = ExpandArgumentSyntax(argumentSyntax);
-        _flags = Enumerable.Range(0, _expandedArguments.Count).Select(_ => true).ToArray();
+        _expandedArguments = ExpandSymbols(symbols, arguments).ToArray();
+        _flags = Enumerable.Range(0, _expandedArguments.Length).Select(_ => true).ToArray();
     }
 
     /// <summary>
@@ -26,10 +29,9 @@ public sealed class SemanticArgumentCollection : IEnumerable<SemanticArgument>
     public IEnumerable<SemanticArgument> GetOptionArguments(SymbolDefinition symbol)
     {
         Guard.IsNotNull(symbol);
-        
-        return InternalArguments
-            .Where(argument => argument.ArgumentSyntax.HasSingleIdentifier &&
-                               symbol.Identities.Any(identity => identity == argument.ArgumentSyntax.Identifiers[0]))
+
+        return Unaccepted
+            .Where(argument => ReferenceEquals(symbol, argument.OptionSymbol))
             .ToArray();
     }
 
@@ -44,74 +46,105 @@ public sealed class SemanticArgumentCollection : IEnumerable<SemanticArgument>
     public IEnumerable<SemanticArgument> GetValueArguments(SymbolDefinition symbol)
     {
         Guard.IsNotNull(symbol);
-        
+
         var maxCount = symbol.Arity.MaxCount.GetValueOrDefault(int.MaxValue);
 
-        return InternalArguments
+        return Unaccepted
             .Take(maxCount)
             .ToArray();
     }
 
-    /// <inheritdoc />
-    public IEnumerator<SemanticArgument> GetEnumerator() => InternalArguments.GetEnumerator();
-
-    private IEnumerable<SemanticArgument> InternalArguments => _expandedArguments
+    /// <summary>
+    /// Gets the arguments that have not been accepted.
+    /// </summary>
+    public IEnumerable<SemanticArgument> Unaccepted => _expandedArguments
         .Where(arg => _flags[arg.OrdinalPosition]);
 
-    private IReadOnlyList<SemanticArgument> ExpandArgumentSyntax(IReadOnlyList<SymbolSyntax> argumentSyntax)
+    private IEnumerable<SemanticArgument> ExpandSymbols(
+        IEnumerable<SymbolDefinition> symbols,
+        IReadOnlyList<SymbolSyntax> arguments)
     {
-        var terminated = false;
+        var symbolDictionary = symbols
+            .Where(symbol => symbol.Type != SymbolType.Argument)
+            .SelectMany(symbol => symbol.Identities.Select(id => (id, symbol)))
+            .ToDictionary(item => item.id, item => item.symbol);
+
         var position = 0;
-        var list = new List<SemanticArgument>(argumentSyntax.Count * 3);
+        var terminated = false;
 
-        for (var c = 0; c < argumentSyntax.Count; c++)
+        for(var c = 0; c < arguments.Count; c++)
         {
-            var syntax = argumentSyntax[c];
-            var next = c < argumentSyntax.Count - 1 ? argumentSyntax[c + 1] : null;
-
+            var syntax = arguments[c];
+            var next = c < arguments.Count - 1 ? arguments[c + 1] : null;
+            
             switch (syntax)
             {
                 case not null when terminated:
-                    list.Add(new SemanticArgument(RemoveArgument, syntax, position++));
+                    yield return new SemanticArgument(Remove, syntax, position++, terminated: true);
                     break;
-                
-                case { Type: SymbolSyntaxType.ArgumentTerminator }:
+                    
+                case { Type: SymbolSyntaxType.ArgumentTerminator } when !terminated:
                     terminated = true;
-                    break;
+                    continue;
                 
+                case { Type: SymbolSyntaxType.Simple or SymbolSyntaxType.NonIdentifier }:
+                    yield return new SemanticArgument(Remove, syntax, position++);
+                    break;
+                    
                 case { Type: SymbolSyntaxType.PosixPrefixed, Identifiers.Length: > 1 }:
-                    list.AddRange(syntax.Identifiers.SkipLast(1).Select(identifier => new SemanticArgument(
-                        RemoveArgument, 
-                        SymbolSyntax.Parse(identifier), 
-                        position++)));
-                    list.Add(new SemanticArgument(
-                        RemoveArgument, 
-                        SymbolSyntax.Parse($"{syntax.Identifiers.Last()}{syntax.OperandExpression}"),
-                        position++));
-                    break;
-                
-                case { IsPrefixed: true, HasOperand: true }:
-                    list.Add(new SemanticArgument(RemoveArgument, syntax, position++));
-                    break;
-                
-                case { IsPrefixed: true } when next is { Type: not SymbolSyntaxType.ArgumentTerminator }:
-                    list.Add(new SemanticArgument(RemoveArgument, syntax, position++, next, position + 1));
+                    foreach (var shortIdentity in syntax.Identifiers.SkipLast(1))
+                    {
+                        yield return new SemanticArgument(
+                            Remove,
+                            SymbolSyntax.Parse(shortIdentity), 
+                            position++,
+                            symbolDictionary.GetValueOrDefault(shortIdentity));
+                    }
+
+                    yield return CreateOptionArgument(
+                        symbolDictionary, 
+                        SymbolSyntax.Parse(syntax.Identifiers.Last()), 
+                        next, 
+                        position++);
                     break;
                 
                 default:
-                    list.Add(new SemanticArgument(RemoveArgument, syntax!, position++));
+                    yield return CreateOptionArgument(symbolDictionary, syntax!, next, position++);
                     break;
-            }   
+            }
         }
-
-        return list;
     }
 
-    /// <inheritdoc />
-    public override string ToString() => $"({this.Count()})";
+    private SemanticArgument CreateOptionArgument(
+        Dictionary<string, SymbolDefinition> symbolDictionary,
+        SymbolSyntax syntax, 
+        SymbolSyntax? next, 
+        int position)
+    {
+        var symbol = symbolDictionary.GetValueOrDefault(syntax.Identifiers[0]);
+        
+        if (syntax.HasOperand)
+        {
+            return new SemanticArgument(Remove, syntax, position, symbol);
+        }
 
-    private void RemoveArgument(int index) => _flags[index] = false;
+        var isCandidateOperand = symbol != null && 
+                                 next is not null &&
+                                 !(next.Identifiers.Length == 1 && symbolDictionary.ContainsKey(next.Identifiers[0]));
+        
+        return isCandidateOperand
+            ? new SemanticArgument(Remove, syntax, position, symbol, next, position + 1)
+            : new SemanticArgument(Remove, syntax, position, symbol);
+    }
+
+    private void Remove(int position) => _flags[position] = false;
 
     /// <inheritdoc />
+    public IEnumerator<SemanticArgument> GetEnumerator() => _expandedArguments
+        .Cast<SemanticArgument>()
+        .GetEnumerator();
+
+    /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

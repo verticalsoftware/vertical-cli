@@ -19,13 +19,15 @@ internal static class SymbolDefinitionExtensions
     
     internal static string GetShortDisplayString(this SymbolDefinition symbol)
     {
-        var notations = symbol.Arity.MinCount > 0 ? "<>" : "[]";
-        var identities = string.Join('|', symbol.Identities);
-        
-        return $"{notations[0]}{identities}{notations[1]}";
+        var identities = symbol.Identities.ToArray();
+        var identityCsv = string.Join('|', identities);
+
+        return identities.Length > 1
+            ? $"[{identityCsv}]"
+            : identityCsv;
     }
 
-    internal static string GetDisplayString(this SymbolDefinition symbol)
+    internal static string GetDisplayString(this SymbolDefinition symbol, bool quoteIdentities = false)
     {
         var typeString = symbol.Type switch
         {
@@ -34,13 +36,17 @@ internal static class SymbolDefinitionExtensions
             SymbolType.Switch => "switch",
             _ => symbol.Type.ToString().ToLower()
         };
+
+        var quotes = quoteIdentities
+            ? "\""
+            : string.Empty;
         
-        return $"{typeString} {symbol.GetShortDisplayString()}";
+        return $"{typeString} {quotes}{symbol.GetShortDisplayString()}{quotes}";
     }
 
     internal static string GetFUllDisplayString(this SymbolDefinition symbol)
     {
-        return $"{symbol.Parent.GetPathString()} {symbol.GetShortDisplayString()}";
+        return $"{symbol.Parent.GetPathString()} -> {symbol.GetShortDisplayString()}";
     }
     
     internal static T GetValueOrDefault<T>(this SymbolDefinition symbol)

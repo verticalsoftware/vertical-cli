@@ -29,29 +29,29 @@ internal sealed class CallSiteContext<TResult> : ICallSiteContext<TResult>
     public CliOptions Options { get; }
 
     /// <inheritdoc />
-    public Func<CancellationToken, TResult> BindModelParameter<TModel>() where TModel : class
-    {
-        var binder = (ModelBinder<TModel>)Options
-            .ModelBinders
-            .First(item => item.ModelType == typeof(TModel));
-
-        var model = binder.BindInstance(BindingContext);
-
-        return CallSite.WrapParameter(model);
-    }
-
-    /// <inheritdoc />
-    public Func<CancellationToken, TResult> BindModelParameter<TModel>(
-        Func<IBindingContext, TModel> bindingFunction)
+    public Func<CancellationToken, TResult> BindModelToCallSite<TModel>(
+        Func<IBindingContext, TModel>? bindingFunction = null)
         where TModel : class
     {
         if (typeof(TModel) == typeof(None))
         {
             return CallSite.WrapParameter(None.Default);
         }
-        
-        var model = bindingFunction(BindingContext);            
 
-        return CallSite.WrapParameter(model);
+        TModel model;
+
+        if (Options.TryCreateBinder<TModel>(out var binder))
+        {
+            model = binder.BindInstance(BindingContext);
+            return CallSite.WrapParameter(model);
+        }
+        
+        if (bindingFunction != null)
+        {
+            model = bindingFunction(BindingContext);
+            return CallSite.WrapParameter(model);
+        }
+
+        throw new InvalidOperationException();
     }
 }

@@ -1,7 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using System.IO.Compression;
-using BasicSetup;
+﻿using System.IO.Compression;
 using Vertical.Cli;
 using Vertical.Cli.Validation;
 
@@ -53,3 +50,11 @@ var rootCommand = RootCommand.Create<FileCopyParameters, Task<int>>(
     });
 
 return await rootCommand.InvokeAsync(args);
+
+public enum Compression { None, GZip }
+
+public record FileCopyParameters(
+    FileInfo Source,
+    FileInfo Dest,
+    Compression Compression,
+    bool Overwrite);

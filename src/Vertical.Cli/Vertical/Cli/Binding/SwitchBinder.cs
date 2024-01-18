@@ -7,7 +7,7 @@ namespace Vertical.Cli.Binding;
 /// <summary>
 /// Binds semantic arguments to switch symbols.
 /// </summary>
-internal sealed class SwitchBinder : IBinder
+internal sealed class SwitchBinder : IBinder 
 {
     internal static SwitchBinder Instance { get; } = new();
 
@@ -37,24 +37,14 @@ internal sealed class SwitchBinder : IBinder
     {
         argument.Accept();
 
-        bool value;
-
         switch (argument)
         {
-            case { ArgumentSyntax.HasOperand: true }:
-                
-                if (!bool.TryParse(argument.ArgumentSyntax.OperandValue, out value))
-                    throw InvocationExceptions.InvalidSwitchArgument(
-                        symbol, 
-                        argument.ArgumentSyntax.OperandValue);
-
-                return value;
-            
-            // Only consume the argument it is "true" or "false"
-            case { CandidateOperandSyntax.Type: SymbolSyntaxType.Simple } when bool.TryParse(
-                argument.CandidateOperandSyntax.Text, out value):
+            case { HasOperand: true } when bool.TryParse(argument.OperandValue, out var value):
                 argument.AcceptOperand();
                 return value;
+            
+            case { ArgumentSyntax.HasOperand: true }:
+                throw InvocationExceptions.InvalidSwitchArgument(symbol, argument.OperandValue);
             
             default:
                 return true;

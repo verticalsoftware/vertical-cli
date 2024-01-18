@@ -8,7 +8,7 @@ internal static class InvocationExceptions
     public static Exception InvalidSwitchArgument(SymbolDefinition symbol, string argumentValue)
     {
         return new CliInvalidSwitchValueException(
-            "{Symbol}: could not convert {AttemptedValue} to a boolean value",
+            "{Symbol}: could not convert \"{AttemptedValue}\" to a boolean value",
             new Dictionary<string, object>
             {
                 ["Symbol"] = symbol.GetDisplayString(),
@@ -102,7 +102,7 @@ internal static class InvocationExceptions
             symbol);
     }
 
-    public static Exception InvalidArguments(SemanticArgumentCollection arguments)
+    public static Exception InvalidArguments(IEnumerable<SemanticArgument> arguments)
     {
         return new CliInvalidArgumentException(
             "Invalid option, argument, or switch: \"{Argument}\".",

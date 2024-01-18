@@ -19,7 +19,7 @@ public sealed class SymbolSyntax : IEquatable<SymbolSyntax>
         Type = type;
         Text = text;
         Prefix = prefix;
-        SimpleIdentifiers = simpleIdentifiers;
+        SimpleIdentifiers = simpleIdentifiers ?? Array.Empty<string>();
         Identifiers = identifiers ?? Array.Empty<string>();
         OperandAssignmentToken = operandAssignmentToken;
         OperandValue = operandValue;
@@ -71,7 +71,7 @@ public sealed class SymbolSyntax : IEquatable<SymbolSyntax>
     /// <summary>
     /// Gets identifiers without the prefix.
     /// </summary>
-    public string[]? SimpleIdentifiers { get; }
+    public string[] SimpleIdentifiers { get; }
 
     /// <summary>
     /// Gets the identifiers of the symbol, which is any part of the text that excludes an operand expression
@@ -108,6 +108,13 @@ public sealed class SymbolSyntax : IEquatable<SymbolSyntax>
     /// <inheritdoc />
     public override string ToString() => Text;
 
+    /// <summary>
+    /// Determines equality among <see cref="SymbolSyntax"/> instances.
+    /// </summary>
     public static bool operator ==(SymbolSyntax x, SymbolSyntax y) => x.Equals(y);
+    
+    /// <summary>
+    /// Determines inequality among <see cref="SymbolSyntax"/> instances.
+    /// </summary>
     public static bool operator !=(SymbolSyntax x, SymbolSyntax y) => !x.Equals(y);
 }

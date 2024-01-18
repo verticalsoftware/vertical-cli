@@ -30,7 +30,8 @@ var rootCommand = RootCommand.Create<int>(
 Application's can fully control binding by adding an `IBinder` instance to `CliOptions`. To bind a model manually, perform the following:
 
 ```csharp
-// Decorate the model with the following attribute:
+// Decorate the model with the following attribute. This step is not required, but applying it
+// allows the source generator to skip the binding code for the model type.
 [ModelBinder<MyModelBinder>]
 public record MyModel(string Color, string Size, string Shape);
 
@@ -64,9 +65,11 @@ var rootCommand = RootCommand.Create<int>(
     options);
 ```
 
-## Inspecting the call site
+## Lower level API
 
-Application's can see all the data the library uses to perform command invocation by inspecting the `ICallSiteContext` object. The best way to see this is to view the generated source file. This data can be obtained by creating the call site manually.
+### Getting the call site
+
+Application's can see all the data the library uses to perform command invocation by inspecting the `ICallSiteContext` object. The best way to see an example of building the call site is to view the application's generated source file. This data can be obtained by creating the call site manually.
 
 ```csharp
 // Note: the default value is necessary for call sites that are invoked that do not
@@ -103,3 +106,20 @@ The `BindingContext` contains a variety of data including the parsed arguments, 
 |HelpOptionSymbol|If defined, a reference to the help option symbol.|
 |BindingDictionary|A dictionary of argument bindings, used to provide final values.|
 
+### Using a value lookup as the binding model
+
+Instead of a application defined model type, a command can get an `ILookup<string, object>` that contains the mapped arguments. The key of the lookup is the symbol's binding id.
+
+```csharp
+var rootCommand = RootCommand.Create<BindingLookup, int>(
+    id: "program",
+    configure: root =>
+    {
+        root.SetHandler(lookup => 
+        {
+            var overwrite = (bool)lookup["--overwrite"].Single();
+
+            return 0;
+        })
+    });
+```

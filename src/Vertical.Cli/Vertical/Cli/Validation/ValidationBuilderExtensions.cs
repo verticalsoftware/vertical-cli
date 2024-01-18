@@ -83,7 +83,7 @@ public static class ValidationBuilderExtensions
     {
         Guard.IsNotNull(builder);
         Guard.IsGreaterThan(minimumLength, 0);
-        Guard.IsLessThanOrEqualTo(maximumLength, minimumLength);
+        Guard.IsGreaterThanOrEqualTo(maximumLength, minimumLength);
 
         return builder.Must(
             value => value.Length >= minimumLength && value.Length <= maximumLength, 
@@ -208,7 +208,7 @@ public static class ValidationBuilderExtensions
         comparer ??= Comparer<T>.Default;
 
         return builder.Must(
-            comparable => comparer.Compare(value, comparable) < 0,
+            comparable => comparer.Compare(comparable, value) < 0,
             message ?? (() => $"Value must be less than {new DisplayValue<T>(value)}."));
     }
     
@@ -232,7 +232,7 @@ public static class ValidationBuilderExtensions
         comparer ??= Comparer<T>.Default;
 
         return builder.Must(
-            comparable => comparer.Compare(value, comparable) <= 0,
+            comparable => comparer.Compare(comparable, value) <= 0,
             message ?? (() => $"Value must be less than or equal to {new DisplayValue<T>(value)}."));
     }
     
@@ -256,7 +256,7 @@ public static class ValidationBuilderExtensions
         comparer ??= Comparer<T>.Default;
 
         return builder.Must(
-            comparable => comparer.Compare(value, comparable) > 0,
+            comparable => comparer.Compare(comparable, value) > 0,
             message ?? (() => $"Value must be greater than {new DisplayValue<T>(value)}."));
     }
     
@@ -280,7 +280,7 @@ public static class ValidationBuilderExtensions
         comparer ??= Comparer<T>.Default;
 
         return builder.Must(
-            comparable => comparer.Compare(value, comparable) >= 0,
+            comparable => comparer.Compare(comparable, value) >= 0,
             message ?? (() => $"Value must be greater than {new DisplayValue<T>(value)}."));
     }
     

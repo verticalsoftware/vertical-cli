@@ -48,12 +48,12 @@ public class GenerationModel
         {
             if (!IsAsyncFlow)
             {
-                return $"global::Vertical.Cli.Binding.Default<{ResultTypeName}>.Value";
+                return $"global::Vertical.Cli.Binding.DefaultOf<{ResultTypeName}>.Value";
             }
 
             var valueType = ((INamedTypeSymbol)ResultType).TypeArguments.FirstOrDefault();
             return valueType != null
-                ? $"global::Vertical.Cli.Binding.AsyncDefault<{valueType.ToFullName()}>.Value"
+                ? $"global::Vertical.Cli.Binding.DefaultOf<{valueType.ToFullName()}>.TaskValue"
                 : "global::System.Threading.Tasks.Task.CompletedTask";
         }
     }

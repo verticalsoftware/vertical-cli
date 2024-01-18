@@ -1,0 +1,4 @@
+﻿[  
+(1) Parameter model type Vertical.Cli.Configuration.ConfigurationValidatorTests+IncompatibleCollectionModelType cannot be bound in path "root" for the following reason(s):
+    Values for argument "Arguments" cannot be bound to .ctor parameter Arguments (System.String[]) because System.Decimal is not assignable to the array or collection type System.String.
+]

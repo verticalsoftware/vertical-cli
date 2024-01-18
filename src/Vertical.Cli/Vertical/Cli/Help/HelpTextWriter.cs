@@ -3,6 +3,9 @@ using CommunityToolkit.Diagnostics;
 
 namespace Vertical.Cli.Help;
 
+/// <summary>
+/// Controls output formatting.
+/// </summary>
 public sealed class HelpTextWriter
 {
     private readonly TextWriter _textWriter;
@@ -10,9 +13,16 @@ public sealed class HelpTextWriter
     private readonly char[] _spaceBuffer;
     private int _x;
 
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HelpTextWriter"/> class.
+    /// </summary>
+    /// <param name="textWriter">Text writer to output content to.</param>
+    /// <param name="width">The horizontal width, in characters.</param>
     public HelpTextWriter(TextWriter textWriter, int width)
     {
         Guard.IsNotNull(textWriter);
+        Guard.IsGreaterThanOrEqualTo(width, 40);
         
         _textWriter = textWriter;
         _width = width;
@@ -20,14 +30,26 @@ public sealed class HelpTextWriter
         Array.Fill(_spaceBuffer, ' ');
     }
 
+    /// <summary>
+    /// Flushes the underlying text writer.
+    /// </summary>
     public void Flush() => _textWriter.Flush();
 
+    /// <summary>
+    /// Writes a character.
+    /// </summary>
+    /// <param name="c">Character value.</param>
     public void Write(char c)
     {
         _textWriter.Write(c);
         ++_x;
     }
 
+    /// <summary>
+    /// Writes a character span within the confines of the specified margin.
+    /// </summary>
+    /// <param name="span">Span of characters.</param>
+    /// <param name="margin">Margin values.</param>
     public void Write(ReadOnlySpan<char> span, (int Left, int Right)? margin = null)
     {
         if (margin.HasValue)
@@ -40,6 +62,10 @@ public sealed class HelpTextWriter
         _x += span.Length;
     }
 
+    /// <summary>
+    /// Writes a line character.
+    /// </summary>
+    /// <param name="count">Number new line characters to write.</param>
     public void WriteLine(int count = 1)
     {
         for (var c = 0; c < count; c++)
@@ -50,20 +76,37 @@ public sealed class HelpTextWriter
         _x = 0;
     }
 
+    /// <summary>
+    /// Writes a character span within the confines of the specified margin, then writes a
+    /// new line.
+    /// </summary>
+    /// <param name="span">Span of characters.</param>
+    /// <param name="margin">Margin values.</param>
     public void WriteLine(ReadOnlySpan<char> span, (int Left, int Right)? margin = null)
     {
         Write(span, margin);
         WriteLine();
     }
 
+    /// <summary>
+    /// Writes a space character.
+    /// </summary>
     public void WriteSpace()
     {
         _textWriter.Write(' ');
         ++_x;
     }
 
+    /// <summary>
+    /// Writes the required number of spaces to position the next output at
+    /// the left margin.
+    /// </summary>
+    /// <param name="margin">The margin value.</param>
     public void Indent(int margin) => WriteNewLineLeftMargin(margin);
 
+    /// <summary>
+    /// Writes a new line character if the current position isn't at a new line.
+    /// </summary>
     public void WriteLineIfNotAtLineOrigin()
     {
         if (_x == 0) return;

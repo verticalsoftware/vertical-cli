@@ -1,0 +1,4 @@
+﻿[  
+(1) Parameter model type Vertical.Cli.Configuration.ConfigurationValidatorTests+IncompatibleCollectionModel cannot be bound in path "root" for the following reason(s):
+    Values for argument "argument" cannot be bound to .ctor parameter Argument (System.String) because it is not an array or supported collection type.
+]
