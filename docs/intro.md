@@ -335,3 +335,4 @@ var rootCommand = RootCommand.Create<CliArgs, int>(
 rootCommand.Invoke(args);
 ```
 
+More [advanced topics](https://github.com/verticalsoftware/vertical-cli/blob/main/docs/advanced.md).
