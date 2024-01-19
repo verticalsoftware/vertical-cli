@@ -219,7 +219,7 @@ namespace Vertical.Cli.Configuration
     public interface IRootCommandBuilder<out TModel, TResult> : Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult>
         where out TModel :  class
     {
-        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> AddHelpOption(string? id = null, string[]? aliases = null, TResult returnValue = default);
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> AddHelpOption(string id = "--help", string[]? aliases = null, string description = "Display help content.", TResult returnValue = default);
     }
     public abstract class SymbolDefinition
     {

@@ -14,7 +14,8 @@ public sealed class HelpSymbolDefinition<TResult> : SymbolDefinition<bool>
         string id,
         string[] aliases,
         SymbolScope scope,
-        TResult returnValue) 
+        TResult returnValue,
+        string description) 
         : base(
             SymbolType.HelpOption, 
             parent, 
@@ -23,7 +24,7 @@ public sealed class HelpSymbolDefinition<TResult> : SymbolDefinition<bool>
             id, 
             aliases, 
             Arity.ZeroOrOne, 
-            description: null, 
+            description: description, 
             scope,
             defaultProvider: null,
             validator: null)

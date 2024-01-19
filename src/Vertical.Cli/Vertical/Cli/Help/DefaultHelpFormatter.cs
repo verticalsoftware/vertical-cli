@@ -38,7 +38,9 @@ public class DefaultHelpFormatter : IHelpFormatter
         WriteUsageGrammar(command, helpFormatInfo);
         WriteCommandList(helpFormatInfo.SubCommands);
         WriteArgumentList(helpFormatInfo.SymbolLookup[SymbolType.Argument]);
-        WriteOptionList(helpFormatInfo.Symbols.Where(symbol => symbol.Type is SymbolType.Option or SymbolType.Switch));
+        WriteOptionList(helpFormatInfo.Symbols.Where(symbol => symbol.Type is SymbolType.Option 
+            or SymbolType.Switch
+            or SymbolType.HelpOption));
         
         _helpWriter.Flush();
     }

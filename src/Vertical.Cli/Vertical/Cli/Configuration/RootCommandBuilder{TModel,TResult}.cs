@@ -12,17 +12,19 @@ internal sealed class RootCommandBuilder<TModel, TResult> :
     
     /// <inheritdoc />
     public ICommandBuilder<TModel, TResult> AddHelpOption(
-        string? id = null,
+        string id = "--help",
         string[]? aliases = null,
+        string description = "Display help content",
         TResult returnValue = default!)
     {
         AddSymbol(new HelpSymbolDefinition<TResult>(
             this,
             GetInsertPosition(),
-            id ?? "--help",
+            id,
             aliases ?? Array.Empty<string>(),
             SymbolScope.ParentAndDescendents,
-            returnValue));
+            returnValue,
+            description));
         
         return this;
     }

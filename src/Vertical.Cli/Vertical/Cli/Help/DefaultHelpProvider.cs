@@ -120,7 +120,7 @@ public class DefaultHelpProvider : IHelpProvider
     /// <inheritdoc />
     public string? GetSymbolArgumentName(SymbolDefinition symbol)
     {
-        if (symbol.Type == SymbolType.Switch)
+        if (symbol.Type is SymbolType.Switch or SymbolType.HelpOption)
             return null;
 
         var identities = symbol.Identities;
