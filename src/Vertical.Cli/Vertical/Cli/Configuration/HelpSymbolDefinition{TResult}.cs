@@ -17,7 +17,7 @@ public sealed class HelpSymbolDefinition<TResult> : SymbolDefinition<bool>
         TResult returnValue,
         string description) 
         : base(
-            SymbolType.HelpOption, 
+            SymbolKind.Switch, 
             parent, 
             () => SwitchBinder.Instance, 
             position, 
@@ -27,7 +27,8 @@ public sealed class HelpSymbolDefinition<TResult> : SymbolDefinition<bool>
             description: description, 
             scope,
             defaultProvider: null,
-            validator: null)
+            validator: null,
+            specialType: SymbolSpecialType.HelpOption)
     {
         ReturnValue = returnValue;
     }

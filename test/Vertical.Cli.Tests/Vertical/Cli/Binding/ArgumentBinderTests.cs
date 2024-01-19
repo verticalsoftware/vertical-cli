@@ -55,7 +55,7 @@ public class ArgumentBinderTests
     {
         return Factories.CreateSymbol(
             Factories.DefaultCommand,
-            SymbolType.Argument,
+            SymbolKind.Argument,
             id: "arg",
             arity: arity,
             defaultProvider: defaultProvider);

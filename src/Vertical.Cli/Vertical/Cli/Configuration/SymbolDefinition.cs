@@ -8,7 +8,7 @@ namespace Vertical.Cli.Configuration;
 public abstract class SymbolDefinition
 {
     internal SymbolDefinition(
-        SymbolType type,
+        SymbolKind kind,
         ICommandDefinition parent,
         Func<IBinder> bindingProvider,
         int position,
@@ -16,9 +16,10 @@ public abstract class SymbolDefinition
         string[] aliases,
         Arity arity,
         string? description,
-        SymbolScope scope)
+        SymbolScope scope,
+        SymbolSpecialType specialType = SymbolSpecialType.None)
     {
-        Type = type;
+        Kind = kind;
         Parent = parent;
         BindingProvider = bindingProvider;
         Position = position;
@@ -27,6 +28,7 @@ public abstract class SymbolDefinition
         Arity = arity;
         Description = description;
         Scope = scope;
+        SpecialType = specialType;
     }
 
     private Func<IBinder> BindingProvider { get; }
@@ -34,7 +36,7 @@ public abstract class SymbolDefinition
     /// <summary>
     /// Gets the symbol type.
     /// </summary>
-    public SymbolType Type { get; }
+    public SymbolKind Kind { get; }
 
     /// <summary>
     /// Gets the command that this symbol is defined in.
@@ -86,6 +88,11 @@ public abstract class SymbolDefinition
     /// Gets the scope of the symbol within the command path.
     /// </summary>
     public SymbolScope Scope { get; }
+
+    /// <summary>
+    /// Gets the symbol special type.
+    /// </summary>
+    public SymbolSpecialType SpecialType { get; }
 
     /// <summary>
     /// Gets the binding value type.

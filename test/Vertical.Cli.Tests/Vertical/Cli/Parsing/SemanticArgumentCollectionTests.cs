@@ -10,8 +10,8 @@ public class SemanticArgumentCollectionTests
     private static readonly ICommandDefinition Command = Substitute.For<ICommandDefinition>();
     private static readonly Dictionary<string, SymbolDefinition> Symbols = new()
     {
-        ["--switch"] = Factories.CreateSymbol<bool>(SymbolType.Switch, "--switch", "-s"),
-        ["--shape"] = Factories.CreateSymbol<string>(SymbolType.Option, "--shape")
+        ["--switch"] = Factories.CreateSymbol<bool>(SymbolKind.Switch, "--switch", "-s"),
+        ["--shape"] = Factories.CreateSymbol<string>(SymbolKind.Option, "--shape")
     };
     private readonly SemanticArgumentCollection _instance = Setup();
     private readonly SemanticArgument[] _arguments;
@@ -107,14 +107,14 @@ public class SemanticArgumentCollectionTests
         foreach (var arg in Symbols.Values.SelectMany(symbol => _instance.GetOptionArguments(symbol)))
         {
             arg.Accept(); 
-            if (arg.OptionSymbol is { Type: SymbolType.Option })
+            if (arg.OptionSymbol is { Kind: SymbolKind.Option })
             {
                 arg.AcceptOperand();
             }
         }
 
         var multiValueSymbol = new SymbolDefinition<string>(
-            SymbolType.Argument,
+            SymbolKind.Argument,
             Command,
             () => ArgumentBinder<string>.Instance,
             0, "arg", Array.Empty<string>(), Arity.OneOrMany,

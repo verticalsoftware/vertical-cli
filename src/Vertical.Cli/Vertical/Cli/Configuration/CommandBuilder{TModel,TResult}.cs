@@ -143,7 +143,7 @@ internal class CommandBuilder<TModel, TResult> :
         Validator<T>? validator = null)
     {
         return AddSymbol(
-            SymbolType.Option,
+            SymbolKind.Option,
             () => OptionBinder<T>.Instance,
             id,
             aliases,
@@ -163,7 +163,7 @@ internal class CommandBuilder<TModel, TResult> :
         Func<bool>? defaultProvider = null)
     {
         return AddSymbol(
-            SymbolType.Switch,
+            SymbolKind.Switch,
             () => SwitchBinder.Instance,
             id,
             aliases,
@@ -183,7 +183,7 @@ internal class CommandBuilder<TModel, TResult> :
         Validator<T>? validator = null)
     {
         return AddSymbol(
-            SymbolType.Argument,
+            SymbolKind.Argument,
             () => ArgumentBinder<T>.Instance,
             id,
             aliases: null,
@@ -219,7 +219,7 @@ internal class CommandBuilder<TModel, TResult> :
     protected int GetInsertPosition() => _positionReference.Next();
 
     private ICommandBuilder<TModel, TResult> AddSymbol<T>(
-        SymbolType type,
+        SymbolKind kind,
         Func<IBinder> binderFactory,
         string id,
         string[]? aliases,
@@ -232,7 +232,7 @@ internal class CommandBuilder<TModel, TResult> :
         Guard.IsNotNullOrWhiteSpace(id);
         
         _symbols.Add(new SymbolDefinition<T>(
-            type,
+            kind,
             this,
             binderFactory,
             _positionReference.Next(),

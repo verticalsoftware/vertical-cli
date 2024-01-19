@@ -65,7 +65,7 @@ public class SemanticArgumentCollection : IEnumerable<SemanticArgument>
         IReadOnlyList<SymbolSyntax> arguments)
     {
         var symbolDictionary = symbols
-            .Where(symbol => symbol.Type != SymbolType.Argument)
+            .Where(symbol => symbol.Kind != SymbolKind.Argument)
             .SelectMany(symbol => symbol.Identities.Select(id => (id, symbol)))
             .ToDictionary(item => item.id, item => item.symbol);
 

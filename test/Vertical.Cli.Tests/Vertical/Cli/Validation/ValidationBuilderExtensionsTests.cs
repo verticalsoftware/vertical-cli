@@ -156,7 +156,7 @@ public class ValidationBuilderExtensionsTests
         configure(builder);
         
         var validator = builder.Build();
-        var symbol = (SymbolDefinition<T>)Factories.CreateSymbol<T>(SymbolType.Argument, "arg");
+        var symbol = (SymbolDefinition<T>)Factories.CreateSymbol<T>(SymbolKind.Argument, "arg");
         var list = new List<string>();
         
         validator.Validate(new ValidationContext<T>(symbol, valid, list));

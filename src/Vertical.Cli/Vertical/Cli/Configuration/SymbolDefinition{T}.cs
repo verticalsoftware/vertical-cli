@@ -13,7 +13,7 @@ public class SymbolDefinition<T> : SymbolDefinition
 {
     /// <inheritdoc />
     internal SymbolDefinition(
-        SymbolType type,
+        SymbolKind kind,
         ICommandDefinition parent,
         Func<IBinder> bindingProvider,
         int position,
@@ -23,8 +23,9 @@ public class SymbolDefinition<T> : SymbolDefinition
         string? description,
         SymbolScope scope,
         Func<T>? defaultProvider,
-        Validator<T>? validator) 
-        : base(type, parent, bindingProvider, position, id, aliases, arity, description, scope)
+        Validator<T>? validator,
+        SymbolSpecialType specialType = SymbolSpecialType.None) 
+        : base(kind, parent, bindingProvider, position, id, aliases, arity, description, scope, specialType)
     {
         DefaultProvider = defaultProvider;
         Validator = validator;

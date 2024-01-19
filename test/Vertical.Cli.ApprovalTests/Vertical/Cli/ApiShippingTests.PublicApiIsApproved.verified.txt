@@ -228,10 +228,11 @@ namespace Vertical.Cli.Configuration
         public string? Description { get; }
         public string Id { get; }
         public System.Collections.Generic.IEnumerable<string> Identities { get; }
+        public Vertical.Cli.Configuration.SymbolKind Kind { get; }
         public Vertical.Cli.Configuration.ICommandDefinition Parent { get; }
         public int Position { get; }
         public Vertical.Cli.SymbolScope Scope { get; }
-        public Vertical.Cli.Configuration.SymbolType Type { get; }
+        public Vertical.Cli.Configuration.SymbolSpecialType SpecialType { get; }
         public abstract System.Type ValueType { get; }
         public Vertical.Cli.Binding.ArgumentBinding CreateBinding(Vertical.Cli.Binding.IBindingContext bindingContext) { }
     }
@@ -242,12 +243,16 @@ namespace Vertical.Cli.Configuration
         public override System.Type ValueType { get; }
         public override string ToString() { }
     }
-    public enum SymbolType
+    public enum SymbolKind
     {
         Argument = 0,
         Option = 1,
         Switch = 2,
-        HelpOption = 3,
+    }
+    public enum SymbolSpecialType
+    {
+        None = 0,
+        HelpOption = 1,
     }
 }
 namespace Vertical.Cli.Conversion
@@ -294,7 +299,7 @@ namespace Vertical.Cli.Help
     public sealed class HelpFormatInfo
     {
         public Vertical.Cli.Configuration.ICommandDefinition[] SubCommands { get; }
-        public System.Linq.ILookup<Vertical.Cli.Configuration.SymbolType, Vertical.Cli.Configuration.SymbolDefinition> SymbolLookup { get; set; }
+        public System.Linq.ILookup<Vertical.Cli.Configuration.SymbolKind, Vertical.Cli.Configuration.SymbolDefinition> SymbolLookup { get; set; }
         public Vertical.Cli.Configuration.SymbolDefinition[] Symbols { get; }
     }
     public sealed class HelpTextWriter

@@ -12,7 +12,7 @@ public class BindingExtensionsTests
     {
         var symbol = (SymbolDefinition<int>)Factories.CreateSymbol<int>(
             Factories.DefaultCommand,
-            SymbolType.Argument,
+            SymbolKind.Argument,
             "arg");
         var args = new[] { "100" };
         var context = new RuntimeBindingContext(new CliOptions(),
@@ -28,7 +28,7 @@ public class BindingExtensionsTests
     {
         var symbol = (SymbolDefinition<int>)Factories.CreateSymbol<int>(
             Factories.DefaultCommand,
-            SymbolType.Argument,
+            SymbolKind.Argument,
             "arg");
         var args = new[] { "100" };
         var cliOptions = new CliOptions();
@@ -46,7 +46,7 @@ public class BindingExtensionsTests
     {
         var symbol = (SymbolDefinition<int>)Factories.CreateSymbol<int>(
             Factories.DefaultCommand,
-            SymbolType.Argument,
+            SymbolKind.Argument,
             "arg");
         var args = new[] { "string" };
         var context = new RuntimeBindingContext(new CliOptions(),
@@ -63,7 +63,7 @@ public class BindingExtensionsTests
         var validator = Validator.Configure<string>(x => x.MinimumLength(1));
         var symbol = (SymbolDefinition<string>)Factories.CreateSymbol(
             Factories.DefaultCommand,
-            SymbolType.Argument,
+            SymbolKind.Argument,
             "arg",
             validator: validator);
         var args = new[] { "arg" };
@@ -80,7 +80,7 @@ public class BindingExtensionsTests
         var validator = Validator.Configure<string>(x => x.MinimumLength(5));
         var symbol = (SymbolDefinition<string>)Factories.CreateSymbol(
             Factories.DefaultCommand,
-            SymbolType.Argument,
+            SymbolKind.Argument,
             "arg",
             validator: validator);
         var args = new[] { "str" };

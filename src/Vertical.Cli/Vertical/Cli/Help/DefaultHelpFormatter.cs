@@ -37,10 +37,8 @@ public class DefaultHelpFormatter : IHelpFormatter
         WriteDescription(command);
         WriteUsageGrammar(command, helpFormatInfo);
         WriteCommandList(helpFormatInfo.SubCommands);
-        WriteArgumentList(helpFormatInfo.SymbolLookup[SymbolType.Argument]);
-        WriteOptionList(helpFormatInfo.Symbols.Where(symbol => symbol.Type is SymbolType.Option 
-            or SymbolType.Switch
-            or SymbolType.HelpOption));
+        WriteArgumentList(helpFormatInfo.SymbolLookup[SymbolKind.Argument]);
+        WriteOptionList(helpFormatInfo.Symbols.Where(symbol => symbol.Kind is SymbolKind.Option or SymbolKind.Switch));
         
         _helpWriter.Flush();
     }
@@ -60,9 +58,9 @@ public class DefaultHelpFormatter : IHelpFormatter
     private void WriteUsageGrammar(ICommandDefinition subject, HelpFormatInfo formatInfo)
     {
         var commandGrammar = _provider.GetCommandUsageGrammar(subject, formatInfo.SubCommands);
-        var argumentGrammar = _provider.GetArgumentsUsageGrammar(subject, formatInfo.SymbolLookup[SymbolType.Argument]);
+        var argumentGrammar = _provider.GetArgumentsUsageGrammar(subject, formatInfo.SymbolLookup[SymbolKind.Argument]);
         var optionGrammar = _provider.GetOptionsUsageGrammar(subject, formatInfo.Symbols.Where(
-            symbol => symbol.Type is SymbolType.Option or SymbolType.Switch));
+            symbol => symbol.Kind is SymbolKind.Option or SymbolKind.Switch));
         
         _helpWriter.WriteLine("Usage:");
         _helpWriter.Indent(DefaultMargin.Left);

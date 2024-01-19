@@ -27,7 +27,7 @@ internal static class HelpCallSite
 
         bindingContext.AddBinding(binding);
 
-        callSite =CallSite<TResult>.Create(
+        callSite = CallSite<TResult>.Create(
             new EmptyCommandDefinition<TResult>(options),
             (_, _) => InvokeHelp(options, helpSymbol, bindingContext, defaultValue),
             CallState.Help);

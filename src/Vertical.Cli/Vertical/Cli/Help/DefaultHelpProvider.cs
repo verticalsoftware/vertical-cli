@@ -89,7 +89,7 @@ public class DefaultHelpProvider : IHelpProvider
 
         try
         {
-            if (symbol.Type == SymbolType.Argument)
+            if (symbol.Kind == SymbolKind.Argument)
             {
                 FormatArgumentGrammar(symbol, sb);
             }
@@ -109,7 +109,7 @@ public class DefaultHelpProvider : IHelpProvider
     /// <inheritdoc />
     public string GetSymbolSortKey(SymbolDefinition symbol)
     {
-        if (symbol.Type == SymbolType.Argument)
+        if (symbol.Kind == SymbolKind.Argument)
         {
             return $"{symbol.Position:0000}";
         }
@@ -120,7 +120,7 @@ public class DefaultHelpProvider : IHelpProvider
     /// <inheritdoc />
     public string? GetSymbolArgumentName(SymbolDefinition symbol)
     {
-        if (symbol.Type is SymbolType.Switch or SymbolType.HelpOption)
+        if (symbol.Kind is SymbolKind.Switch)
             return null;
 
         var identities = symbol.Identities;

@@ -15,6 +15,8 @@ internal sealed class RuntimeBindingContext : IBindingContext
         IEnumerable<string> rawArguments,
         IEnumerable<string> subjectArguments)
     {
+        var symbols = subject.GetAllSymbols();
+
         Options = options;
         Subject = subject;
         RawArguments = rawArguments.ToArray();
@@ -23,13 +25,12 @@ internal sealed class RuntimeBindingContext : IBindingContext
         SemanticArguments = new SemanticArgumentCollection(subject.GetAllSymbols(), ArgumentSyntax);
         ConverterDictionary = options.Converters.ToDictionary(converter => converter.ValueType);
         ValidatorDictionary = options.Validators.ToDictionary(validator => validator.ValueType);
-
-        var symbols = subject.GetAllSymbols();
-        SymbolLookup = symbols.ToLookup(symbol => symbol.Type);
+        SymbolLookup = symbols.ToLookup(symbol => symbol.Kind);
         SymbolIdentities = new HashSet<string>(symbols.SelectMany(symbol => symbol.Identities));
+        HelpOptionSymbol = symbols.FirstOrDefault(symbol => symbol.SpecialType == SymbolSpecialType.HelpOption);
     }
 
-    private ILookup<SymbolType, SymbolDefinition> SymbolLookup { get; }
+    private ILookup<SymbolKind, SymbolDefinition> SymbolLookup { get; }
 
     /// <summary>
     /// Gets the CLI options.
@@ -61,16 +62,16 @@ internal sealed class RuntimeBindingContext : IBindingContext
     public IReadOnlyCollection<string> SymbolIdentities { get; }
 
     /// <inheritdoc />
-    public IEnumerable<SymbolDefinition> ArgumentSymbols => SymbolLookup[SymbolType.Argument];
+    public IEnumerable<SymbolDefinition> ArgumentSymbols => SymbolLookup[SymbolKind.Argument];
 
     /// <inheritdoc />
-    public IEnumerable<SymbolDefinition> SwitchSymbols => SymbolLookup[SymbolType.Switch];
+    public IEnumerable<SymbolDefinition> SwitchSymbols => SymbolLookup[SymbolKind.Switch];
 
     /// <inheritdoc />
-    public IEnumerable<SymbolDefinition> OptionSymbols => SymbolLookup[SymbolType.Option];
+    public IEnumerable<SymbolDefinition> OptionSymbols => SymbolLookup[SymbolKind.Option];
 
     /// <inheritdoc />
-    public SymbolDefinition? HelpOptionSymbol => SymbolLookup[SymbolType.HelpOption].FirstOrDefault();
+    public SymbolDefinition? HelpOptionSymbol { get; }
 
     /// <inheritdoc />
     public IReadOnlyDictionary<string, ArgumentBinding> BindingDictionary => _bindings;

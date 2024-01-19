@@ -149,7 +149,7 @@ public static class ConfigurationValidator
 
         var argumentSymbols = subject
             .GetAllSymbols()
-            .Where(symbol => symbol.Type == SymbolType.Argument)
+            .Where(symbol => symbol.Kind == SymbolKind.Argument)
             .OrderBy(symbol => symbol.Position)
             .ToArray();
 
@@ -247,7 +247,7 @@ public static class ConfigurationValidator
         
         foreach (var symbol in subject.GetAllSymbols())
         {
-            if (symbol.Type == SymbolType.HelpOption)
+            if (symbol.SpecialType != SymbolSpecialType.None)
                 continue;
             
             var matched = model.FindParameters(symbol).ToArray();
@@ -384,7 +384,7 @@ public static class ConfigurationValidator
         var hasSymbols = subject.Symbols.Any(symbol => symbol is
         {
             Scope: SymbolScope.Parent or SymbolScope.ParentAndDescendents,
-            Type: not SymbolType.HelpOption
+            SpecialType: SymbolSpecialType.None
         });
 
         if (!hasSymbols)
@@ -484,12 +484,12 @@ public static class ConfigurationValidator
         
         invalidEntries.AddRange(SelectInvalidSyntax(
             symbols, 
-            type => type == SymbolType.Argument,
+            type => type == SymbolKind.Argument,
             syntax => syntax.Type == SymbolSyntaxType.Simple));
         
         invalidEntries.AddRange(SelectInvalidSyntax(
             symbols,
-            type => type is SymbolType.Option or SymbolType.Switch,
+            type => type is SymbolKind.Option or SymbolKind.Switch,
             syntax => syntax.IsPrefixed));
 
         if (invalidEntries.Count == 0)
@@ -507,11 +507,11 @@ public static class ConfigurationValidator
 
     private static IEnumerable<(SymbolDefinition, string)> SelectInvalidSyntax(
         this IEnumerable<SymbolDefinition> symbols,
-        Predicate<SymbolType> typePredicate,
+        Predicate<SymbolKind> typePredicate,
         Predicate<SymbolSyntax> syntaxPredicate)
     {
         return symbols
-            .Where(symbol => typePredicate(symbol.Type))
+            .Where(symbol => typePredicate(symbol.Kind))
             .SelectMany(symbol => symbol.Identities.Select(identity => (symbol, identity)))
             .Where(item => !syntaxPredicate(SymbolSyntax.Parse(item.identity)));
     }

@@ -29,12 +29,12 @@ internal static class SymbolDefinitionExtensions
 
     internal static string GetDisplayString(this SymbolDefinition symbol, bool quoteIdentities = false)
     {
-        var typeString = symbol.Type switch
+        var typeString = symbol.Kind switch
         {
-            SymbolType.Argument => "argument",
-            SymbolType.Option => "option",
-            SymbolType.Switch => "switch",
-            _ => symbol.Type.ToString().ToLower()
+            SymbolKind.Argument => "argument",
+            SymbolKind.Option => "option",
+            SymbolKind.Switch => "switch",
+            _ => symbol.Kind.ToString().ToLower()
         };
 
         var quotes = quoteIdentities

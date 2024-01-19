@@ -122,7 +122,7 @@ public class OptionBinderTests
     {
         return Factories.CreateSymbol(
             Factories.DefaultCommand,
-            SymbolType.Option,
+            SymbolKind.Option,
             id: "--option",
             arity: arity,
             defaultProvider: defaultProvider);

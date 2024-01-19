@@ -15,10 +15,10 @@ public class Factories
         return substitute;
     })();
     
-    public static SymbolDefinition CreateSymbol<T>(SymbolType type, string id, params string[] aliases)
+    public static SymbolDefinition CreateSymbol<T>(SymbolKind kind, string id, params string[] aliases)
     {
         return new SymbolDefinition<T>(
-            type,
+            kind,
             DefaultCommand,
             () => OptionBinder<T>.Instance,
             0,
@@ -33,7 +33,7 @@ public class Factories
 
     public static SymbolDefinition CreateSymbol<T>(
         ICommandDefinition command,
-        SymbolType type,
+        SymbolKind kind,
         string id,
         string[]? aliases = null,
         Arity? arity = null,
@@ -44,7 +44,7 @@ public class Factories
         Func<IBinder>? binderFactory = null)
     {
         return new SymbolDefinition<T>(
-            type,
+            kind,
             command,
             binderFactory ?? (() => OptionBinder<T>.Instance),
             0,

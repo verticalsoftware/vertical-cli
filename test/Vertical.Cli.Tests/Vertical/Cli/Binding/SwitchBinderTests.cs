@@ -9,7 +9,7 @@ public class SwitchBinderTests
 {
     private static readonly SymbolDefinition SwitchSymbol = Factories.CreateSymbol<bool>(
         Factories.DefaultCommand,
-        SymbolType.Switch,
+        SymbolKind.Switch,
         id: "--switch",
         arity: Arity.ZeroOrOne);
     
@@ -84,7 +84,7 @@ public class SwitchBinderTests
         var provider = new Provider<bool>(true);
         var symbol = Factories.CreateSymbol<bool>(
             Factories.DefaultCommand,
-            SymbolType.Switch,
+            SymbolKind.Switch,
             "--switch",
             defaultProvider: provider);
         _ = SwitchBinder.Instance.CreateBinding(SetupBindingContext("--switch"), symbol);

@@ -16,13 +16,13 @@ public sealed class HelpFormatInfo
         RootCommand = command.GetRootCommand();
         SubCommands = commands.ToArray();
         Symbols = symbols.ToArray();
-        SymbolLookup = Symbols.ToLookup(symbol => symbol.Type);
+        SymbolLookup = Symbols.ToLookup(symbol => symbol.Kind);
     }
 
     /// <summary>
     /// Gets a lookup of symbols by type.
     /// </summary>
-    public ILookup<SymbolType, SymbolDefinition> SymbolLookup { get; set; }
+    public ILookup<SymbolKind, SymbolDefinition> SymbolLookup { get; set; }
 
     /// <summary>
     /// Gets all symbols of the subject command.

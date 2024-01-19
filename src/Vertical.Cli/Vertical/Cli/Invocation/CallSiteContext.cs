@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Diagnostics;
 using Vertical.Cli.Binding;
 using Vertical.Cli.Configuration;
-using Vertical.Cli.Help;
-using Vertical.Cli.Utilities;
+using Vertical.Cli.Invocation.Pipeline;
 
 namespace Vertical.Cli.Invocation;
 
@@ -45,52 +44,6 @@ public static class CallSiteContext
 
         var subject = commands.Last();
         var bindingContext = new RuntimeBindingContext(rootCommand.Options, subject, args, queue);
-        var options = rootCommand.Options;
-
-        try
-        {
-            if (HelpCallSite.TryCreate(bindingContext, options, defaultValue, out var helpSite))
-            {
-                return new CallSiteContext<TResult>(helpSite, options, bindingContext);
-            }
-
-            var commandSite = CreateCommandCallSite<TResult>(bindingContext);
-
-            if (bindingContext.SemanticArguments.Unaccepted.Any())
-            {
-                // Any arguments left not mapped to symbols are invalid
-                throw InvocationExceptions.InvalidArguments(bindingContext.SemanticArguments.Unaccepted);
-            }
-
-            return new CallSiteContext<TResult>(commandSite, options, bindingContext);
-        }
-        catch (Exception exception)
-        {
-            return new CallSiteContext<TResult>(
-                ExceptionStateCallSite.Create(exception, rootCommand.Options, defaultValue),
-                options,
-                bindingContext,
-                exception);
-        }
-    }
-
-    private static ICallSite<TResult> CreateCommandCallSite<TResult>(RuntimeBindingContext bindingContext)
-    {
-        // These have to be done in a specific order so the arguments
-        // are mapped and consumed properly
-        bindingContext.AddBindings(CreateBindings(bindingContext, bindingContext.SwitchSymbols));
-        bindingContext.AddBindings(CreateBindings(bindingContext, bindingContext.OptionSymbols));
-        bindingContext.AddBindings(CreateBindings(bindingContext, bindingContext.ArgumentSymbols));
-
-        var subject = (ICommandDefinition<TResult>)bindingContext.Subject;
-
-        return subject.CreateCallSite();
-    }
-
-    private static IEnumerable<ArgumentBinding> CreateBindings(
-        IBindingContext bindingContext,
-        IEnumerable<SymbolDefinition> symbols)
-    {
-        return symbols.Select(symbol => symbol.CreateBinding(bindingContext));
+        return CallSiteBuilder.Build(bindingContext, rootCommand.Options, defaultValue);
     }
 }
