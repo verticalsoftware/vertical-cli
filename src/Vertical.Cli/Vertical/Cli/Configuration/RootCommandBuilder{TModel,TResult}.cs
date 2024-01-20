@@ -1,4 +1,6 @@
-﻿namespace Vertical.Cli.Configuration;
+﻿using Vertical.Cli.Binding;
+
+namespace Vertical.Cli.Configuration;
 
 internal sealed class RootCommandBuilder<TModel, TResult> : 
     CommandBuilder<TModel, TResult>,
@@ -17,14 +19,19 @@ internal sealed class RootCommandBuilder<TModel, TResult> :
         string description = "Display help content",
         TResult returnValue = default!)
     {
-        AddSymbol(new HelpSymbolDefinition<TResult>(
+        AddSymbol(new SymbolDefinition<bool>(
+            SymbolKind.Switch,
             this,
+            () => SwitchBinder.Instance,
             GetInsertPosition(),
             id,
             aliases ?? Array.Empty<string>(),
+            Arity.ZeroOrOne,
+            description,
             SymbolScope.ParentAndDescendents,
-            returnValue,
-            description));
+            defaultProvider: null,
+            validator: null,
+            SymbolSpecialType.HelpOption));
         
         return this;
     }

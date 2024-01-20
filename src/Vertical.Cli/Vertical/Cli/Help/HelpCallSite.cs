@@ -2,7 +2,6 @@
 using Vertical.Cli.Binding;
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Invocation;
-using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Help;
 
@@ -19,7 +18,7 @@ internal static class HelpCallSite
         if (bindingContext.HelpOptionSymbol == null)
             return false;
 
-        var helpSymbol = (HelpSymbolDefinition<TResult>)bindingContext.HelpOptionSymbol;
+        var helpSymbol = (SymbolDefinition<bool>)bindingContext.HelpOptionSymbol;
         var binding = (ArgumentBinding<bool>)helpSymbol.CreateBinding(bindingContext);
 
         if (!binding.Values.Any(set => set))
@@ -29,7 +28,7 @@ internal static class HelpCallSite
 
         callSite = CallSite<TResult>.Create(
             new EmptyCommandDefinition<TResult>(options),
-            (_, _) => InvokeHelp(options, helpSymbol, bindingContext, defaultValue),
+            (_, _) => InvokeHelp(options, bindingContext, defaultValue),
             CallState.Help);
 
         return true;
@@ -37,13 +36,12 @@ internal static class HelpCallSite
 
     private static TResult InvokeHelp<TResult>(
         CliOptions options,
-        HelpSymbolDefinition<TResult> helpSymbol,
         IBindingContext bindingContext,
         TResult defaultValue)
     {
         var formatter = options.CreateHelpFormatter();
         formatter.WriteContent(bindingContext.Subject);
 
-        return helpSymbol.ReturnValue ?? defaultValue;
+        return defaultValue;
     }
 }

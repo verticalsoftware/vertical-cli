@@ -174,11 +174,6 @@ namespace Vertical.Cli.Configuration
         public static void ThrowIfInvalid<TModel, TResult>(this Vertical.Cli.IRootCommand<TModel, TResult> rootCommand)
             where TModel :  class { }
     }
-    public sealed class HelpSymbolDefinition<TResult> : Vertical.Cli.Configuration.SymbolDefinition<bool>
-    {
-        public TResult ReturnValue { get; }
-        public override System.Type ValueType { get; }
-    }
     public interface ICommandBuilder<out TModel, TResult>
         where out TModel :  class
     {
