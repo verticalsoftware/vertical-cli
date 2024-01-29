@@ -109,4 +109,24 @@ internal static class InvocationExceptions
             new Dictionary<string, object> { ["Argument"] = arguments.First().ArgumentSyntax.Text },
             arguments.ToArray());
     }
+
+    public static Exception ResponseFileUnterminatedQuote(string source, int lineNumber, string input)
+    {
+        return new CliResponseFileException(
+            "Unterminated quote in response file {Source} near line {LineNumber}: {Input}",
+            new Dictionary<string, object>
+            {
+                ["Source"] = source,
+                ["LineNumber"] = lineNumber,
+                ["Input"] = input
+            });
+    }
+
+    public static Exception ResponseFileIOException(IOException exception)
+    {
+        return new CliResponseFileException(
+            "Could not read response file: {Message}",
+            new Dictionary<string, object> { ["Message"] = exception.Message },
+            exception);
+    }
 }

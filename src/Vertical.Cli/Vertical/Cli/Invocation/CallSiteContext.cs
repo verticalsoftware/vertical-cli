@@ -28,22 +28,13 @@ public static class CallSiteContext
         Guard.IsNotNull(rootCommand);
         Guard.IsNotNull(args);
 
-        ICommandDefinition<TResult> command = rootCommand;
-        var queue = new Queue<string>(args);
-        var commands = new List<ICommandDefinition<TResult>>(5) { rootCommand };
-
-        // Select command
-        while (queue.TryPeek(out var arg))
-        {
-            if (!command.TryCreateChild(arg, out var child))
-                break;
-
-            queue.Dequeue();
-            commands.Add(command = child);
-        }
-
-        var subject = commands.Last();
-        var bindingContext = new RuntimeBindingContext(rootCommand.Options, subject, args, queue);
+        var selectedPath = CommandSelector.GetPath(rootCommand, args);
+        var bindingContext = new RuntimeBindingContext(
+            rootCommand.Options, 
+            selectedPath.Subject, 
+            args, 
+            selectedPath.Arguments);
+        
         return CallSiteBuilder.Build(bindingContext, rootCommand.Options, defaultValue);
     }
 }

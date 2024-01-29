@@ -39,7 +39,8 @@ public static class ConfigurationValidator
 
         var state = new StateHelper(rootCommand.Options);
         var path = ImmutableList.Create((ICommandDefinition<TResult>)rootCommand);
-        
+
+        ValidateRootCommand(rootCommand, state);
         ValidateOptions(rootCommand.Options, state);
         
         return Visit(path, state)
@@ -71,6 +72,44 @@ public static class ConfigurationValidator
         }
 
         throw new InvalidOperationException(sb.ToString());
+    }
+
+    private static void ValidateRootCommand<TModel, TResult>(
+        IRootCommand<TModel, TResult> rootCommand, 
+        StateHelper state) 
+        where TModel : class
+    {
+        ValidateSpecialSymbols(rootCommand, state);
+    }
+
+    private static void ValidateSpecialSymbols<TModel, TResult>(
+        IRootCommand<TModel, TResult> rootCommand,
+        StateHelper state) 
+        where TModel : class
+    {
+        var repeatedSymbols = rootCommand
+            .Symbols
+            .Where(symbol => symbol.SpecialType != SymbolSpecialType.None)
+            .GroupBy(symbol => symbol.SpecialType)
+            .Where(group => group.Count() > 1)
+            .ToArray();
+
+        if (repeatedSymbols.Length == 0)
+            return;
+        
+        state.Errors.Add(message =>
+        {
+            message.AppendLine("The following root command special symbols are defined more than once:");
+            foreach (var grouping in repeatedSymbols)
+            {
+                var description = grouping.Key switch
+                {
+                    SymbolSpecialType.HelpOption => "help option",
+                    _ => "response file option"
+                };
+                message.AppendLine($"{Indent}{description}");
+            }
+        });
     }
 
     private static void ValidateOptions(CliOptions options, StateHelper state)

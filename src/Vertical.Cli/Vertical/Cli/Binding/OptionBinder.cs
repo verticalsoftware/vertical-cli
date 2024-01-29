@@ -28,7 +28,7 @@ internal sealed class OptionBinder<T> : IBinder
 
         if (values.Length == 0 && typedSymbol.DefaultProvider != null)
         {
-            values = new[] { typedSymbol.DefaultProvider() };
+            values = [typedSymbol.DefaultProvider()];
         }
         
         symbol.ValidateArity(values.Length);
@@ -50,6 +50,10 @@ internal sealed class OptionBinder<T> : IBinder
                 case { HasOperand: true }:
                     argument.AcceptOperand();
                     return bindingContext.GetBindingValue(symbol, argument.OperandValue);
+                
+                case { HasOperand: false } when symbol.DefaultProvider != null:
+                    // Default value will be used
+                    return symbol.DefaultProvider();
                 
                 default:
                     throw InvocationExceptions.OptionMissingOperand(symbol);

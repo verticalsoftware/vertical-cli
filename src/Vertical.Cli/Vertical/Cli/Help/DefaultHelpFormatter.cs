@@ -21,6 +21,14 @@ public class DefaultHelpFormatter : IHelpFormatter
         _helpWriter = new HelpTextWriter(textWriter, outputWidth);
     }
 
+    internal static IHelpFormatter Create()
+    {
+        return new DefaultHelpFormatter(
+            new DefaultHelpProvider(),
+            Console.Out,
+            Console.WindowWidth);
+    }
+
     /// <inheritdoc />
     public void WriteContent(ICommandDefinition command)
     {

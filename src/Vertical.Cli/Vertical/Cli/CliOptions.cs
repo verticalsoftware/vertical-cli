@@ -32,19 +32,14 @@ public sealed class CliOptions
     public IReadOnlyCollection<Type> BinderTypes => _binderRegistrations.Keys;
 
     /// <summary>
-    /// Gets whether to automatically display argument exceptions.
+    /// Gets whether to automatically display argument exceptions to the console.
     /// </summary>
     public bool DisplayExceptions { get; set; } = true;
 
     /// <summary>
-    /// Gets whether to throw binding exceptions.
+    /// Gets whether to automatically throw command line exceptions.
     /// </summary>
     public bool ThrowExceptions { get; set; } = false;
-
-    /// <summary>
-    /// Gets a function that creates the help renderer at the moment it is needed.
-    /// </summary>
-    public Func<IHelpFormatter>? HelpFormatterFactory { get; set; }
     
     /// <summary>
     /// Adds a conversion function.
@@ -139,15 +134,6 @@ public sealed class CliOptions
             return this;
 
         throw new InvalidOperationException($"There is already a binder registration for {typeof(T)}.");
-    }
-
-    internal IHelpFormatter CreateHelpFormatter()
-    {
-        return HelpFormatterFactory?.Invoke()
-               ?? new DefaultHelpFormatter(
-                   new DefaultHelpProvider(),
-                   Console.Out,
-                   Console.WindowWidth);
     }
 
     internal bool TryCreateBinder<T>([NotNullWhen(true)] out ModelBinder<T>? binder)

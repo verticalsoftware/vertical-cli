@@ -213,6 +213,21 @@ internal class CommandBuilder<TModel, TResult> :
     }
 
     /// <summary>
+    /// Replaces an existing special symbol.
+    /// </summary>
+    /// <param name="symbol">The symbol to replace an instance that has already been added.</param>
+    protected void ReplaceSpecialSymbol(SymbolDefinition symbol)
+    {
+        var existing = _symbols.FirstOrDefault(sym => sym.SpecialType == symbol.SpecialType);
+        if (existing != null)
+        {
+            _symbols.Remove(existing);
+        }
+
+        AddSymbol(symbol);
+    }
+
+    /// <summary>
     /// Gets the position reference.
     /// </summary>
     /// <returns></returns>

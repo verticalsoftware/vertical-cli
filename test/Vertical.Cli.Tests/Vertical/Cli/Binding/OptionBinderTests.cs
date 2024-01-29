@@ -10,12 +10,21 @@ public class OptionBinderTests
     [Fact]
     public void UsesDefaultProvider()
     {
-        var provider = () => "value";
-        var option = CreateOption(Arity.ZeroOrOne, provider);
-        var context = SetupBindingContext(CreateOption(Arity.ZeroOrOne, provider));
+        var option = CreateOption(Arity.ZeroOrOne, () => "value");
+        var context = SetupBindingContext(option);
         var binding = (ArgumentBinding<string>)OptionBinder<string>.Instance.CreateBinding(context, option);
 
-        Assert.Equal(provider(), binding.Values.Single());
+        Assert.Equal("value", binding.Values.Single());
+    }
+
+    [Fact]
+    public void UsesDefaultProviderAsInferredOperand()
+    {
+        var option = CreateOption(Arity.One, () => "default");
+        var context = SetupBindingContext(option, "--option");
+        var binding = (ArgumentBinding<string>)OptionBinder<string>.Instance.CreateBinding(context, option);
+        
+        Assert.Equal("default", binding.Values.Single());
     }
 
     [Fact]

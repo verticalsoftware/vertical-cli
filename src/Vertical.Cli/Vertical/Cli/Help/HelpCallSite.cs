@@ -18,7 +18,7 @@ internal static class HelpCallSite
         if (bindingContext.HelpOptionSymbol == null)
             return false;
 
-        var helpSymbol = (SymbolDefinition<bool>)bindingContext.HelpOptionSymbol;
+        var helpSymbol = bindingContext.HelpOptionSymbol;
         var binding = (ArgumentBinding<bool>)helpSymbol.CreateBinding(bindingContext);
 
         if (!binding.Values.Any(set => set))
@@ -28,18 +28,17 @@ internal static class HelpCallSite
 
         callSite = CallSite<TResult>.Create(
             new EmptyCommandDefinition<TResult>(options),
-            (_, _) => InvokeHelp(options, bindingContext, defaultValue),
+            (_, _) => InvokeHelp(bindingContext, defaultValue),
             CallState.Help);
 
         return true;
     }
 
     private static TResult InvokeHelp<TResult>(
-        CliOptions options,
         IBindingContext bindingContext,
         TResult defaultValue)
     {
-        var formatter = options.CreateHelpFormatter();
+        var formatter = bindingContext.HelpOptionSymbol!.FormatterProvider();
         formatter.WriteContent(bindingContext.Subject);
 
         return defaultValue;

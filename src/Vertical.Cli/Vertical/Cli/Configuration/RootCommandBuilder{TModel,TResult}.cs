@@ -1,4 +1,5 @@
-﻿using Vertical.Cli.Binding;
+﻿using Vertical.Cli.Help;
+using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;
 
@@ -13,26 +14,41 @@ internal sealed class RootCommandBuilder<TModel, TResult> :
     }
     
     /// <inheritdoc />
-    public ICommandBuilder<TModel, TResult> AddHelpOption(
+    public ICommandBuilder<TModel, TResult> SetHelpOption(
         string id = "--help",
         string[]? aliases = null,
         string description = "Display help content",
-        TResult returnValue = default!)
+        Func<IHelpFormatter>? formatterProvider = null)
     {
-        AddSymbol(new SymbolDefinition<bool>(
-            SymbolKind.Switch,
+        
+        ReplaceSpecialSymbol(new HelpSymbolDefinition(
             this,
-            () => SwitchBinder.Instance,
+            GetInsertPosition(),
+            formatterProvider ?? DefaultHelpFormatter.Create,
+            id,
+            aliases ?? Array.Empty<string>(),
+            description));
+        
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ICommandBuilder<TModel, TResult> SetResponseFileOption(
+        string id = "--silent",
+        string[]? aliases = null,
+        Arity? arity = null,
+        string description = "Response file to read for unattended input.",
+        Func<FileInfo>? defaultProvider = null,
+        Validator<FileInfo>? validator = null)
+    {
+        ReplaceSpecialSymbol(new ResponseFileSymbolDefinition(
+            this,
             GetInsertPosition(),
             id,
             aliases ?? Array.Empty<string>(),
-            Arity.ZeroOrOne,
             description,
-            SymbolScope.ParentAndDescendents,
-            defaultProvider: null,
-            validator: null,
-            SymbolSpecialType.HelpOption));
-        
+            defaultProvider));
+
         return this;
     }
 }

@@ -130,12 +130,11 @@ public class CallSiteContextTests
     public void HelpSiteSelected()
     {
         var helpFormatter = Substitute.For<IHelpFormatter>();
-        var options = new CliOptions { HelpFormatterFactory = () => helpFormatter };
         var root = RootCommand.Create<int>("root", cmd =>
         {
             cmd.SetHandler(_ => 0);
-            cmd.AddHelpOption();
-        }, options);
+            cmd.SetHelpOption(formatterProvider: () => helpFormatter);
+        });
         var context = CallSiteContext.Create(root, new[] { "--help" }, 0);
         
         Assert.Equal(CallState.Help, context.CallSite.State);

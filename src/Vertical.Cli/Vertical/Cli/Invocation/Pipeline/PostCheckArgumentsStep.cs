@@ -7,6 +7,13 @@ internal sealed class PostCheckArgumentsStep<TResult> : CallSiteBuilderStep<TRes
     /// <inheritdoc />
     internal override void Perform(RuntimeState<TResult> state, Action<RuntimeState<TResult>> next)
     {
+        PerformCore(state);
+
+        next(state);
+    }
+
+    private static void PerformCore(RuntimeState<TResult> state)
+    {
         var unacceptedArguments = state
             .BindingContext
             .SemanticArguments

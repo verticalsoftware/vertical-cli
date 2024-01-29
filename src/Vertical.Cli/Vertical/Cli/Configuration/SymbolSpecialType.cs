@@ -6,12 +6,17 @@
 public enum SymbolSpecialType
 {
     /// <summary>
-    /// Indicates no special designation.,
+    /// Indicates no special designation.
     /// </summary>
     None,
     
     /// <summary>
     /// Indicates the help option.
     /// </summary>
-    HelpOption
+    HelpOption,
+    
+    /// <summary>
+    /// Indicates a response file option.
+    /// </summary>
+    ResponseFileOption
 }

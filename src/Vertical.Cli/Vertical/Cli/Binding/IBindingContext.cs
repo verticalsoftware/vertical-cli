@@ -68,7 +68,12 @@ public interface IBindingContext
     /// <summary>
     /// Gets the help option symbol, or <c>null</c>.
     /// </summary>
-    SymbolDefinition? HelpOptionSymbol { get; }
+    HelpSymbolDefinition? HelpOptionSymbol { get; }
+    
+    /// <summary>
+    /// Gets the response option symbol, or <c>null</c>.
+    /// </summary>
+    ResponseFileSymbolDefinition? ResponseFileOptionSymbol { get; }
     
     /// <summary>
     /// Gets the bindings available in the context.

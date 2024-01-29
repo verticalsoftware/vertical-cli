@@ -42,7 +42,6 @@
         public System.Collections.Generic.IReadOnlyCollection<System.Type> BinderTypes { get; }
         public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Conversion.ValueConverter> Converters { get; }
         public bool DisplayExceptions { get; set; }
-        public System.Func<Vertical.Cli.Help.IHelpFormatter>? HelpFormatterFactory { get; set; }
         public bool ThrowExceptions { get; set; }
         public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Validation.Validator> Validators { get; }
         public Vertical.Cli.CliOptions AddBinder<T>(System.Func<Vertical.Cli.Binding.ModelBinder<T>> provider)
@@ -54,6 +53,7 @@
         public Vertical.Cli.CliOptions AddValidator<T>(System.Action<Vertical.Cli.Validation.ValidationBuilder<T>> configure) { }
         public Vertical.Cli.CliOptions AddValidator<T>(Vertical.Cli.Validation.Validator<T> validator) { }
     }
+    public sealed class CliResponseFileException : Vertical.Cli.CliArgumentException { }
     public sealed class CliValidationFailedException : Vertical.Cli.CliArgumentException
     {
         public object? AttemptedValue { get; }
@@ -134,9 +134,10 @@ namespace Vertical.Cli.Binding
         System.Collections.Generic.IReadOnlyDictionary<string, Vertical.Cli.Binding.ArgumentBinding> BindingDictionary { get; }
         Vertical.Cli.Binding.BindingLookup BindingValueLookup { get; }
         System.Collections.Generic.IReadOnlyDictionary<System.Type, Vertical.Cli.Conversion.ValueConverter> ConverterDictionary { get; }
-        Vertical.Cli.Configuration.SymbolDefinition? HelpOptionSymbol { get; }
+        Vertical.Cli.Configuration.HelpSymbolDefinition? HelpOptionSymbol { get; }
         System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.SymbolDefinition> OptionSymbols { get; }
         string[] RawArguments { get; }
+        Vertical.Cli.Configuration.ResponseFileSymbolDefinition? ResponseFileOptionSymbol { get; }
         Vertical.Cli.Parsing.SemanticArgumentCollection SemanticArguments { get; }
         Vertical.Cli.Configuration.ICommandDefinition Subject { get; }
         string[] SubjectArguments { get; }
@@ -173,6 +174,10 @@ namespace Vertical.Cli.Configuration
             where TModel :  class { }
         public static void ThrowIfInvalid<TModel, TResult>(this Vertical.Cli.IRootCommand<TModel, TResult> rootCommand)
             where TModel :  class { }
+    }
+    public sealed class HelpSymbolDefinition : Vertical.Cli.Configuration.SymbolDefinition<bool>
+    {
+        public System.Func<Vertical.Cli.Help.IHelpFormatter> FormatterProvider { get; }
     }
     public interface ICommandBuilder<out TModel, TResult>
         where out TModel :  class
@@ -214,8 +219,10 @@ namespace Vertical.Cli.Configuration
     public interface IRootCommandBuilder<out TModel, TResult> : Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult>
         where out TModel :  class
     {
-        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> AddHelpOption(string id = "--help", string[]? aliases = null, string description = "Display help content.", TResult returnValue = default);
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> SetHelpOption(string id = "--help", string[]? aliases = null, string description = "Display help content.", System.Func<Vertical.Cli.Help.IHelpFormatter>? formatterProvider = null);
+        Vertical.Cli.Configuration.ICommandBuilder<TModel, TResult> SetResponseFileOption(string id = "--silent", string[]? aliases = null, Vertical.Cli.Arity? arity = default, string description = "Response file to read for unattended input.", System.Func<System.IO.FileInfo>? defaultProvider = null, Vertical.Cli.Validation.Validator<System.IO.FileInfo>? validator = null);
     }
+    public sealed class ResponseFileSymbolDefinition : Vertical.Cli.Configuration.SymbolDefinition<System.IO.FileInfo> { }
     public abstract class SymbolDefinition
     {
         public string[] Aliases { get; }
@@ -248,6 +255,7 @@ namespace Vertical.Cli.Configuration
     {
         None = 0,
         HelpOption = 1,
+        ResponseFileOption = 2,
     }
 }
 namespace Vertical.Cli.Conversion

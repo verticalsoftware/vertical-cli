@@ -32,4 +32,10 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\test-arguments.rsp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

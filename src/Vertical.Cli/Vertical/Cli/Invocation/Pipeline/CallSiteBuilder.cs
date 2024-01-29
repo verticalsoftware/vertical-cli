@@ -37,8 +37,9 @@ internal static class CallSiteBuilder
             new ReadResponseFileStep<TResult>(),
             new EvaluateHelpOptionStep<TResult>(),
             new CatchErrorSiteStep<TResult>(),
-            new BuildCommandSiteStep<TResult>(),
-            new PostCheckArgumentsStep<TResult>()
+            new AddBindingsStep<TResult>(),
+            new PostCheckArgumentsStep<TResult>(),
+            new ResolveCallSiteStep<TResult>()
         };
     }
 }

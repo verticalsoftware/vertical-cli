@@ -27,7 +27,10 @@ internal sealed class RuntimeBindingContext : IBindingContext
         ValidatorDictionary = options.Validators.ToDictionary(validator => validator.ValueType);
         SymbolLookup = symbols.ToLookup(symbol => symbol.Kind);
         SymbolIdentities = new HashSet<string>(symbols.SelectMany(symbol => symbol.Identities));
-        HelpOptionSymbol = symbols.FirstOrDefault(symbol => symbol.SpecialType == SymbolSpecialType.HelpOption);
+        HelpOptionSymbol = (HelpSymbolDefinition?)symbols.FirstOrDefault(symbol => 
+            symbol.SpecialType == SymbolSpecialType.HelpOption);
+        ResponseFileOptionSymbol = (ResponseFileSymbolDefinition?)symbols.FirstOrDefault(symbol => 
+            symbol.SpecialType == SymbolSpecialType.ResponseFileOption);
     }
 
     private ILookup<SymbolKind, SymbolDefinition> SymbolLookup { get; }
@@ -71,7 +74,10 @@ internal sealed class RuntimeBindingContext : IBindingContext
     public IEnumerable<SymbolDefinition> OptionSymbols => SymbolLookup[SymbolKind.Option];
 
     /// <inheritdoc />
-    public SymbolDefinition? HelpOptionSymbol { get; }
+    public HelpSymbolDefinition? HelpOptionSymbol { get; }
+
+    /// <inheritdoc />
+    public ResponseFileSymbolDefinition? ResponseFileOptionSymbol { get; }
 
     /// <inheritdoc />
     public IReadOnlyDictionary<string, ArgumentBinding> BindingDictionary => _bindings;
