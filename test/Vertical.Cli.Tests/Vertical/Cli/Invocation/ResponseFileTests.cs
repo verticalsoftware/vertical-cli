@@ -27,7 +27,7 @@ public class ResponseFileTests
                     .AddOption<string?>("--source")
                     .AddOption<string>("--config", ["-c"], defaultProvider: () => "Debug");
 
-                cmd.SetResponseFileOption();
+                cmd.AddResponseFileOption();
 
                 cmd.SetHandler(model => 
                 {

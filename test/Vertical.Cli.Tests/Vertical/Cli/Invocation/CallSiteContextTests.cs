@@ -133,7 +133,7 @@ public class CallSiteContextTests
         var root = RootCommand.Create<int>("root", cmd =>
         {
             cmd.SetHandler(_ => 0);
-            cmd.SetHelpOption(formatterProvider: () => helpFormatter);
+            cmd.AddHelpOption(formatterProvider: () => helpFormatter);
         });
         var context = CallSiteContext.Create(root, new[] { "--help" }, 0);
         

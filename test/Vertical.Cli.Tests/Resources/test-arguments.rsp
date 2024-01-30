@@ -1,0 +1,2 @@
+﻿--no-restore --no-symbols
+--api-key *the_secret*

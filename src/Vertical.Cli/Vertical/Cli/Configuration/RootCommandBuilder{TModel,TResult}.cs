@@ -14,7 +14,7 @@ internal sealed class RootCommandBuilder<TModel, TResult> :
     }
     
     /// <inheritdoc />
-    public ICommandBuilder<TModel, TResult> SetHelpOption(
+    public ICommandBuilder<TModel, TResult> AddHelpOption(
         string id = "--help",
         string[]? aliases = null,
         string description = "Display help content",
@@ -33,10 +33,9 @@ internal sealed class RootCommandBuilder<TModel, TResult> :
     }
 
     /// <inheritdoc />
-    public ICommandBuilder<TModel, TResult> SetResponseFileOption(
+    public ICommandBuilder<TModel, TResult> AddResponseFileOption(
         string id = "--silent",
         string[]? aliases = null,
-        Arity? arity = null,
         string description = "Response file to read for unattended input.",
         Func<FileInfo>? defaultProvider = null,
         Validator<FileInfo>? validator = null)
