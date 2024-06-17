@@ -27,8 +27,6 @@
 
   <ItemGroup>
     <PackageReference Include="communitytoolkit.diagnostics" Version="8.2.2" />
-    <PackageReference Include="DiffEngine" Version="15.4.2" />
-    <PackageReference Include="oneof" Version="3.0.271" />
   </ItemGroup>
   
   <ItemGroup>
@@ -36,7 +34,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="$(OutputPath)\Vertical.Cli.SourceGenerator.dll"
+    <None Include=".\..\..\lib\Vertical.Cli.SourceGenerator.dll"
           Pack="true"
           PackagePath="analyzers/dotnet/cs"
           Visible="false" />

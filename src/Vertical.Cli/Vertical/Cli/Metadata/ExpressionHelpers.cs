@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using OneOf;
 
 namespace Vertical.Cli.Metadata;
 
