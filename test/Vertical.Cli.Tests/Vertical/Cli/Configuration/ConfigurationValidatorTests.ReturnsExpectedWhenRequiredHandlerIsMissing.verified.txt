@@ -1,3 +1,0 @@
-﻿[
-  (1) Command "root" must implement a handler because it has symbols in scope.
-]

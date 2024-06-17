@@ -1,51 +1,39 @@
-﻿using CommunityToolkit.Diagnostics;
-using Vertical.Cli.Configuration;
+﻿using Vertical.Cli.Configuration;
 
 namespace Vertical.Cli.Validation;
 
 /// <summary>
-/// Describes a value being validated and any reported errors.
+/// Represents a context by which models are validated.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public sealed class ValidationContext<T>
+public sealed class ValidationContext
 {
-    private readonly ICollection<string> _errorCollection;
+    private readonly List<ValidationError> _errors = new();
     
-    internal ValidationContext(
-        SymbolDefinition symbol,
-        T value,
-        ICollection<string> errorCollection)
+    internal ValidationContext()
     {
-        _errorCollection = errorCollection;
-        Symbol = symbol;
-        Value = value;
     }
 
     /// <summary>
-    /// Gets the option, argument, or switch definition that value is being bound with.
+    /// Gets validation errors.
     /// </summary>
-    public SymbolDefinition Symbol { get; }
+    public IReadOnlyCollection<ValidationError> Errors => _errors;
 
     /// <summary>
-    /// Gets the value being validated.
+    /// Gets whether all validations passed.
     /// </summary>
-    public T Value { get; }
-
+    public bool IsValid => _errors.Count == 0;
+    
     /// <summary>
-    /// Gets whether any errors have been reported.
+    /// Adds an error.
     /// </summary>
-    public bool IsValidState => _errorCollection.Count == 0;
-
-    /// <summary>
-    /// Adds an error to the context.
-    /// </summary>
-    /// <param name="message"></param>
-    public void AddError(string message)
+    /// <param name="symbol">Mapped symbol</param>
+    /// <param name="attemptedValue">Value that was attempted</param>
+    /// <param name="message">Description of the error</param>
+    public void AddError(
+        CliSymbol symbol,
+        object? attemptedValue,
+        string? message)
     {
-        Guard.IsNotNullOrWhiteSpace(message);
-        _errorCollection.Add(message);
+        _errors.Add(new ValidationError(symbol, attemptedValue, message));    
     }
-
-    /// <inheritdoc />
-    public override string ToString() => $"\"{Value}\" (valid={IsValidState})";
 }

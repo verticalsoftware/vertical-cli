@@ -1,5 +1,0 @@
-﻿[  
-(1) Parameter model type Vertical.Cli.Configuration.ConfigurationValidatorTests+BoundModel cannot be bound in path "root" for the following reason(s):
-    Values for argument "singleArg" cannot be bound to ".ctor parameter SingleArg (System.String)" because System.Int32 is not assignable to System.String.
-    Binding .ctor parameter ArrayArg (System.String[]) does not bind to any defined symbols.
-]

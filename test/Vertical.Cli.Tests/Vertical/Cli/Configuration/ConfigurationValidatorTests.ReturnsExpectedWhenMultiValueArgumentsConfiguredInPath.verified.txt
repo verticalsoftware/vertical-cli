@@ -1,5 +1,0 @@
-﻿[  
-(1) Command path "root -> cmd" has more than one multi-valued argument symbol defined:
-    root -> arg1
-    root -> cmd -> arg2
-]

@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net6.0;net7.0</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace />
-    <Title>vertical-cli</Title>
+    <Title>Vertical-cli</Title>
     <Description>Command line argument parsing and binding framework.</Description>
     <Authors>Vertical Software Contributors</Authors>
     <PackageId>vertical-cli</PackageId>
@@ -24,38 +23,29 @@
     <SymbolsPackageFormat>snupkg</SymbolsPackageFormat>
     <SignAssembly>false</SignAssembly>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-  </PropertyGroup>  
-  
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="communitytoolkit.diagnostics" Version="8.2.2" />
-  </ItemGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
-    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="DiffEngine" Version="15.4.2" />
+    <PackageReference Include="oneof" Version="3.0.271" />
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
+    <InternalsVisibleTo Include="Vertical.Cli.Tests" />
   </ItemGroup>
   
   <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Vertical.Cli.Tests</_Parameter1>
-    </AssemblyAttribute>
+    <None Include="$(OutputPath)\Vertical.Cli.SourceGenerator.dll"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs"
+          Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
     <None Include="..\..\assets\package-logo.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="$(OutputPath)\Vertical.Cli.SourceGenerator.dll"
-          Pack="true"
-          PackagePath="analyzers/dotnet/cs"
-          Visible="false" />
   </ItemGroup>
 
 </Project>

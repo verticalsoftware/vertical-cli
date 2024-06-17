@@ -1,3 +1,0 @@
-﻿[
-  (1) Parameter model type Vertical.Cli.Configuration.ConfigurationValidatorTests+ModelWithMultipleConstructors has multiple constructors.
-]

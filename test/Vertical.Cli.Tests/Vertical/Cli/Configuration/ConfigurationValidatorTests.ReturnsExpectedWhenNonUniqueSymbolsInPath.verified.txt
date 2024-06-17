@@ -1,6 +1,0 @@
-﻿[  
-(1) Duplicate symbol identities found in path:
-    Identity "--switch"
-        in switch --switch
-        in switch --switch
-]

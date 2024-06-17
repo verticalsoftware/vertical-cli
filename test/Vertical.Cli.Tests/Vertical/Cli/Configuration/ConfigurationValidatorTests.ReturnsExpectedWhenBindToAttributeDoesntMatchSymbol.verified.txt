@@ -1,5 +1,0 @@
-﻿[  
-(1) Parameter model type Vertical.Cli.Configuration.ConfigurationValidatorTests+MismatchedBindingIdModelType cannot be bound in path "root" for the following reason(s):
-    Symbol "root -> --switch" is not bound to any constructor parameter, property, or field.
-    Binding .ctor parameter Switch (System.Boolean) (BindTo="--unknown") does not bind to any defined symbols.
-]

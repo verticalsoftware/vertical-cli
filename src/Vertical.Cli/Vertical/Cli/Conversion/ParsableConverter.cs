@@ -1,12 +1,27 @@
-﻿#if NET7_0_OR_GREATER
-namespace Vertical.Cli.Conversion;
+﻿namespace Vertical.Cli.Conversion;
 
-internal sealed class ParsableConverter<T> : ValueConverter<T> where T : IParsable<T>
+/// <summary>
+/// Leverages the <see cref="IParsable{TSelf}"/> interface for conversion.
+/// </summary>
+/// <typeparam name="T">Value type</typeparam>
+public sealed class ParsableConverter<T> : ValueConverter<T> where T : IParsable<T>
 {
     /// <inheritdoc />
-    public override T Convert(ConversionContext<T> context)
+    public override T Convert(string s)
     {
-        return T.Parse(context.Value, provider: null);
+        return T.Parse(s, provider: null);
     }
 }
-#endif
+
+/// <summary>
+/// Leverages the <see cref="IParsable{TSelf}"/> interface for conversion.
+/// </summary>
+/// <typeparam name="T">Value type</typeparam>
+public sealed class NullableParsableConverter<T> : ValueConverter<T?> where T : struct, IParsable<T>
+{
+    /// <inheritdoc />
+    public override T? Convert(string s)
+    {
+        return T.Parse(s, provider: null);
+    }
+}

@@ -1,5 +1,0 @@
-﻿[  
-(1) One or more symbols aren't bindable in path "root" because their value types aren't supported by a ValueConverter:
-    System.IntPtr
-        used by argument "arg"
-]

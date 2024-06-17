@@ -1,4 +1,0 @@
-﻿[  
-(1) Multiple validators defined for the following types:
-    System.String (2 services)
-]

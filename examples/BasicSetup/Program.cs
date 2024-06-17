@@ -1,60 +1,55 @@
-﻿using System.IO.Compression;
+﻿using System.Text.Json;
+using BasicSetup;
 using Vertical.Cli;
+using Vertical.Cli.Configuration;
 using Vertical.Cli.Validation;
 
-var rootCommand = RootCommand.Create<FileCopyParameters, Task<int>>(
-    id: "copy",
-    root =>
+var root = new RootCommand<Model, Task>("cp", "Copies files");
+root
+    .AddOption(x => x.LogLevel, ["--log-level"],
+        description:
+        "The verbosity level of log output. Can be one of: Trace, Debug, Information, Warning, Error, or Critical.")
+    .AddArgument(x => x.Sources,
+        description:
+        "The name of the source file. This could be an absolute or relative path, or a directory/globbing pattern.",
+        validation: v => v.Each<string>(c => c.HasMinLength(10)))
+    .AddOption(x => x.DirectoryInfo, ["--out"], validation: v => v.ExistsOrIsNull())
+    .AddOption(x => x.FileInfo, ["--in"])
+    .AddOption(x => x.BaseUrl, ["--endpoint"])
+    .AddOption(x => x.Port, ["--port"], validation: v => v.GreaterThan((uint)3000))
+    .AddOption(x => x.UserId, ["-u"])
+    .AddHelpSwitch(Task.CompletedTask);
+
+root.SetHandler(async (model, cancellationToken) =>
+{
+    await Task.CompletedTask;
+    
+    Console.WriteLine(JsonSerializer.Serialize(new
     {
-        root.AddDescription("Copies a file, optionally compressing it.");
+        model.LogLevel,
+        Value = string.Join(',', model.Sources),
+        DirectoryInfo = model.DirectoryInfo?.FullName,
+        FileInfo = model.FileInfo?.FullName,
+        BaseUrl = model.BaseUrl?.ToString(),
+        model.Port,
+        model.UserId
+    }, new JsonSerializerOptions
+    {
+        WriteIndented = true
+    }));
+});
 
-        root.AddArgument(
-            id: "source",
-            description: "Path to the source file",
-            validator: Validator.Configure<FileInfo>(x => x.FileExists()));
+var testArgs =
+    "snips --log-level information --out . --in .\\Program.cs --endpoint https://google.com --port 3306"
+        .Split(' ');
 
-        root.AddArgument(
-            id: "dest",
-            description: "Path to write the output file to",
-            validator: Validator.Configure<FileInfo>(x => x.FilePathExists()));
+try
+{
+    await root.InvokeAsync(args);
+}
+catch (CommandLineException exception)
+{
+    Console.WriteLine(exception.Message);
+}
 
-        root.AddOption(
-            id: "--compression",
-            aliases: new[] { "-c" },
-            description: "The compression type to use",
-            defaultProvider: () => Compression.None);
-
-        root.AddSwitch(
-            id: "--overwrite",
-            aliases: new[] { "-o" },
-            description: "Whether to overwrite existing files");
-
-        root.AddHelpOption();
-
-        root.SetHandler(async (model, cancellationToken) =>
-        {
-            if (model.Dest.Exists && !model.Overwrite)
-            {
-                Console.WriteLine("Output file exists and will not be overwritten.");
-                return -1;
-            }
-            
-            await using var sourceStream = File.OpenRead(model.Source.FullName); 
-            await using Stream destStream = model.Compression == Compression.GZip
-                ? new GZipStream(File.OpenWrite(model.Dest.FullName), CompressionMode.Compress)
-                : File.OpenWrite(model.Dest.FullName);
-            
-            await sourceStream.CopyToAsync(destStream, cancellationToken);
-            return 0;
-        });
-    });
-
-return await rootCommand.InvokeAsync(args);
-
-public enum Compression { None, GZip }
-
-public record FileCopyParameters(
-    FileInfo Source,
-    FileInfo Dest,
-    Compression Compression,
-    bool Overwrite);
+Console.WriteLine("done");
