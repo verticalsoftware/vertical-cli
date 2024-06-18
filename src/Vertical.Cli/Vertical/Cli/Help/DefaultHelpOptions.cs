@@ -19,9 +19,9 @@ public sealed class DefaultHelpProviderOptions
     public int IndentSpaces { get; init; } = 3;
 
     /// <summary>
-    /// Gets the desired render width.
+    /// Gets a function that computes the desired render width.
     /// </summary>
-    public int RenderWidth { get; init; }
+    public Func<int> RenderWidth { get; init; } = () => Console.WindowWidth;
 
     /// <summary>
     /// Gets a function that formats operand argument names.
@@ -35,4 +35,9 @@ public sealed class DefaultHelpProviderOptions
             sb.Append(char.ToUpper(next));
             return next;
         });
+    
+    /// <summary>
+    /// Gets whether to double-space lists.
+    /// </summary>
+    public bool DoubleSpace { get; init; }
 }
