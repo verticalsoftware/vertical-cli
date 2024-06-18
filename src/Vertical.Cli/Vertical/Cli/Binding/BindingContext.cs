@@ -1,4 +1,5 @@
-﻿using Vertical.Cli.Configuration;
+﻿using System.Diagnostics.CodeAnalysis;
+using Vertical.Cli.Configuration;
 using Vertical.Cli.Conversion;
 using Vertical.Cli.Internal;
 using ValidationContext = Vertical.Cli.Validation.ValidationContext;
@@ -12,10 +13,16 @@ namespace Vertical.Cli.Binding;
 /// <typeparam name="TResult">Result type.</typeparam>
 public sealed partial class BindingContext<TResult>
 {
+    private static readonly (Type ModelType, Func<CliCommand, CancellationToken, TResult> WrappedCallSite)[]
+        StaticCallSites = 
+            [
+                (typeof(Empty), (command, token) => InvokeCallSite(command, Empty.Default, token)),
+                (typeof(CliCommand), (command, token) => InvokeCallSite(command, command, token))
+            ];
+    
     private readonly IReadOnlyDictionary<string, CliSymbol> _symbols;
     private readonly ILookup<string, string> _valueLookup;
     private readonly CliOptions _options;
-    private readonly CliCommand<TResult> _commandTarget;
 
     internal BindingContext(
         CliCommand<TResult> commandTarget,
@@ -25,7 +32,7 @@ public sealed partial class BindingContext<TResult>
         CliOptions options)
     {
         Path = path;
-        _commandTarget = commandTarget;
+        CommandTarget = commandTarget;
         _valueLookup = valueLookup;
         _options = options;
         _symbols = symbols.ToDictionary(symbol => symbol.BindingName);
@@ -35,11 +42,16 @@ public sealed partial class BindingContext<TResult>
     /// Gets the command path.
     /// </summary>
     public string Path { get; }
+    
+    /// <summary>
+    /// Gets the command.
+    /// </summary>
+    public CliCommand CommandTarget { get; }
 
     /// <summary>
     /// Gets the model type of the target command.
     /// </summary>
-    public Type ModelType => _commandTarget.ModelType;
+    public Type ModelType => CommandTarget.ModelType;
 
     /// <summary>
     /// Gets the call site.
@@ -48,7 +60,47 @@ public sealed partial class BindingContext<TResult>
     /// <returns>Function that implement's the command logic.</returns>
     public Func<TModel, CancellationToken, TResult> GetCallSite<TModel>() where TModel : class
     {
-        return ((CliCommand<TModel, TResult>)_commandTarget).Handler;
+        return ((CliCommand<TModel, TResult>)CommandTarget).Handler;
+    }
+
+    /// <summary>
+    /// Attempts to obtain a call site.
+    /// </summary>
+    /// <param name="callSite">If successful, the function used to invoke the command handler.</param>
+    /// <typeparam name="TModel">Model type</typeparam>
+    /// <returns><c>bool</c> indicating if the call site was matched</returns>
+    public bool TryGetCallSite<TModel>([NotNullWhen(true)] out Func<TModel, CancellationToken, TResult>? callSite)
+        where TModel : class
+    {
+        callSite = typeof(TModel) == ModelType
+            ? ((CliCommand<TModel, TResult>)CommandTarget).Handler
+            : null;
+
+        return callSite != null;
+    }
+
+    /// <summary>
+    /// Attempts to get a static call site (one where model is internally provided).
+    /// </summary>
+    /// <param name="callSite">If successful, the function used to invoke the command handler.</param>
+    /// <returns><c>bool</c> indicating if the call site was matched</returns>
+    public bool TryGetStaticCallSite([NotNullWhen(true)] out Func<CancellationToken, TResult>? callSite)
+    {
+        var wrappedCallSite = StaticCallSites
+            .FirstOrDefault(cs => cs.ModelType == ModelType)
+            .WrappedCallSite;
+
+        return (callSite = wrappedCallSite != null
+            ? token => wrappedCallSite(CommandTarget, token)
+            : null) != null;
+    }
+
+    private static TResult InvokeCallSite<TModel>(CliCommand command, 
+        TModel model, 
+        CancellationToken cancellationToken) 
+        where TModel : class
+    {
+        return ((CliCommand<TModel, TResult>)command).Handler(model, cancellationToken);
     }
     
     /// <summary>
@@ -140,7 +192,7 @@ public sealed partial class BindingContext<TResult>
     public ValidationContext ValidateModel<TModel>(TModel model) where TModel : class
     {
         var context = new ValidationContext();
-        for (CliCommand? command = _commandTarget; command != null; command = command.ParentCommand)
+        for (CliCommand? command = CommandTarget; command != null; command = command.ParentCommand)
         {
             command.ValidateModel(model, context);
         }
@@ -183,6 +235,6 @@ public sealed partial class BindingContext<TResult>
         if (_symbols.TryGetValue(bindingName, out var obj))
             return (CliSymbol<TValue>)obj;
 
-        throw new InvalidOperationException($"No symbol has been mapped for binding \"{_commandTarget.ModelType}.{bindingName}\".");
+        throw new InvalidOperationException($"No symbol has been mapped for binding \"{CommandTarget.ModelType}.{bindingName}\".");
     }
 }

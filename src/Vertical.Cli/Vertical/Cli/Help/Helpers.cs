@@ -4,6 +4,8 @@ namespace Vertical.Cli.Help;
 
 internal static class Helpers
 {
+    delegate void Callback(int index, ReadOnlySpan<char> span);
+    
     internal static void AppendWrapped(
         StringBuilder sb,
         string str,
@@ -11,15 +13,15 @@ internal static class Helpers
         string tab,
         bool appendNewLine)
     {
-        BreakString(str, width, (index, line) =>
+        BreakString(str, width, (index, span) =>
         {
             if (index > 0)
             {
                 sb.AppendLine();
                 sb.Append(tab);
             }
-
-            sb.Append(line);
+            
+            sb.Append(span);
         });
 
         if (appendNewLine)
@@ -28,7 +30,7 @@ internal static class Helpers
         }
     }
     
-    internal static void BreakString(string str, int width, Action<int, string> callback)
+    private static void BreakString(string str, int width, Callback callback)
     {
         var span = str.AsSpan();
         var iteration = 0;
@@ -47,7 +49,7 @@ internal static class Helpers
         ReadOnlySpan<char> span,
         int iteration,
         int length, 
-        Action<int, string> callback)
+        Callback callback)
     {
         if (span.Length == 0)
             return span;
@@ -61,14 +63,14 @@ internal static class Helpers
                     continue;
                 
                 case '\n':
-                    callback(iteration, span[..i].ToString());
+                    callback(iteration, span[..i]);
                     return ++i < length ? span[i..] : ReadOnlySpan<char>.Empty;
             }
         }
 
         if (span.Length <= length)
         {
-            callback(iteration, span.ToString());
+            callback(iteration, span);
             return ReadOnlySpan<char>.Empty;
         }
 

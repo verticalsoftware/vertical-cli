@@ -8,11 +8,11 @@ public static class CliExtensions
     /// <summary>
     /// Gets the root options.
     /// </summary>
-    /// <param name="command">Command in the path.</param>
+    /// <param name="command">Command</param>
     /// <returns><see cref="CliOptions"/></returns>
     public static CliOptions GetOptions(this CliCommand command)
     {
-        var optionsRoot = (IOptionsRoot)command.SelectPath().First();
+        var optionsRoot = (IRootCommand)command.SelectPath().First();
         return optionsRoot.Options;
     }
     
@@ -21,11 +21,11 @@ public static class CliExtensions
     /// </summary>
     /// <param name="obj">Command or symbol.</param>
     /// <returns><see cref="IEnumerable{T}"/></returns>
-    public static IEnumerable<CliPrimitive> SelectPath(this CliPrimitive obj)
+    public static IEnumerable<CliObject> SelectPath(this CliObject obj)
     {
         return Select(obj).Reverse();
         
-        static IEnumerable<CliPrimitive> Select(CliPrimitive? target)
+        static IEnumerable<CliObject> Select(CliObject? target)
         {
             for (; target != null; target = target.Parent)
                 yield return target;
@@ -40,7 +40,7 @@ public static class CliExtensions
     /// A string composed of the identifiers in the path of <paramref name="obj"/>
     /// separated by <c>/</c>.
     /// </returns>
-    public static string SelectPathString(this CliPrimitive obj) => string.Join(',', obj.SelectPath());
+    public static string SelectPathString(this CliObject obj) => string.Join(',', obj.SelectPath());
     
     /// <summary>
     /// Aggregates the symbols in the path.

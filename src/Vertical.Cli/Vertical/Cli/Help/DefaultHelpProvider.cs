@@ -9,75 +9,88 @@ namespace Vertical.Cli.Help;
 /// </summary>
 public sealed class DefaultHelpProvider : IHelpProvider
 {
-    private static readonly DefaultHelpProviderOptions DefaultOptions = new()
-    {
-        RenderWidth = Console.WindowWidth
-    };
+    private record RenderInfo(
+        CliCommand Target,
+        CliSymbol[] Symbols,
+        StringBuilder Buffer,
+        int Width, 
+        string TabX1, 
+        string TabX2);
     
     /// <summary>
     /// Gets an instance of this type.
     /// </summary>
-    public static readonly IHelpProvider Instance = new DefaultHelpProvider(DefaultOptions);
+    public static readonly IHelpProvider Instance = new DefaultHelpProvider(new DefaultHelpOptions());
     
-    private readonly DefaultHelpProviderOptions _options;
+    private readonly DefaultHelpOptions _options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultHelpProvider"/> type.
     /// </summary>
     /// <param name="options">Options</param>
-    public DefaultHelpProvider(DefaultHelpProviderOptions options) => _options = options;
+    public DefaultHelpProvider(DefaultHelpOptions options) => _options = options;
 
     /// <inheritdoc />
     public string GetContent(CliCommand command)
     {
-        var sb = new StringBuilder(5000);
-        var indent = Math.Max(0, _options.IndentSpaces);
-        var tabs = (T1: new string(' ', indent), T2: new string(' ', indent * 2));
-        var symbols = command.AggregateSymbols().ToArray();
+        var indentSpaces = Math.Max(0, _options.IndentSpaces);
+        var renderInfo = new RenderInfo(
+            command,
+            command.AggregateSymbols().ToArray(),
+            new StringBuilder(5000),
+            _options.RenderWidth(),
+            new string(' ', indentSpaces),
+            new string(' ', indentSpaces * 2));
+        
+        BuildDescriptionSection(renderInfo);
+        BuildUsageSection(renderInfo);
+        BuildSubCommandsSection(renderInfo);
+        BuildArgumentsSection(renderInfo);
+        BuildOptionsSection(renderInfo);
 
-        BuildDescriptionSection(sb, command, tabs);
-        BuildUsageSection(sb, command, tabs);
-        BuildSubCommandsSection(sb, command, tabs);
-        BuildArgumentsSection(sb, symbols, tabs);
-        BuildOptionsSection(sb, command, symbols, tabs);
-
-        return sb.ToString();
+        return renderInfo.Buffer.ToString();
     }
 
-    private void BuildDescriptionSection(StringBuilder sb, CliCommand command, (string T1, string T2) tabs)
+    private void BuildDescriptionSection(RenderInfo renderInfo)
     {
-        if (!TryGetContent(command, out var content))
+        if (!TryGetContent(renderInfo.Target, out var content))
             return;
 
+        var sb = renderInfo.Buffer;
+
         sb.AppendLine("Description:");
-        sb.Append(tabs.T1);
-        Helpers.AppendWrapped(sb, content, _options.RenderWidth, tabs.T1, true);
+        sb.Append(renderInfo.TabX1);
+        Helpers.AppendWrapped(sb, content, renderInfo.Width, renderInfo.TabX1, true);
     }
 
-    private void BuildUsageSection(StringBuilder sb, 
-        CliCommand command, 
-        (string T1, string T2) tabs)
+    private void BuildUsageSection(RenderInfo renderInfo)
     {
+        var sb = renderInfo.Buffer;
+        
         if (sb.Length > 0)
         {
             sb.AppendLine();
         }
 
         sb.AppendLine("Usage:");
-        BuildUsage(sb, command, tabs);
-        foreach (var subCommand in command.Commands)
+        BuildUsage(renderInfo, renderInfo.Target);
+        foreach (var subCommand in renderInfo.Target.Commands)
         {
-            BuildUsage(sb, subCommand, tabs, command.PrimaryIdentifier);
+            BuildUsage(renderInfo, subCommand, renderInfo.Target.PrimaryIdentifier);
         }
     }
 
     private void BuildUsage(
-        StringBuilder sb,
+        RenderInfo renderInfo,
         CliCommand command,
-        (string T1, string T2) tabs,
         string? parentIdentifier = null)
     {
-        sb.Append(tabs.T1);
+        if (command.Symbols.All(symbol => symbol.Scope is CliScope.Descendants))
+            return; // Not executable
+
+        var sb = renderInfo.Buffer;
+        
+        sb.Append(renderInfo.TabX1);
         if (parentIdentifier != null)
             sb.Append(parentIdentifier + ' ');
         sb.Append(command.PrimaryIdentifier);
@@ -102,89 +115,106 @@ public sealed class DefaultHelpProvider : IHelpProvider
         sb.AppendLine();
     }
 
-    private void BuildSubCommandsSection(StringBuilder sb, CliCommand command, (string T1, string T2) tabs)
+    private void BuildSubCommandsSection(RenderInfo renderInfo)
     {
-        var subCommands = command.Commands.Where(cmd => !cmd.IsActionSwitch).ToArray();
+        var sb = renderInfo.Buffer;
+        var subCommands = renderInfo
+            .Target
+            .Commands
+            .Where(cmd => !cmd.IsActionSwitch).ToArray();
+        
         if (subCommands.Length == 0)
             return;
 
+        var count = 0;
         sb.AppendLine();
         sb.AppendLine("Commands:");
-        foreach (var subCommand in subCommands)
+        
+        foreach (var subCommand in subCommands.Order(_options.NameComparer))
         {
-            sb.AppendLine($"{tabs.T1}{subCommand.PrimaryIdentifier}");
+            if (_options.DoubleSpace && ++count > 1)
+                sb.AppendLine();
+            
+            sb.AppendLine($"{renderInfo.TabX1}{subCommand.PrimaryIdentifier}");
             if (!TryGetContent(subCommand, out var content))
                 continue;
-            Helpers.AppendWrapped(sb, content, _options.RenderWidth, tabs.T1, appendNewLine: true);
+            sb.Append(renderInfo.TabX2);
+            Helpers.AppendWrapped(sb, content, renderInfo.Width, renderInfo.TabX2, appendNewLine: true);
         }
     }
 
-    private void BuildArgumentsSection(StringBuilder sb, CliSymbol[] symbols, (string T1, string T2) tabs)
+    private void BuildArgumentsSection(RenderInfo renderInfo)
     {
-        var arguments = symbols.Where(sym => sym.Type == SymbolType.Argument).ToArray();
+        var sb = renderInfo.Buffer;
+        var arguments = renderInfo 
+            .Symbols
+            .Where(sym => sym.Type == SymbolType.Argument).ToArray();
+        
         if (arguments.Length == 0)
             return;
 
-        var wrappingWidth = _options.RenderWidth - 2 * _options.IndentSpaces;
+        var count = 0;
+        var wrappingWidth = renderInfo.Width - 2 * _options.IndentSpaces;
         sb.AppendLine();
         sb.AppendLine("Arguments:");
+        
         foreach (var argument in arguments)
         {
-            sb.Append(tabs.T1);
+            if (_options.DoubleSpace && ++count > 1)
+                sb.AppendLine();
+            
+            sb.Append(renderInfo.TabX1);
             BuildOperandNotation(sb, argument);
             sb.AppendLine();
             if (!TryGetContent(argument, out var content))
                 continue;
             
-            sb.Append(tabs.T2);
-            Helpers.AppendWrapped(sb, content, wrappingWidth, tabs.T2, appendNewLine: true);
+            sb.Append(renderInfo.TabX2);
+            Helpers.AppendWrapped(sb, content, wrappingWidth, renderInfo.TabX2, appendNewLine: true);
         }
     }
 
-    private void BuildOptionsSection(StringBuilder sb,
-        CliCommand command,
-        IEnumerable<CliSymbol> symbols, 
-        (string T1, string T2) tabs)
+    private void BuildOptionsSection(RenderInfo renderInfo)
     {
-        var options = symbols
+        var sb = renderInfo.Buffer;
+
+        var items = renderInfo
+            .Symbols
             .Where(sym => sym.Type is SymbolType.Option or SymbolType.Switch)
+            .Cast<CliObject>()
+            .Concat(renderInfo.Target.Commands.Where(cmd => cmd.IsActionSwitch))
             .ToArray();
 
-        var actions = command.Commands.Where(cmd => cmd.IsActionSwitch).ToArray();
-
-        if (options.Length + actions.Length == 0)
+        if (items.Length == 0)
             return;
 
-        var wrappingWidth = _options.RenderWidth - 2 * _options.IndentSpaces;
+        var count = 0;
+        var wrappingWidth = renderInfo.Width - 2 * _options.IndentSpaces;
         sb.AppendLine();
         sb.AppendLine("Options:");
-        foreach (var option in options)
+
+        foreach (var item in items.Order(_options.NameComparer))
         {
-            sb.Append(tabs.T1);
-            sb.Append(string.Join(", ", option.Names));
-            if (!(option.ValueType == typeof(bool) || option.ValueType == typeof(bool?)))
+            if (_options.DoubleSpace && ++count > 1)
+                sb.AppendLine();
+            
+            sb.Append(renderInfo.TabX1);
+            sb.Append(string.Join(", ", item.Names));
+
+            if (item is CliSymbol option && !(option.ValueType == typeof(bool) || option.ValueType == typeof(bool?)))
             {
                 sb.Append(" <");
                 BuildOperandNotation(sb, option);
-                sb.AppendLine(">");
+                sb.Append(">");
             }
+
+            sb.AppendLine();
             
-            if (!TryGetContent(option, out var content))
+            if (!TryGetContent(item, out var content))
                 continue;
 
-            sb.Append(tabs.T2);
-            Helpers.AppendWrapped(sb, content, wrappingWidth, tabs.T2, appendNewLine: true);
-        }
-
-        foreach (var action in actions)
-        {
-            sb.Append(tabs.T1);
-            sb.AppendLine(string.Join(", ", action.Names));
-            if (!TryGetContent(action, out var content))
-                continue;
-
-            sb.Append(tabs.T2);
-            Helpers.AppendWrapped(sb, content, wrappingWidth, tabs.T2, appendNewLine: true);
+            sb.Append(renderInfo.TabX2);
+            Helpers.AppendWrapped(sb, content, wrappingWidth, renderInfo.TabX2, appendNewLine: true);
         }
     }
 
@@ -203,7 +233,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
             sb.Append("...");
     }
 
-    private bool TryGetContent(CliPrimitive obj, [NotNullWhen(true)]out string? str)
+    private bool TryGetContent(CliObject obj, [NotNullWhen(true)]out string? str)
     {
         str = _options.ContentProvider.GetContent(obj) ?? string.Empty;
         return !string.IsNullOrWhiteSpace(str);

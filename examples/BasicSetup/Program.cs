@@ -1,55 +1,64 @@
-﻿using System.Text.Json;
-using BasicSetup;
-using Vertical.Cli;
+﻿using Vertical.Cli;
 using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
 
-var root = new RootCommand<Model, Task>("cp", "Copies files");
-root
-    .AddOption(x => x.LogLevel, ["--log-level"],
-        description:
-        "The verbosity level of log output. Can be one of: Trace, Debug, Information, Warning, Error, or Critical.")
-    .AddArgument(x => x.Sources,
-        description:
-        "The name of the source file. This could be an absolute or relative path, or a directory/globbing pattern.",
-        validation: v => v.Each<string>(c => c.HasMinLength(10)))
-    .AddOption(x => x.DirectoryInfo, ["--out"], validation: v => v.ExistsOrIsNull())
-    .AddOption(x => x.FileInfo, ["--in"])
-    .AddOption(x => x.BaseUrl, ["--endpoint"])
-    .AddOption(x => x.Port, ["--port"], validation: v => v.GreaterThan((uint)3000))
-    .AddOption(x => x.UserId, ["-u"])
-    .AddHelpSwitch(Task.CompletedTask);
+var rootCommand = new RootCommand<BaseModel, Task>("dotnet", description: ".NET SDK tooling");
 
-root.SetHandler(async (model, cancellationToken) =>
+rootCommand
+    .AddOption(x => x.Verbosity, ["--verbosity"],
+        scope: CliScope.Descendants,
+        description: "Output verbosity (Verbose, Normal, Minimal)");
+
+var buildCommand = new SubCommand<BuildModel, Task>("build", description: "Builds a .NET assembly");
+buildCommand
+    .AddArgument(x => x.ProjectPath, Arity.One,
+        description: "Path to the project file",
+        validation: v => v.Exists())
+    .AddOption(x => x.Configuration, ["-c", "--configuration"],
+        defaultProvider: () => "Debug",
+        description: "Configuration name to build")
+    .AddOption(x => x.OutputDirectory, ["-o", "--output"],
+        defaultProvider: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
+        description: "Directory where the built artifacts will be written")
+    .AddSwitch(x => x.Force, ["-f", "--force"],
+        description: "Forces all dependencies to be resolved")
+    .AddSwitch(x => x.NoRestore, ["--no-restore"],
+        description: "Don't execute implicit restore")
+    .SetHandler(async (model, cancellation) =>
+    {
+        Console.WriteLine($"Building {model.ProjectPath}, configuration={model.Configuration}");
+        await Task.CompletedTask;
+    });
+
+rootCommand.AddSubCommand(buildCommand);
+rootCommand.Options.HelpProvider = new DefaultHelpProvider(new DefaultHelpOptions
 {
-    await Task.CompletedTask;
-    
-    Console.WriteLine(JsonSerializer.Serialize(new
-    {
-        model.LogLevel,
-        Value = string.Join(',', model.Sources),
-        DirectoryInfo = model.DirectoryInfo?.FullName,
-        FileInfo = model.FileInfo?.FullName,
-        BaseUrl = model.BaseUrl?.ToString(),
-        model.Port,
-        model.UserId
-    }, new JsonSerializerOptions
-    {
-        WriteIndented = true
-    }));
+    DoubleSpace = true,
+    NameComparer = IdentifierComparer.Sorted
 });
-
-var testArgs =
-    "snips --log-level information --out . --in .\\Program.cs --endpoint https://google.com --port 3306"
-        .Split(' ');
 
 try
 {
-    await root.InvokeAsync(args);
+    await rootCommand.InvokeAsync(["build", "--help"], CancellationToken.None);
 }
 catch (CommandLineException exception)
 {
     Console.WriteLine(exception.Message);
 }
 
-Console.WriteLine("done");
+public enum Verbosity { Verbose, Normal, Minimal }
+
+public abstract class BaseModel
+{
+    public Verbosity Verbosity { get; set; }
+}
+
+public class BuildModel : BaseModel
+{
+    public FileInfo ProjectPath { get; set; } = default!;
+    public string Configuration { get; set; } = default!;
+    public DirectoryInfo OutputDirectory { get; set; } = default!;
+    public bool Force { get; set; }
+    public bool NoRestore { get; set; }
+}

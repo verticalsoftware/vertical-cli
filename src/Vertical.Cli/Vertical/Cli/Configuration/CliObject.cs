@@ -5,9 +5,9 @@ namespace Vertical.Cli.Configuration;
 /// <summary>
 /// Superclass for symbols and commands.
 /// </summary>
-public abstract class CliPrimitive
+public abstract class CliObject
 {
-    private protected CliPrimitive(
+    private protected CliObject(
         string[] names,
         string? description,
         string? primaryIdentifier = null)
@@ -33,7 +33,7 @@ public abstract class CliPrimitive
     /// <summary>
     /// Gets the parent of this item.
     /// </summary>
-    public abstract CliPrimitive? Parent { get; }
+    public abstract CliObject? Parent { get; }
 
     /// <summary>
     /// Gets the primary identifier.

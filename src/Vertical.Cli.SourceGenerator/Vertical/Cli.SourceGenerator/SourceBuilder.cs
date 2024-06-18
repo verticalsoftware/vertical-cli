@@ -97,15 +97,13 @@ public class SourceBuilder
 
         if (id > 1) code.AppendLine();
         
-        code.AppendLine("// Always bind to this model type (not detected by generator)");
-        code.AppendLine("if (modelType == typeof(global::Vertical.Cli.Configuration.Empty))");
+        code.AppendLine("// A static call site has a model that is provided internally.");
+        code.AppendLine("if (context.TryGetStaticCallSite(out var callSite))");
         code.AppendBlock(BlockStyle.BracedBody, (ref CodeBlock inner) =>
         {
-            inner.AppendLine("var callSite = context.GetCallSite<global::Vertical.Cli.Configuration.Empty>();");
             inner.AppendIf("return ", _returnsValue);
             inner.AppendIf("await ", _isAsync);
-            inner.AppendLine("callSite(global::Vertical.Cli.Configuration.Empty.Default, cancellationToken);");
-            if (!_returnsValue) inner.AppendLine("return;");
+            inner.AppendLine("callSite(cancellationToken);");
         });
         
         code.AppendLine();
@@ -119,7 +117,7 @@ public class SourceBuilder
 
         var typeFormat = modelType.Format();
         code.AppendLine($"// Bind/invoke {typeFormat} command");
-        code.AppendLine($"if (modelType == typeof({typeFormat}))");
+        code.AppendLine($"if (context.TryGetCallSite<{typeFormat}>(out var callSite{id}))");
         code.AppendBlock(BlockStyle.BracedBody, (ref CodeBlock inner) => WriteModelBindingImplementation(
             ref inner, 
             modelType,
@@ -143,7 +141,6 @@ public class SourceBuilder
         code.AppendLine($"context.AssertBinding(model{id});");
         code.AppendLine();
         code.AppendLine("// Route control to the command handler with the constructed model");
-        code.AppendLine($"var callSite{id} = context.GetCallSite<{modelType.Format()}>();");
         code.AppendIf("return ", _returnsValue);
         code.AppendIf("await ", _isAsync);
         code.AppendLine($"callSite{id}(model{id}, cancellationToken);");
@@ -304,7 +301,7 @@ public class SourceBuilder
                 $"new global::Vertical.Cli.Conversion.NullableEnumConverter<{namedSymbol.TypeArguments[0].Format()}>()",
             
             not null when resolvedType.ImplementsIParsableInterface() => 
-                $"new global::Vertical.Cli.Conversion.NullParsableConverter<{resolvedType.Format()}>()",
+                $"new global::Vertical.Cli.Conversion.ParsableConverter<{resolvedType.Format()}>()",
             
             not null when resolvedType.IsEnum() =>
                 $"new global::Vertical.Cli.Conversion.EnumConverter<{resolvedType.Format()}>()",

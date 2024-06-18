@@ -3,7 +3,7 @@
 /// <summary>
 /// Superclass for all symbols.
 /// </summary>
-public abstract class CliSymbol : CliPrimitive
+public abstract class CliSymbol : CliObject
 {
     private protected CliSymbol(
         CliCommand command,
@@ -28,7 +28,7 @@ public abstract class CliSymbol : CliPrimitive
     public CliCommand Command { get; }
 
     /// <inheritdoc />
-    public override CliPrimitive? Parent => Command;
+    public override CliObject? Parent => Command;
 
     /// <summary>
     /// Gets the model property binding name.

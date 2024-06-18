@@ -15,11 +15,7 @@ public class HelpersTests
         var str = $"{p1}\n\n{p2}";
 
         var sb = new StringBuilder();
-        Helpers.BreakString(str, 80, (i, s) =>
-        {
-            if (i > 0) sb.AppendLine();
-            sb.Append(s);
-        });
+        Helpers.AppendWrapped(sb, str, 80, string.Empty, true);
 
         var result = sb.ToString();
         return Verify(result);

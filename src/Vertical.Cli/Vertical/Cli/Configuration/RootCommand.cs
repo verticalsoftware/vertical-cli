@@ -1,11 +1,14 @@
-﻿namespace Vertical.Cli.Configuration;
+﻿using Vertical.Cli.Help;
+
+namespace Vertical.Cli.Configuration;
 
 /// <summary>
 /// Represents the root-most command of an application.
 /// </summary>
 /// <typeparam name="TModel">Model type</typeparam>
 /// <typeparam name="TResult">Result type</typeparam>
-public sealed class RootCommand<TModel, TResult> : CliCommand<TModel, TResult>, IOptionsRoot 
+public sealed class RootCommand<TModel, TResult> : 
+    CliCommand<TModel, TResult>, IRootCommand
     where TModel : class
 {
     /// <inheritdoc />
@@ -15,6 +18,8 @@ public sealed class RootCommand<TModel, TResult> : CliCommand<TModel, TResult>, 
         : base([name], description, null)
     {
     }
+
+    CliOptions IRootCommand.Options => Options;
 
     /// <summary>
     /// Gets the global options.

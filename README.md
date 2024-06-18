@@ -86,11 +86,11 @@ Models of subcommands must be a subtype of the model of the parent command. This
 
 ### Result Type
 
-All commands in an application must return the same result type from their handlers. The result type may be any value type, reference type, `Task`, or `Task<T>`. The only type forbidden is `void`.
+All commands in an application must return the same result type from their handlers. The result type may be any value type, reference type, `Task`, or `Task<T>`. The only type that cannot be used is `void`.
 
 ### Handlers
 
-Handlers a functions that receive the model, perform the application's logic, and return a result.
+Handlers are functions that receive the model, perform the application's logic, and return a result.
 
 ### Symbols
 
@@ -110,11 +110,13 @@ This example simulates the setup of two .net CLI tools.
 ```csharp
 public enum Verbosity { Verbose, Normal, Minimal }
 
+// Base model
 public abstract class BaseModel
 {
     public Verbosity Verbosity { get; set; }
 }
 
+// Model for the 'build' command
 public class BuildModel : BaseModel
 {
     public FileInfo ProjectPath { get; set; } = default!;
@@ -124,10 +126,17 @@ public class BuildModel : BaseModel
     public bool NoRestore { get; set; }
 }
 
+// Create the root command. The type arguments are the model type and
+// the handler result type
 var rootCommand = new RootCommand<BaseModel, Task>("dotnet");
+
 rootCommand
+    // Expressions are used so the binder knows what properties to
+    // assign
     .AddOption(x => x.Verbosity, ["--verbosity"],
         description: "Output verbosity (Verbose, Normal, Minimal)")
+    
+    // Adds --help as an option using the default implementation
     .AddHelpSwitch(Task.CompletedTask);
 
 var buildCommand = new SubCommand<BuildModel, Task>("build");

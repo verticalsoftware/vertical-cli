@@ -6,7 +6,7 @@ namespace Vertical.Cli.Help;
 /// <summary>
 /// Options used by <see cref="DefaultHelpProvider"/>
 /// </summary>
-public sealed class DefaultHelpProviderOptions
+public sealed class DefaultHelpOptions
 {
     /// <summary>
     /// Gets the help content provider.
@@ -22,6 +22,11 @@ public sealed class DefaultHelpProviderOptions
     /// Gets a function that computes the desired render width.
     /// </summary>
     public Func<int> RenderWidth { get; init; } = () => Console.WindowWidth;
+
+    /// <summary>
+    /// Gets a comparer used to sort commands and symbols.
+    /// </summary>
+    public IComparer<CliObject> NameComparer { get; init; } = IdentifierComparer.Default;
 
     /// <summary>
     /// Gets a function that formats operand argument names.

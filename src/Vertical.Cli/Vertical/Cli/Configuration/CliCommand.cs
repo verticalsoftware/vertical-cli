@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using CommunityToolkit.Diagnostics;
-using Vertical.Cli.Help;
 using Vertical.Cli.Metadata;
 using Vertical.Cli.Validation;
 
@@ -9,7 +8,7 @@ namespace Vertical.Cli.Configuration;
 /// <summary>
 /// Super class for all command types.
 /// </summary>
-public abstract class CliCommand : CliPrimitive
+public abstract class CliCommand : CliObject
 {
     private readonly List<CliSymbol> _symbols = new(6);
     private readonly List<CliCommand> _commands = [];
@@ -41,17 +40,17 @@ public abstract class CliCommand : CliPrimitive
     public CliCommand? ParentCommand { get; private set; }
 
     /// <inheritdoc />
-    public override CliPrimitive? Parent => ParentCommand;
+    public override CliObject? Parent => ParentCommand;
     
     /// <summary>
     /// Gets the symbols defined in the collection.
     /// </summary>
     public IReadOnlyCollection<CliSymbol> Symbols => _symbols;
-    
+
     /// <summary>
     /// Gets the collection of child commands defined by this instance.
     /// </summary>
-    public IReadOnlyCollection<CliCommand> Commands => _commands;
+    public IEnumerable<CliCommand> Commands => _commands;
 
     /// <summary>
     /// Performs verbose checking of the configuration.
@@ -286,29 +285,6 @@ public partial class CliCommand<TModel, TResult> : CliCommand<TResult> where TMo
             (_,_) => handler(),
             isActionSwitch: true));
         return this;
-    }
-
-    /// <summary>
-    /// Adds a help switch.
-    /// </summary>
-    /// <param name="result">The result to return.</param>
-    /// <param name="names">Names the help switch is identified by, defaults to <c>--help</c>.</param>
-    /// <param name="description">The description to display for the option.</param>
-    /// <returns>A reference to this instance.</returns>
-    public CliCommand<TModel, TResult> AddHelpSwitch(
-        TResult result,
-        string[]? names = null,
-        string? description = null)
-    {
-        return AddActionSwitch(
-            names ?? ["--help"],
-            () =>
-            {
-                var helpProvider = this.GetOptions().HelpProvider ?? DefaultHelpProvider.Instance;
-                Console.WriteLine(helpProvider.GetContent(this));
-                return result;
-            },
-            description ?? "Displays help content for this command.");
     }
 
     /// <summary>
