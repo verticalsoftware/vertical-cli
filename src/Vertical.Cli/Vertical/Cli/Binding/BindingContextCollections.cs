@@ -2,7 +2,7 @@
 
 namespace Vertical.Cli.Binding;
 
-public sealed partial class BindingContext<TResult>
+public sealed partial class BindingContext
 {
     /// <summary>
     /// Gets the values of the indicated binding as an array.

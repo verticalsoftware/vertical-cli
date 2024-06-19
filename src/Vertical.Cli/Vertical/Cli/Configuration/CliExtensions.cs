@@ -10,37 +10,23 @@ public static class CliExtensions
     /// </summary>
     /// <param name="command">Command</param>
     /// <returns><see cref="CliOptions"/></returns>
-    public static CliOptions GetOptions(this CliCommand command)
-    {
-        var optionsRoot = (IRootCommand)command.SelectPath().First();
-        return optionsRoot.Options;
-    }
-    
-    /// <summary>
-    /// Selects the path of the object starting with the root command.
-    /// </summary>
-    /// <param name="obj">Command or symbol.</param>
-    /// <returns><see cref="IEnumerable{T}"/></returns>
-    public static IEnumerable<CliObject> SelectPath(this CliObject obj)
-    {
-        return Select(obj).Reverse();
-        
-        static IEnumerable<CliObject> Select(CliObject? target)
-        {
-            for (; target != null; target = target.Parent)
-                yield return target;
-        }    
-    }
+    public static CliOptions GetOptions(this CliCommand command) => command.GetRootCommand().Options;
 
     /// <summary>
-    /// Constructs a path string.
+    /// Resolves the root command.
     /// </summary>
-    /// <param name="obj">Command or symbol.</param>
-    /// <returns>
-    /// A string composed of the identifiers in the path of <paramref name="obj"/>
-    /// separated by <c>/</c>.
-    /// </returns>
-    public static string SelectPathString(this CliObject obj) => string.Join(',', obj.SelectPath());
+    /// <param name="command">Command instance.</param>
+    /// <returns><see cref="IRootCommand"/></returns>
+    public static IRootCommand GetRootCommand(this CliCommand command)
+    {
+        var target = command;
+        while (target.Parent != null)
+        {
+            target = target.Parent;
+        }
+
+        return (IRootCommand)target;
+    }
     
     /// <summary>
     /// Aggregates the symbols in the path.
@@ -49,28 +35,31 @@ public static class CliExtensions
     /// <returns>An enumerable that emits each <see cref="CliSymbol"/></returns>
     public static IEnumerable<CliSymbol> AggregateSymbols(this CliCommand command)
     {
-        return command.AggregateSymbolsInternal().Reverse();
-    }
-    
-    private static IEnumerable<CliSymbol> AggregateSymbolsInternal(this CliCommand command)
-    {
-        foreach (var symbol in command
-                     .Symbols
-                     .Reverse()
-                     .Where(sym => sym.Scope != CliScope.Descendants))
+        for (var current = command; current != null; current = current.Parent)
         {
-            yield return symbol;
-        }
+            Predicate<CliSymbol> filter = ReferenceEquals(command, current)
+                ? symbol => symbol.Scope != CliScope.Descendants
+                : symbol => symbol.Scope != CliScope.Self;
 
-        for (var parent = command.ParentCommand; parent != null; parent = parent.ParentCommand)
-        {
-            foreach (var symbol in parent
-                         .Symbols
-                         .Reverse()
-                         .Where(sym => sym.Scope != CliScope.Self))
-            {
+            foreach (var symbol in current.Symbols.Where(item => filter(item)))
                 yield return symbol;
-            }
+        }
+    }
+
+    /// <summary>
+    /// Aggregates short tasks.
+    /// </summary>
+    /// <param name="command">Command</param>
+    /// <returns>An enumeration of <see cref="ModelessTaskConfiguration"/> objects in the path.</returns>
+    public static IEnumerable<ModelessTaskConfiguration> AggregateModelessTasks(this CliCommand command)
+    {
+        foreach (var task in command.ModelessTasks.Where(t => t.Scope != CliScope.Descendants))
+            yield return task;
+
+        for (var target = command.Parent; target != null; target = target.Parent)
+        {
+            foreach (var task in target.ModelessTasks.Where(t => t.Scope != CliScope.Self))
+                yield return task;
         }
     }
 }

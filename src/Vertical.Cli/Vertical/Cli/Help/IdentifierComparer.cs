@@ -10,16 +10,16 @@ public static class IdentifierComparer
     /// <summary>
     /// Defines the default implementation.
     /// </summary>
-    public static readonly IComparer<CliObject> Default = new DefaultImpl();
+    public static readonly IComparer<ICliSymbol> Default = new DefaultImpl();
     
     /// <summary>
     /// Defines the sorted implementation.
     /// </summary>
-    public static readonly IComparer<CliObject> Sorted = new SortedImpl();
+    public static readonly IComparer<ICliSymbol> Sorted = new SortedImpl();
     
-    private sealed class SortedImpl : IComparer<CliObject>
+    private sealed class SortedImpl : IComparer<ICliSymbol>
     {
-        public int Compare(CliObject? x, CliObject? y)
+        public int Compare(ICliSymbol? x, ICliSymbol? y)
             {
                 if (ReferenceEquals(x, y))
                     return 0;
@@ -50,7 +50,7 @@ public static class IdentifierComparer
                 return 0;
             }
         
-            private static ReadOnlySpan<char> GetSpan(CliObject obj)
+            private static ReadOnlySpan<char> GetSpan(ICliSymbol obj)
             {
                 var name = obj.Names.Length != 0 ? obj.Names[0] : obj.PrimaryIdentifier;
                 var span = name.AsSpan();
@@ -62,9 +62,9 @@ public static class IdentifierComparer
             }
     }
 
-    private sealed class DefaultImpl : IComparer<CliObject>
+    private sealed class DefaultImpl : IComparer<ICliSymbol>
     {
-        public int Compare(CliObject? x, CliObject? y)
+        public int Compare(ICliSymbol? x, ICliSymbol? y)
         {
             if (ReferenceEquals(x, y))
                 return 0;

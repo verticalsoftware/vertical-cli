@@ -3,15 +3,21 @@ using Vertical.Cli.Configuration;
 using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
 
-var rootCommand = new RootCommand<BaseModel, Task>("dotnet", description: ".NET SDK tooling");
+var rootCommand = new RootCommand<BaseModel>("dotnet", description: ".NET SDK tooling");
 
 rootCommand
+    .AddHelpSwitch()
+    .ConfigureOptions(options => options.HelpProvider = new DefaultHelpProvider(new DefaultHelpOptions
+    {
+        DoubleSpace = true,
+        NameComparer = IdentifierComparer.Sorted
+    }))
+    .AddAction(["-v", "--version"], () => Console.WriteLine("1.0.0-dev"), description: "Displays the application version")
     .AddOption(x => x.Verbosity, ["--verbosity"],
         scope: CliScope.Descendants,
         description: "Output verbosity (Verbose, Normal, Minimal)");
 
-var buildCommand = new SubCommand<BuildModel, Task>("build", description: "Builds a .NET assembly");
-buildCommand
+rootCommand.AddSubCommand<BuildModel>(["build"], "Builds a .NET assembly")
     .AddArgument(x => x.ProjectPath, Arity.One,
         description: "Path to the project file",
         validation: v => v.Exists())
@@ -25,22 +31,15 @@ buildCommand
         description: "Forces all dependencies to be resolved")
     .AddSwitch(x => x.NoRestore, ["--no-restore"],
         description: "Don't execute implicit restore")
-    .SetHandler(async (model, cancellation) =>
+    .HandleAsync(async (model, cancellation) =>
     {
         Console.WriteLine($"Building {model.ProjectPath}, configuration={model.Configuration}");
         await Task.CompletedTask;
     });
 
-rootCommand.AddSubCommand(buildCommand);
-rootCommand.Options.HelpProvider = new DefaultHelpProvider(new DefaultHelpOptions
-{
-    DoubleSpace = true,
-    NameComparer = IdentifierComparer.Sorted
-});
-
 try
 {
-    await rootCommand.InvokeAsync(["build", "--help"], CancellationToken.None);
+    await rootCommand.InvokeAsync(args, CancellationToken.None);
 }
 catch (CommandLineException exception)
 {

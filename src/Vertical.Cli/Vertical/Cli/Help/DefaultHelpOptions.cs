@@ -26,7 +26,7 @@ public sealed class DefaultHelpOptions
     /// <summary>
     /// Gets a comparer used to sort commands and symbols.
     /// </summary>
-    public IComparer<CliObject> NameComparer { get; init; } = IdentifierComparer.Default;
+    public IComparer<ICliSymbol> NameComparer { get; init; } = IdentifierComparer.Default;
 
     /// <summary>
     /// Gets a function that formats operand argument names.

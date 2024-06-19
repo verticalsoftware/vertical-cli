@@ -10,7 +10,7 @@ public class RootCommandExtensionsGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var models = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, _) => IsCommandReferenceSyntaxNode(node),
+                predicate: static (node, _) => IsReferenceSyntaxNode(node),
                 transform: static (syntaxContext, _) => TransformReferenceSyntaxNode(syntaxContext))
             .Where(node => node is not null);
 
@@ -33,16 +33,70 @@ public class RootCommandExtensionsGenerator : IIncrementalGenerator
         });
     }
 
+    private static bool IsReferenceSyntaxNode(SyntaxNode node)
+    {
+        return IsCommandReferenceSyntaxNode(node) || IsAddSubCommandReferenceSyntaxNode(node);
+    }
+
     private static bool IsCommandReferenceSyntaxNode(SyntaxNode node)
     {
         if (node is not ObjectCreationExpressionSyntax objectCreationSyntax)
             return false;
 
         var type = objectCreationSyntax.Type.GetSimpleTypeName();
-        return type is "RootCommand" or "SubCommand";
+        return type is "RootCommand";
+    }
+
+    private static bool IsAddSubCommandReferenceSyntaxNode(SyntaxNode node)
+    {
+        return node is MemberAccessExpressionSyntax
+        {
+            Name: GenericNameSyntax
+            {
+                Identifier.Text: "AddSubCommand",
+                TypeArgumentList.Arguments.Count: 1
+            }
+        };
     }
 
     private static CommandDefinition? TransformReferenceSyntaxNode(GeneratorSyntaxContext syntaxContext)
+    {
+        return syntaxContext.Node is ObjectCreationExpressionSyntax
+            ? TransformRootCommandReferenceSyntaxNode(syntaxContext)
+            : TransformSubCommandReferenceSyntaxNode(syntaxContext);
+    }
+
+    private static CommandDefinition? TransformSubCommandReferenceSyntaxNode(GeneratorSyntaxContext syntaxContext)
+    {
+        if (syntaxContext.Node is not MemberAccessExpressionSyntax memberAccessSyntax)
+            return null;
+
+        var symbolInfo = syntaxContext.SemanticModel.GetSymbolInfo(memberAccessSyntax.Name);
+
+        if (symbolInfo.Symbol is not IMethodSymbol
+            {
+                Name: "AddSubCommand",
+                ContainingType:
+                {
+                    Name: "CliCommand",
+                    ContainingNamespace:
+                    {
+                        Name: "Configuration",
+                        ContainingNamespace:
+                        {
+                            Name: "Cli",
+                            ContainingNamespace.Name: "Vertical"
+                        }
+                    }
+                }
+            } methodSymbol)
+            return null;
+
+        var modelType = methodSymbol.TypeArguments[0];
+        return new CommandDefinition((INamedTypeSymbol)modelType, false);
+    }
+
+    private static CommandDefinition? TransformRootCommandReferenceSyntaxNode(GeneratorSyntaxContext syntaxContext)
     {
         if (syntaxContext.Node is not ObjectCreationExpressionSyntax objectCreationSyntax)
             return null;
@@ -65,29 +119,15 @@ public class RootCommandExtensionsGenerator : IIncrementalGenerator
             } typeSymbol)
             return null;
 
-        var genericParameterTypes = typeSymbol.TypeArguments;
+        var modelType = typeSymbol.TypeArguments[0];
 
-        if (genericParameterTypes[0] is
-            {
-                ContainingAssembly.Name: "Vertical.Cli",
-                ContainingNamespace:
-                {
-                    Name: "Configuration",
-                    ContainingNamespace:
-                    {
-                        Name: "Cli",
-                        ContainingNamespace.Name: "Vertical"
-                    }
-                },
-                Name: "Empty"
-            }) 
+        if (modelType.HasNoGeneratorBindingAttribute())
             return null;
 
         var isRootDefinition = typeSymbol.Name == "RootCommand";
         
         return new CommandDefinition(
-            (INamedTypeSymbol) genericParameterTypes[0], 
-            (INamedTypeSymbol) genericParameterTypes[1],
+            (INamedTypeSymbol) modelType, 
             isRootDefinition);
     }
 }

@@ -27,25 +27,23 @@ public class CliEngineTests
         public string? Password { get; init; } = default!;
     }
 
-    private readonly RootCommand<BaseModel, Task<int>> _root = Unit.Create(() =>
+    private readonly RootCommand<BaseModel> _root = Unit.Create(() =>
     {
-        var root = new RootCommand<BaseModel, Task<int>>("db");
+        var root = new RootCommand<BaseModel>("db");
 
         root.AddOption(x => x.Verbosity,
             ["--verbosity"],
             defaultProvider: () => Verbosity.Minimal,
             scope: CliScope.Descendants);
 
-        var connect = new SubCommand<ConnectModel, Task<int>>("connect");
+        var connect = root.AddSubCommand<ConnectModel>("connect");
 
         connect
             .AddOption(x => x.Host, ["-h", "--host"], Arity.One)
             .AddOption(x => x.Port, ["--port"], defaultProvider: () => (uint)3306)
             .AddOption(x => x.UserId, ["-u", "--user"], Arity.One)
             .AddOption(x => x.Password, ["-p", "--password"])
-            .SetHandler((model, cancel) => Task.FromResult(1));
-
-        root.AddSubCommand(connect);
+            .HandleAsync((model, cancel) => Task.FromResult(1));
 
         return root;
     });
@@ -98,7 +96,7 @@ public class CliEngineTests
             ]));
     }
 
-    private static async Task<int> InvokeAsync(RootCommand<BaseModel, Task<int>> command, string[] args)
+    private static async Task<int> InvokeAsync(RootCommand<BaseModel> command, string[] args)
     {
         // This is what generator would make
         var context = CliEngine.GetContext(command, args);

@@ -15,7 +15,7 @@ public static class Exceptions
     /// <param name="command">Command</param>
     /// <param name="arguments"></param>
     /// <returns></returns>
-    public static Exception InvocationFailed<TModel, TResult>(RootCommand<TModel, TResult> command, string[] arguments)
+    public static Exception InvocationFailed<TModel>(RootCommand<TModel> command, string[] arguments)
         where TModel : class
     {
         return new Exception();
@@ -65,7 +65,7 @@ public static class Exceptions
     internal static Exception UnmappedArgument(string path, string unbound)
     {
         return new CommandLineException(
-            $"{path}: unknown option, argument, or symbol '{unbound}'",
+            $"{path}: unknown option, argument, or command '{unbound}'",
             path);
     }
 

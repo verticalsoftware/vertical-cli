@@ -31,11 +31,6 @@ public abstract class CliObject
     public string? Description { get; }
 
     /// <summary>
-    /// Gets the parent of this item.
-    /// </summary>
-    public abstract CliObject? Parent { get; }
-
-    /// <summary>
     /// Gets the primary identifier.
     /// </summary>
     public string PrimaryIdentifier { get; }

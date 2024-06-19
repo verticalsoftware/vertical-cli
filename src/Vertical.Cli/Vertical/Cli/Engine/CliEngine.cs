@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Diagnostics;
+﻿using System.Diagnostics.CodeAnalysis;
+using CommunityToolkit.Diagnostics;
 using Vertical.Cli.Binding;
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Parsing;
@@ -16,10 +17,9 @@ public static class CliEngine
     /// <param name="command">The command definition.</param>
     /// <param name="arguments">Arguments of the application.</param>
     /// <typeparam name="TModel">Model type</typeparam>
-    /// <typeparam name="TResult">Result type.</typeparam>
     /// <returns></returns>
-    public static BindingContext<TResult> GetContext<TModel, TResult>(
-        RootCommand<TModel, TResult> command,
+    public static BindingContext GetContext<TModel>(
+        RootCommand<TModel> command,
         string[] arguments)
         where TModel : class
     {
@@ -29,9 +29,9 @@ public static class CliEngine
         var argumentSyntaxes = ArgumentParser.Parse(arguments);
         var queue = new Queue<ArgumentSyntax>(argumentSyntaxes);
         var path = new List<string>(6);
-
+        
         // Resolve which command to invoke - peek/pick from leading arguments.
-        CliCommand<TResult> target = command;
+        CliCommand target = command;
         for (;;)
         {
             path.Add(target.PrimaryIdentifier);
@@ -39,18 +39,24 @@ public static class CliEngine
             if (!queue.TryPeek(out var argument))
                 break;
 
-            // if (argument.PrefixType != OptionPrefixType.None)
-            //     break;
-
-            var child = target
-                .Commands
-                .FirstOrDefault(cmd => cmd.Names.Any(name => name == argument.Text));
-            
-            if (child == null)
+            if (!TryMatchSubCommand(target, argument.Text, out var child))
                 break;
 
-            target = (CliCommand<TResult>)child;
+            target = child;
             queue.Dequeue();
+        }
+
+        var pathString = string.Join(' ', path);
+
+        if (TryMatchModelessTaskConfiguration(target, queue, out var shortTask))
+        {
+            return new BindingContext(
+                target,
+                pathString,
+                [],
+                Enumerable.Empty<string>().ToLookup(s => string.Empty),
+                command.Options,
+                shortTask.InvokeAsync(target, command.Options));
         }
 
         var symbols = target
@@ -58,12 +64,42 @@ public static class CliEngine
             .ToArray();
 
         var valueLookup = ArgumentValueLookup.Create(queue, symbols);
+        var options = command.Options;
 
-        return new BindingContext<TResult>(
+        return new BindingContext(
             target, 
-            string.Join(' ', path), 
+            pathString, 
             symbols, 
             valueLookup, 
-            command.Options);
+            options);
+    }
+
+    private static bool TryMatchModelessTaskConfiguration(
+        CliCommand command,
+        Queue<ArgumentSyntax> queue,
+        [NotNullWhen(true)] out ModelessTaskConfiguration? task)
+    {
+        task = null;
+        
+        if (!queue.TryPeek(out var argument))
+            return false;
+
+        var tasks = command.AggregateModelessTasks();
+
+        task = tasks.FirstOrDefault(t => t.Names.Any(name => name == argument.Text));
+
+        return task != null;
+    }
+
+    private static bool TryMatchSubCommand(
+        CliCommand command,
+        string argument,
+        [NotNullWhen(true)] out CliCommand? match)
+    {
+        match = command
+            .SubCommands
+            .FirstOrDefault(cmd => cmd.Names.Any(name => name == argument));
+        
+        return match is not null;
     }
 }

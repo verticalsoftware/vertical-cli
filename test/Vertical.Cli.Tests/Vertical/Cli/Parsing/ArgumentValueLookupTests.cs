@@ -8,7 +8,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_Single_Argument()
     {
-        var command = new RootCommand<Model<string[]>, int>("command");
+        var command = new RootCommand<Model<string[]>>("command");
         command.AddArgument(x => x.Value);
 
         var unit = CreateUnit(command, ["arg"]);
@@ -19,7 +19,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_MultiValued_Arguments()
     {
-        var command = new RootCommand<Model<string[]>, int>("command");
+        var command = new RootCommand<Model<string[]>>("command");
         command.AddArgument(x => x.Value, Arity.OneOrMany);
 
         var unit = CreateUnit(command, ["1", "2", "3"]);
@@ -30,7 +30,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_Arguments_In_Sequence()
     {
-        var command = new RootCommand<Tuple<string, string>, int>("command");
+        var command = new RootCommand<Tuple<string, string>>("command");
         command
             .AddArgument(x => x.Item1)
             .AddArgument(x => x.Item2);
@@ -44,7 +44,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_Arguments_In_Sequence_Last_Is_MultiValued()
     {
-        var command = new RootCommand<Tuple<string, string>, int>("command");
+        var command = new RootCommand<Tuple<string, string>>("command");
         command
             .AddArgument(x => x.Item1)
             .AddArgument(x => x.Item2, Arity.OneOrMany);
@@ -58,7 +58,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_Switches_True()
     {
-        var command = new RootCommand<Tuple<bool, bool>, int>("command");
+        var command = new RootCommand<Tuple<bool, bool>>("command");
         command
             .AddSwitch(x => x.Item1, ["-a"])
             .AddSwitch(x => x.Item2, ["-b"]);
@@ -71,7 +71,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_Switches_Explicit()
     {
-        var command = new RootCommand<Tuple<bool, bool>, int>("command");
+        var command = new RootCommand<Tuple<bool, bool>>("command");
         command
             .AddSwitch(x => x.Item1, ["-a"])
             .AddSwitch(x => x.Item2, ["-b"]);
@@ -84,7 +84,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_Switches_Explicit_Mixed()
     {
-        var command = new RootCommand<Tuple<bool, bool>, int>("command");
+        var command = new RootCommand<Tuple<bool, bool>>("command");
         command
             .AddSwitch(x => x.Item1, ["-a"])
             .AddSwitch(x => x.Item2, ["-b"]);
@@ -97,7 +97,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_Options()
     {
-        var command = new RootCommand<Tuple<string, string>, int>("command");
+        var command = new RootCommand<Tuple<string, string>>("command");
         command
             .AddOption(x => x.Item1, ["-a"])
             .AddOption(x => x.Item2, ["-b"]);
@@ -111,7 +111,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_Options_MultiValued()
     {
-        var command = new RootCommand<Tuple<string, string>, int>("command");
+        var command = new RootCommand<Tuple<string, string>>("command");
         command
             .AddOption(x => x.Item1, ["-a"])
             .AddOption(x => x.Item2, ["-b"]);
@@ -125,7 +125,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_Args_Before_Options()
     {
-        var command = new RootCommand<Tuple<string, string, bool>, int>("command");
+        var command = new RootCommand<Tuple<string, string, bool>>("command");
         command
             .AddArgument(x => x.Item1)
             .AddArgument(x => x.Item2)
@@ -141,7 +141,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Maps_Args_After_Options()
     {
-        var command = new RootCommand<Tuple<string, string, bool>, int>("command");
+        var command = new RootCommand<Tuple<string, string, bool>>("command");
         command
             .AddArgument(x => x.Item1)
             .AddArgument(x => x.Item2)
@@ -157,7 +157,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Doesnt_Map_Options_Missing_Args()
     {
-        var command = new RootCommand<Model<string>, int>("command");
+        var command = new RootCommand<Model<string>>("command");
         command.AddOption(x => x.Value, ["-a"]);
 
         var unit = CreateUnit(command, ["-b"]);
@@ -168,7 +168,7 @@ public class ArgumentValueLookupTests
     [Fact]
     public void Enqueues_Non_Matched_Options()
     {
-        var command = new RootCommand<Tuple<string, string>, int>("command");
+        var command = new RootCommand<Tuple<string, string>>("command");
         command
             .AddOption(x => x.Item1, ["-a"])
             .AddOption(x => x.Item2, ["-b"]);
@@ -178,8 +178,8 @@ public class ArgumentValueLookupTests
         unit["#unmapped"].ShouldBe(["-c", "-d"]);
     }
 
-    private static ILookup<string, string> CreateUnit<TModel, TResult>(
-        RootCommand<TModel, TResult> command,
+    private static ILookup<string, string> CreateUnit<TModel>(
+        RootCommand<TModel> command,
         string[] args) where TModel : class
     {
         var queue = new Queue<ArgumentSyntax>(ArgumentParser.Parse(args));

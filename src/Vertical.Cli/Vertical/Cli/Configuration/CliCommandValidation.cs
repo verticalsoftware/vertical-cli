@@ -2,7 +2,7 @@
 
 namespace Vertical.Cli.Configuration;
 
-public partial class CliCommand<TModel, TResult>
+public partial class CliCommand<TModel>
 {
     /// <inheritdoc cref="CliCommand"/>>
     internal override void VerifyConfiguration(ICollection<string> messages)
@@ -13,7 +13,7 @@ public partial class CliCommand<TModel, TResult>
         VerifySymbolArity(messages);
         VerifyHandler(messages);
 
-        foreach (var subCommand in Commands)
+        foreach (var subCommand in SubCommands)
         {
             subCommand.VerifyConfiguration(messages);
         }
@@ -24,17 +24,22 @@ public partial class CliCommand<TModel, TResult>
         // E.g., model=Empty
         if (Symbols.Count == 0)
             return;
-        
-        var requiresHandler = Symbols.Any(symbol => symbol.Scope is CliScope.Self or CliScope.SelfAndDescendants);
+
+        var requiresHandler = Symbols
+            .Any(symbol => symbol is
+            {
+                Scope: CliScope.Self or CliScope.SelfAndDescendants,
+                Type: not SymbolType.Action
+            });
 
         switch (requiresHandler)
         {
             case true when _handler is null:
-                messages.Add($"Command {PrimaryIdentifier}: Self or descendant scoped symbols defined, but handler not provided.");
+                messages.Add($"Command {PrimaryIdentifier}: Scoped symbols defined, but handler not provided.");
                 break;
             
             case false when _handler is not null:
-                messages.Add($"Command {PrimaryIdentifier}: Descendant only scoped symbols defined, but handler provided.");
+                messages.Add($"Command {PrimaryIdentifier}: No scoped symbols defined, but handler provided.");
                 break;
         }
     }

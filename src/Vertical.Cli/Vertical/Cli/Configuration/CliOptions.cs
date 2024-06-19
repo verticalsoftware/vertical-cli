@@ -1,4 +1,5 @@
-﻿using Vertical.Cli.Conversion;
+﻿using Vertical.Cli.Binding;
+using Vertical.Cli.Conversion;
 using Vertical.Cli.Help;
 
 namespace Vertical.Cli.Configuration;
@@ -26,5 +27,10 @@ public sealed class CliOptions
     /// <summary>
     /// Gets the object that creates help content.
     /// </summary>
-    public IHelpProvider? HelpProvider { get; set; }
+    public IHelpProvider HelpProvider { get; set; } = DefaultHelpProvider.Instance;
+    
+    /// <summary>
+    /// Gets or sets a function that is invoked when a command handler is not available.
+    /// </summary>
+    public Func<BindingContext, CancellationToken, Task<int>>? FallbackHandler { get; set; }
 }

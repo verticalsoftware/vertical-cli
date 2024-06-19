@@ -12,5 +12,5 @@ public interface IHelpContentProvider
     /// </summary>
     /// <param name="cliObject">Command or symbol reference.</param>
     /// <returns>Description of the object or <c>null</c>.</returns>
-    string? GetContent(CliObject cliObject);
+    string? GetContent(ICliSymbol cliObject);
 }

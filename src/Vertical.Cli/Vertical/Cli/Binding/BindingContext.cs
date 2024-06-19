@@ -2,6 +2,7 @@
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Conversion;
 using Vertical.Cli.Internal;
+using Vertical.Cli.Parsing;
 using ValidationContext = Vertical.Cli.Validation.ValidationContext;
 
 namespace Vertical.Cli.Binding;
@@ -10,31 +11,31 @@ namespace Vertical.Cli.Binding;
 /// Describes the context for client code to bind a model and invoke the command
 /// handler.
 /// </summary>
-/// <typeparam name="TResult">Result type.</typeparam>
-public sealed partial class BindingContext<TResult>
+[NoGeneratorBinding]
+public sealed partial class BindingContext
 {
-    private static readonly (Type ModelType, Func<CliCommand, CancellationToken, TResult> WrappedCallSite)[]
-        StaticCallSites = 
-            [
-                (typeof(Empty), (command, token) => InvokeCallSite(command, Empty.Default, token)),
-                (typeof(CliCommand), (command, token) => InvokeCallSite(command, command, token))
-            ];
+    private record InternalCallSite(
+        Predicate<Type> ModelSelector,
+        Func<CliCommand, CancellationToken, Task<int>> CallSite);
     
     private readonly IReadOnlyDictionary<string, CliSymbol> _symbols;
     private readonly ILookup<string, string> _valueLookup;
     private readonly CliOptions _options;
+    private readonly Task<int>? _shortTask;
 
     internal BindingContext(
-        CliCommand<TResult> commandTarget,
+        CliCommand commandTarget,
         string path,
         IEnumerable<CliSymbol> symbols,
         ILookup<string, string> valueLookup,
-        CliOptions options)
+        CliOptions options,
+        Task<int>? shortTask = null)
     {
         Path = path;
         CommandTarget = commandTarget;
         _valueLookup = valueLookup;
         _options = options;
+        _shortTask = shortTask;
         _symbols = symbols.ToDictionary(symbol => symbol.BindingName);
     }
 
@@ -42,7 +43,7 @@ public sealed partial class BindingContext<TResult>
     /// Gets the command path.
     /// </summary>
     public string Path { get; }
-    
+
     /// <summary>
     /// Gets the command.
     /// </summary>
@@ -58,9 +59,19 @@ public sealed partial class BindingContext<TResult>
     /// </summary>
     /// <typeparam name="TModel">Command model type</typeparam>
     /// <returns>Function that implement's the command logic.</returns>
-    public Func<TModel, CancellationToken, TResult> GetCallSite<TModel>() where TModel : class
+    public Func<TModel, CancellationToken, Task<int>> GetCallSite<TModel>() where TModel : class
     {
-        return ((CliCommand<TModel, TResult>)CommandTarget).Handler;
+        return ((CliCommand<TModel>)CommandTarget).Handler;
+    }
+
+    /// <summary>
+    /// Tries to get the action call site.
+    /// </summary>
+    /// <param name="callSite">If the action call site is registered, a reference to the task.</param>
+    /// <returns><c>true</c> if the callsite was assigned.</returns>
+    public bool TryGetModelessTask([NotNullWhen(true)] out Task<int>? callSite)
+    {
+        return (callSite = _shortTask) != null;
     }
 
     /// <summary>
@@ -69,39 +80,20 @@ public sealed partial class BindingContext<TResult>
     /// <param name="callSite">If successful, the function used to invoke the command handler.</param>
     /// <typeparam name="TModel">Model type</typeparam>
     /// <returns><c>bool</c> indicating if the call site was matched</returns>
-    public bool TryGetCallSite<TModel>([NotNullWhen(true)] out Func<TModel, CancellationToken, TResult>? callSite)
+    public bool TryGetCallSite<TModel>([NotNullWhen(true)] out Func<TModel, CancellationToken, Task<int>>? callSite)
         where TModel : class
     {
         callSite = typeof(TModel) == ModelType
-            ? ((CliCommand<TModel, TResult>)CommandTarget).Handler
+            ? ((CliCommand<TModel>)CommandTarget).Handler
             : null;
 
         return callSite != null;
     }
 
     /// <summary>
-    /// Attempts to get a static call site (one where model is internally provided).
+    /// Gets the default call site.
     /// </summary>
-    /// <param name="callSite">If successful, the function used to invoke the command handler.</param>
-    /// <returns><c>bool</c> indicating if the call site was matched</returns>
-    public bool TryGetStaticCallSite([NotNullWhen(true)] out Func<CancellationToken, TResult>? callSite)
-    {
-        var wrappedCallSite = StaticCallSites
-            .FirstOrDefault(cs => cs.ModelType == ModelType)
-            .WrappedCallSite;
-
-        return (callSite = wrappedCallSite != null
-            ? token => wrappedCallSite(CommandTarget, token)
-            : null) != null;
-    }
-
-    private static TResult InvokeCallSite<TModel>(CliCommand command, 
-        TModel model, 
-        CancellationToken cancellationToken) 
-        where TModel : class
-    {
-        return ((CliCommand<TModel, TResult>)command).Handler(model, cancellationToken);
-    }
+    public readonly Func<CancellationToken, Task<int>> DefaultCallSite = _ => throw new NotImplementedException("Command not implemented");
     
     /// <summary>
     /// Gets a value for the specified binding.
@@ -113,7 +105,7 @@ public sealed partial class BindingContext<TResult>
     {
         return GetValues<TValue, TValue>(bindingName).SingleOrDefault()!;
     }
-    
+
     /// <summary>
     /// Gets a range of values for the specific collection binding.
     /// </summary>
@@ -143,10 +135,6 @@ public sealed partial class BindingContext<TResult>
                 case TValue value:
                     valueList.Add(value);
                     break;
-                
-                default:
-                    // Shouldn't happen because type safety is enforced in symbol
-                    throw new InvalidOperationException();
             }
         }
         
@@ -170,17 +158,25 @@ public sealed partial class BindingContext<TResult>
     /// </exception>
     public void AssertBinding<TModel>(TModel model) where TModel : class
     {
-        var unmappedArguments = GetUnmappedArguments().ToArray();
-        if (unmappedArguments.Length != 0)
-        {
-            throw Exceptions.UnmappedArgument(Path,unmappedArguments.First());
-        }
-
         var validationContext = ValidateModel(model);
+        
         if (validationContext.IsValid)
             return;
 
         throw Exceptions.ValidationFailed(Path, validationContext.Errors);
+    }
+
+    /// <summary>
+    /// Asserts unmapped arguments.
+    /// </summary>
+    /// <exception cref="Exception">There are one or more unmapped arguments.</exception>
+    public void AssertArguments()
+    {
+        var unmappedArguments = UnmappedArguments().ToArray();
+        if (unmappedArguments.Length != 0)
+        {
+            throw Exceptions.UnmappedArgument(Path,unmappedArguments.First());
+        }
     }
 
     /// <summary>
@@ -192,22 +188,19 @@ public sealed partial class BindingContext<TResult>
     public ValidationContext ValidateModel<TModel>(TModel model) where TModel : class
     {
         var context = new ValidationContext();
-        for (CliCommand? command = CommandTarget; command != null; command = command.ParentCommand)
+        for (var command = CommandTarget; command != null; command = command.Parent)
         {
             command.ValidateModel(model, context);
         }
         return context;
     }
-    
+
     /// <summary>
     /// Gets the arguments that were not matched to command symbols.
     /// </summary>
     /// <returns>Collection of arguments</returns>
-    public IEnumerable<string> GetUnmappedArguments()
-    {
-        return _valueLookup["#unmapped"];
-    }
-    
+    public IEnumerable<string> UnmappedArguments() => _valueLookup[ArgumentValueLookup.UnmappedArgumentKey];
+
     private ValueConverter<TValue> GetConverter<TValue>()
     {
         var targetType = typeof(TValue);
@@ -217,7 +210,7 @@ public sealed partial class BindingContext<TResult>
 
         return clientConverter as ValueConverter<TValue> ?? throw Exceptions.NoDefaultConverter<TValue>();
     }
-    
+
     private TValue ResolveValue<TValue>(CliSymbol symbol, string value, ValueConverter<TValue> converter)
     {
         try

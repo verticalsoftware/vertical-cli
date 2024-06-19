@@ -1,30 +1,64 @@
-﻿using Vertical.Cli.Help;
-
-namespace Vertical.Cli.Configuration;
+﻿namespace Vertical.Cli.Configuration;
 
 /// <summary>
 /// Represents the root-most command of an application.
 /// </summary>
 /// <typeparam name="TModel">Model type</typeparam>
-/// <typeparam name="TResult">Result type</typeparam>
-public sealed class RootCommand<TModel, TResult> : 
-    CliCommand<TModel, TResult>, IRootCommand
+public sealed class RootCommand<TModel> : 
+    CliCommand<TModel>, IRootCommand
     where TModel : class
 {
     /// <inheritdoc />
     public RootCommand(
         string name,
         string? description = null) 
-        : base([name], description, null)
+        : base([name], description)
     {
     }
 
-    CliOptions IRootCommand.Options => Options;
-
     /// <summary>
-    /// Gets the global options.
+    /// Gets the options.
     /// </summary>
     public CliOptions Options { get; } = new();
+
+    /// <summary>
+    /// Adds help functionality.
+    /// </summary>
+    /// <param name="names">The names the switch can be identified by.</param>
+    /// <param name="description">Description of the help option.</param>
+    /// <param name="handler">Handler that displays the help content.</param>
+    /// <param name="result">Result to return from the default handler.</param>
+    /// <returns>A reference to this instance.</returns>
+    public RootCommand<TModel> AddHelpSwitch(
+        string[]? names = null,
+        string? description = null,
+        Func<CliCommand, CliOptions, Task<int>>? handler = null,
+        int result = 0)
+    {
+        if (names is { Length: 0 })
+        {
+            throw new ArgumentException("Help option names cannot be empty.", nameof(names));
+        }
+        
+        AddModelessTask(new HelpTaskConfiguration(
+            names ?? ["--help", "?", "-?"],
+            description ?? "Display help content",
+            CliScope.SelfAndDescendants,
+            result));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Configure options fluently.
+    /// </summary>
+    /// <param name="configure">Action that configures the provided <see cref="CliOptions"/></param>
+    /// <returns>A reference to this instance.</returns>
+    public RootCommand<TModel> ConfigureOptions(Action<CliOptions> configure)
+    {
+        configure(Options);
+        return this;
+    }
 
     /// <summary>
     /// Performs verbose configuration checking.

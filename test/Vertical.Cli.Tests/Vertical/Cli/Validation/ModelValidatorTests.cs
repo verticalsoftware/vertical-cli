@@ -14,7 +14,7 @@ public class ModelValidatorTests
     [Fact]
     public void Evaluators_Invoked()
     {
-        var command = new RootCommand<Model<string>, int>("root");
+        var command = new RootCommand<Model<string>>("root");
         command.AddArgument(x => x.Value);
         var symbol = command.Symbols.First();
         
@@ -42,7 +42,7 @@ public class ModelValidatorTests
     [Fact]
     public void Validate_Adds_Errors()
     {
-        var command = new RootCommand<Model<string>, int>("root");
+        var command = new RootCommand<Model<string>>("root");
         command.AddArgument(x => x.Value, validation: b => b.HasMinLength(3));
 
         var context = new ValidationContext();

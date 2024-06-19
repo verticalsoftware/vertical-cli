@@ -36,7 +36,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
         var indentSpaces = Math.Max(0, _options.IndentSpaces);
         var renderInfo = new RenderInfo(
             command,
-            command.AggregateSymbols().ToArray(),
+            BuildSymbols(command),
             new StringBuilder(5000),
             _options.RenderWidth(),
             new string(' ', indentSpaces),
@@ -74,7 +74,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
         sb.AppendLine("Usage:");
         BuildUsage(renderInfo, renderInfo.Target);
-        foreach (var subCommand in renderInfo.Target.Commands)
+        foreach (var subCommand in renderInfo.Target.SubCommands)
         {
             BuildUsage(renderInfo, subCommand, renderInfo.Target.PrimaryIdentifier);
         }
@@ -107,7 +107,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
             BuildArityEnclosedNotation(sb, symbol);
         }
 
-        if (command.Symbols.Any(s => s.Type is SymbolType.Option or SymbolType.Switch))
+        if (command.Symbols.Any(s => s.Type != SymbolType.Argument))
         {
             sb.Append(" [Options]");
         }
@@ -120,8 +120,8 @@ public sealed class DefaultHelpProvider : IHelpProvider
         var sb = renderInfo.Buffer;
         var subCommands = renderInfo
             .Target
-            .Commands
-            .Where(cmd => !cmd.IsActionSwitch).ToArray();
+            .SubCommands
+            .ToArray();
         
         if (subCommands.Length == 0)
             return;
@@ -180,9 +180,9 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
         var items = renderInfo
             .Symbols
-            .Where(sym => sym.Type is SymbolType.Option or SymbolType.Switch)
-            .Cast<CliObject>()
-            .Concat(renderInfo.Target.Commands.Where(cmd => cmd.IsActionSwitch))
+            .Where(sym => sym.Type != SymbolType.Argument)
+            .Cast<ICliSymbol>()
+            .Concat(renderInfo.Target.AggregateModelessTasks())
             .ToArray();
 
         if (items.Length == 0)
@@ -233,7 +233,13 @@ public sealed class DefaultHelpProvider : IHelpProvider
             sb.Append("...");
     }
 
-    private bool TryGetContent(CliObject obj, [NotNullWhen(true)]out string? str)
+    private static CliSymbol[] BuildSymbols(CliCommand command)
+    {
+        // Ensure help switch is displayed
+        return command.AggregateSymbols().ToArray();
+    }
+
+    private bool TryGetContent(ICliSymbol obj, [NotNullWhen(true)]out string? str)
     {
         str = _options.ContentProvider.GetContent(obj) ?? string.Empty;
         return !string.IsNullOrWhiteSpace(str);

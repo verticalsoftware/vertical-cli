@@ -3,7 +3,7 @@
 /// <summary>
 /// Superclass for all symbols.
 /// </summary>
-public abstract class CliSymbol : CliObject
+public abstract class CliSymbol : CliObject, ICliSymbol
 {
     private protected CliSymbol(
         CliCommand command,
@@ -21,14 +21,16 @@ public abstract class CliSymbol : CliObject
         Arity = arity;
         Scope = scope;
     }
+    
+    /// <summary>
+    /// Gets the object's scope.
+    /// </summary>
+    public CliScope Scope { get; }
 
     /// <summary>
     /// Gets the command the symbol is assign to.
     /// </summary>
     public CliCommand Command { get; }
-
-    /// <inheritdoc />
-    public override CliObject? Parent => Command;
 
     /// <summary>
     /// Gets the model property binding name.
@@ -39,11 +41,6 @@ public abstract class CliSymbol : CliObject
     /// Gets the symbol type.
     /// </summary>
     public SymbolType Type { get; }
-
-    /// <summary>
-    /// Gets the scope of the symbol.
-    /// </summary>
-    public CliScope Scope { get; }
 
     /// <summary>
     /// Gets whether the symbol is named.
@@ -70,9 +67,9 @@ public abstract class CliSymbol : CliObject
 /// Extends the non-generic <see cref="CliSymbol"/> with type information.
 /// </summary>
 /// <typeparam name="TValue">Value type</typeparam>
-public abstract class CliSymbol<TValue> : CliSymbol
+public class CliSymbol<TValue> : CliSymbol
 {
-    private protected CliSymbol(
+    internal CliSymbol(
         CliCommand command,
         SymbolType type,
         string bindingName,

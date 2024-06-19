@@ -3,20 +3,10 @@ using Microsoft.CodeAnalysis;
 
 namespace Vertical.Cli.SourceGenerator;
 
-public class SourceBuilder
+public class SourceBuilder(SourceGenerationModel model)
 {
     private static readonly SymbolDisplayFormat TypeFormat = SymbolDisplayFormat.FullyQualifiedFormat;
-    private readonly SourceGenerationModel _model;
-    private readonly bool _isAsync;
-    private readonly bool _returnsValue;
 
-    public SourceBuilder(SourceGenerationModel model)
-    {
-        _model = model;
-        _isAsync = model.RootDefinition.ResultType.IsAsyncResultType();
-        _returnsValue = model.RootDefinition.ResultType.ResultTypeHasValue();
-    }
-    
     /// <summary>
     /// Generates the code given the model.
     /// </summary>
@@ -49,22 +39,15 @@ public class SourceBuilder
         code.AppendLine("/// <param name=\"command\">The root command definition.</param>");
         code.AppendLine("/// <param name=\"arguments\">The arguments to parse.</param>");
         code.AppendLine("/// <param name=\"cancellationToken\">Token that can be observed for cancellation requests..</param>");
-        if (_returnsValue)
-        {
-            code.AppendLine("/// <returns>The value returned by the command handler.</returns>");
-        }
+        code.AppendLine("/// <returns>The value returned by the command handler.</returns>");
         code.AppendLine("/// <exception cref=\"Vertical.Cli.CommandLineException\">");
         code.AppendLine("/// The model failed binding, a value couldn't be converted, or one or more unmapped arguments were found.");
         code.AppendLine("/// </exception>");
-        code.Append("public static ");
-        code.AppendIf("async ", _isAsync);
-        code.Append(_model.RootDefinition.ResultType.Format());
-        code.Append(" Invoke");
-        code.AppendIf("Async", _isAsync);
+        code.Append("public static async global::System.Threading.Tasks.Task<int> InvokeAsync");
         code.AppendBlock(BlockStyle.ParameterList, (ref CodeBlock inner) =>
         {
             var csv = new Separator(SeparatorStyle.CsvList);
-            var typeArguments = $"{_model.RootDefinition.ModelType.Format()},{_model.RootDefinition.ResultType.Format()}";
+            var typeArguments = $"{model.RootDefinition.ModelType.Format()}";
             inner.AppendListItem(csv, $"this {Constants.RootCommandClass}<{typeArguments}> command");
             inner.AppendListItem(csv, "string[] arguments");
             inner.AppendListItem(csv, "global::System.Threading.CancellationToken cancellationToken = default");
@@ -77,14 +60,24 @@ public class SourceBuilder
         code.AppendUnIndentedLine("#if DEBUG");
         code.AppendLine("command.VerifyConfiguration();");
         code.AppendUnIndentedLine("#endif");
-        code.AppendLine();
         code.AppendLine("var context = global::Vertical.Cli.Engine.CliEngine.GetContext(command, arguments);");
+        code.AppendLine();
+        code.AppendLine("// See if arguments trigger a modeless task.");
+        code.AppendLine("if (context.TryGetModelessTask(out var task))");
+        code.AppendBlock(BlockStyle.BracedBody, (ref CodeBlock inner) =>
+        {
+            inner.AppendLine("return await task;");
+        });
+        code.AppendLine();
         code.AppendLine("var modelType = context.ModelType;");
         code.AppendLine("var converters = command.Options.ValueConverters;");
         code.AppendLine();
+        code.AppendLine("// Throws CommandLineException if there are unmapped arguments");
+        code.AppendLine("context.AssertArguments();");
+        code.AppendLine();
 
-        var modelTypes = new[] { _model.RootDefinition.ModelType }
-            .Concat(_model.SubDefinitions.Select(def => def.ModelType))
+        var modelTypes = new[] { model.RootDefinition.ModelType }
+            .Concat(model.SubDefinitions.Select(def => def.ModelType))
             .Distinct(SymbolEqualityComparer.Default)
             .Cast<INamedTypeSymbol>();
 
@@ -97,17 +90,7 @@ public class SourceBuilder
 
         if (id > 1) code.AppendLine();
         
-        code.AppendLine("// A static call site has a model that is provided internally.");
-        code.AppendLine("if (context.TryGetStaticCallSite(out var callSite))");
-        code.AppendBlock(BlockStyle.BracedBody, (ref CodeBlock inner) =>
-        {
-            inner.AppendIf("return ", _returnsValue);
-            inner.AppendIf("await ", _isAsync);
-            inner.AppendLine("callSite(cancellationToken);");
-        });
-        
-        code.AppendLine();
-        code.AppendLine("throw global::Vertical.Cli.Internal.Exceptions.InvocationFailed(command, arguments);");
+        code.AppendLine("return await context.DefaultCallSite(cancellationToken);");
     }
 
     private bool WriteModelBinding(ref CodeBlock code, INamedTypeSymbol modelType, int id)
@@ -137,14 +120,11 @@ public class SourceBuilder
         WriteModelConstructor(ref code, modelType, constructor, id);
          
         code.AppendLine();
-        code.AppendLine("// Validate bound model & check for unused arguments/options");
+        code.AppendLine("// Invoke client configured validators");
         code.AppendLine($"context.AssertBinding(model{id});");
         code.AppendLine();
         code.AppendLine("// Route control to the command handler with the constructed model");
-        code.AppendIf("return ", _returnsValue);
-        code.AppendIf("await ", _isAsync);
-        code.AppendLine($"callSite{id}(model{id}, cancellationToken);");
-        if (!_returnsValue) code.AppendLine("return;");
+        code.AppendLine($"return await callSite{id}(model{id}, cancellationToken);");
     }
 
     private void WriteModelConstructor(

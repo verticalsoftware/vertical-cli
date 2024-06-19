@@ -1,8 +1,11 @@
-﻿namespace Vertical.Cli.Configuration;
+﻿using Vertical.Cli.Binding;
+
+namespace Vertical.Cli.Configuration;
 
 /// <summary>
 /// An empty model.
 /// </summary>
+[NoGeneratorBinding]
 public sealed class Empty
 {
     private Empty(){}

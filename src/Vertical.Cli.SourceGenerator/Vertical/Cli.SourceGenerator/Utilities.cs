@@ -38,6 +38,28 @@ public static class Utilities
         };
     }
 
+    public static bool HasNoGeneratorBindingAttribute(this ITypeSymbol typeSymbol)
+    {
+        return typeSymbol
+            .GetAttributes()
+            .Any(attributeData => attributeData is
+            {
+                AttributeClass:
+                {
+                    Name: "NoGeneratorBindingAttribute",
+                    ContainingNamespace:
+                    {
+                        Name: "Binding",
+                        ContainingNamespace:
+                        {
+                            Name: "Cli",
+                            ContainingNamespace.Name: "Vertical"
+                        }
+                    }
+                }
+            });
+    }
+
     public static string Format(this ITypeSymbol symbol) => symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
     
     public static bool IsAsyncResultType(this ITypeSymbol typeSymbol)

@@ -7,6 +7,8 @@ namespace Vertical.Cli.Parsing;
 /// </summary>
 public static class ArgumentValueLookup
 {
+    internal const string UnmappedArgumentKey = "#unmapped";
+    
     private record MappingState(
         Queue<ArgumentSyntax> ArgumentQueue,
         Queue<ArgumentSyntax> DeferredQueue,
@@ -39,7 +41,7 @@ public static class ArgumentValueLookup
 
         while (state.DeferredQueue.TryDequeue(out var unmapped))
         {
-            state.MappedValues.Add(("#unmapped", unmapped.Text));
+            state.MappedValues.Add((UnmappedArgumentKey, unmapped.Text));
         }
 
         return state.MappedValues.ToLookup(pair => pair.Key, pair => pair.Value);

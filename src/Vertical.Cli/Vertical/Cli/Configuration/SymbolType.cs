@@ -18,5 +18,10 @@ public enum SymbolType
     /// <summary>
     /// Indicates a switch symbol.
     /// </summary>
-    Switch
+    Switch,
+    
+    /// <summary>
+    /// Indicates an action.
+    /// </summary>
+    Action
 }
