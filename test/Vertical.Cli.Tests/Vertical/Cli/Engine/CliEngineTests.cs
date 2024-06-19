@@ -100,6 +100,7 @@ public class CliEngineTests
     {
         // This is what generator would make
         var context = CliEngine.GetContext(command, args);
+        context.AssertArguments();
         var modelType = context.ModelType;
         var converters = command.Options.ValueConverters;
 

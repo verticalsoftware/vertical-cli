@@ -17,7 +17,7 @@ public class CliExtensionsTests
              .AddSwitch(x => x.Value, ["-e"], scope: CliScope.Descendants)
              .AddSwitch(x => x.Value, ["-f"], scope: CliScope.SelfAndDescendants);
         
-        var grandchild = root.AddSubCommand<Model<bool>>("grandchild");
+        var grandchild = child.AddSubCommand<Model<bool>>("grandchild");
         grandchild.AddSwitch(x => x.Value, ["-g"], scope: CliScope.Self)
                   .AddSwitch(x => x.Value, ["-h"], scope: CliScope.Descendants)
                   .AddSwitch(x => x.Value, ["-i"], scope: CliScope.SelfAndDescendants);
