@@ -18,14 +18,20 @@ public abstract class CliCommand : CliObject, ICliSymbol
 
     private protected CliCommand(
         Type modelType,
+        int index,
         string[] names,
         string? description,
+        SymbolId symbolId,
         CliCommand? parent)
         : base(names, description)
     {
         ModelType = modelType;
+        Index = index;
         Parent = parent;
+        SymbolId = symbolId;
     }
+
+    internal SymbolId SymbolId { get; }
 
     /// <summary>
     /// Adds a symbol to the underlying collection.
@@ -54,7 +60,7 @@ public abstract class CliCommand : CliObject, ICliSymbol
     /// Gets the parent command, or <c>null</c> if this is the root command.
     /// </summary>
     public CliCommand? Parent { get; }
-    
+
     /// <summary>
     /// Gets the symbols defined in the collection.
     /// </summary>
@@ -90,6 +96,9 @@ public abstract class CliCommand : CliObject, ICliSymbol
 
     /// <inheritdoc />
     public string? OperandSyntax => null;
+
+    /// <inheritdoc />
+    public int Index { get; }
 }
 
 /// <summary>
@@ -102,11 +111,13 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
     private Func<TModel, CancellationToken, Task<int>>? _handler;
 
     internal CliCommand(
+        int index,
         string[] names,
         string? description,
+        SymbolId symbolId,
         Func<TModel, CancellationToken, Task<int>>? handler = null,
         CliCommand? parent = null) 
-        : base(typeof(TModel), names, description, parent)
+        : base(typeof(TModel), index, names, description, symbolId, parent)
     {
         _handler = handler;
     }
@@ -148,6 +159,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         var symbol = new CliSymbol<TValue>(
             this,
             SymbolType.Argument,
+            SymbolId.Next(),
             memberExpression.GetMemberName(),
             [],
             arity ?? Arity.One,
@@ -196,6 +208,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         var symbol = new CliSymbol<TValue>(
             this,
             SymbolType.Option,
+            SymbolId.Next(),
             memberExpression.GetMemberName(),
             names,
             arity ?? Arity.ZeroOrOne,
@@ -237,6 +250,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         var symbol = new CliSymbol<bool>(
             this,
             SymbolType.Switch,
+            SymbolId.Next(),
             memberExpression.GetMemberName(),
             names,
             Arity.One,
@@ -274,7 +288,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
     public CliCommand<TChildModel> AddSubCommand<TChildModel>(string[] names, string? description = null)
         where TChildModel : class, TModel
     {
-        var subCommand = new CliCommand<TChildModel>(names, description, parent: this);
+        var subCommand = new CliCommand<TChildModel>(SymbolId.Next(), names, description, SymbolId, parent: this);
         base.AddSubCommand(subCommand);
         
         return subCommand;
@@ -299,8 +313,9 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         Guard.IsNotNull(handler);
 
         AddModelessTask(new ActionTaskConfiguration(
+            SymbolId.Next(),
             names,
-            description,
+            description, 
             scope,
             (_, _) =>
             {
@@ -330,6 +345,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         Guard.IsNotNull(handler);
 
         AddModelessTask(new ActionTaskConfiguration(
+            SymbolId.Next(),
             names,
             description,
             scope,
@@ -357,6 +373,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         Guard.IsNotNull(handler);
         
         AddModelessTask(new ActionTaskConfiguration(
+            SymbolId.Next(),
             names,
             description,
             scope,

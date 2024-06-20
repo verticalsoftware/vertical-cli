@@ -75,7 +75,7 @@ public static class IdentifierComparer
             if (ReferenceEquals(y, null))
                 return 1;
 
-            return StringComparer.Ordinal.Compare(x.PrimaryIdentifier, y.PrimaryIdentifier);
+            return Comparer<int>.Default.Compare(x.Index, y.Index);
         }
     }
 }

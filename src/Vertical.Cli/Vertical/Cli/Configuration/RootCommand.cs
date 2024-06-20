@@ -15,7 +15,7 @@ public sealed class RootCommand<TModel> :
     public RootCommand(
         string name,
         string? description = null) 
-        : base([name], description)
+        : base(Configuration.SymbolId.Root, [name], description, new SymbolId())
     {
     }
 
@@ -44,6 +44,7 @@ public sealed class RootCommand<TModel> :
         }
         
         AddModelessTask(new HelpTaskConfiguration(
+            SymbolId.Next(),
             names ?? ["--help", "?", "-?"],
             description ?? "Display help content",
             CliScope.SelfAndDescendants,

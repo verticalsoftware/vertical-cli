@@ -24,4 +24,9 @@ public interface ICliSymbol
     /// Gets the operand syntax to display in help content.
     /// </summary>
     string? OperandSyntax { get; }
+    
+    /// <summary>
+    /// Gets the index of the item.
+    /// </summary>
+    int Index { get; }
 }

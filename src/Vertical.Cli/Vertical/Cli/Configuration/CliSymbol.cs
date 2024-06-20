@@ -8,6 +8,7 @@ public abstract class CliSymbol : CliObject, ICliSymbol
     private protected CliSymbol(
         CliCommand command,
         SymbolType type,
+        int index,
         string bindingName,
         string[] names,
         Arity arity,
@@ -19,6 +20,7 @@ public abstract class CliSymbol : CliObject, ICliSymbol
         Command = command;
         BindingName = bindingName;
         Type = type;
+        Index = index;
         Arity = arity;
         Scope = scope;
         OperandSyntax = operandNotation;
@@ -50,6 +52,11 @@ public abstract class CliSymbol : CliObject, ICliSymbol
     public SymbolType Type { get; }
 
     /// <summary>
+    /// Gets the symbol's index.
+    /// </summary>
+    public int Index { get; }
+
+    /// <summary>
     /// Gets whether the symbol is named.
     /// </summary>
     public bool HasNames => Names.Length > 0;
@@ -79,6 +86,7 @@ public class CliSymbol<TValue> : CliSymbol
     internal CliSymbol(
         CliCommand command,
         SymbolType type,
+        int index,
         string bindingName,
         string[] names,
         Arity arity,
@@ -86,7 +94,7 @@ public class CliSymbol<TValue> : CliSymbol
         Func<TValue>? defaultProvider,
         string? description,
         string? operandNotation)
-    : base(command, type, bindingName, names, arity, scope, description, operandNotation)
+    : base(command, type, index, bindingName, names, arity, scope, description, operandNotation)
     {
         DefaultProvider = defaultProvider;
     }

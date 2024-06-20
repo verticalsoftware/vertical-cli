@@ -6,14 +6,21 @@
 public abstract class ModelessTaskConfiguration : ICliSymbol
 {
     internal ModelessTaskConfiguration(
+        int index,
         string[] names,
         string? description,
         CliScope scope)
     {
+        Index = index;
         Names = names;
         Description = description;
         Scope = scope;
     }
+
+    /// <summary>
+    /// Gets the symbol index.
+    /// </summary>
+    public int Index { get; }
 
     /// <summary>
     /// Gets the names the task can be identified by.

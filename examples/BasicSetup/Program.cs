@@ -3,9 +3,6 @@
 // Defines the root command (aka the app)
 var root = new RootCommand<Options>("arc", "An archiving utility.");
 root
-    // Adds a switch [--help, ?, -?] that triggers the help system
-    .AddHelpSwitch()
-    
     // Only applies to sub-commands
     .AddOption(x => x.Compression,
         names: ["--compression"],
@@ -18,14 +15,14 @@ root
 // Add the create mode command
 root
     .AddSubCommand<CreateOptions>("create", "Creates a new archive.")
-    .AddSwitch(x => x.ComputeChecksum,
-        names: ["--check", "--compute-checksum"],
-        description: "Compute and display the checksum on the output file.")
     .AddOption(x => x.OutputFile,
         names: ["-o", "--out"],
         description: "Path/name of the output file.",
         arity: Arity.One, // require value
         validation: value => value.DoesNotExist()) // don't overwrite existing file
+    .AddSwitch(x => x.ComputeChecksum,
+        names: ["--check", "--compute-checksum"],
+        description: "Compute and display the checksum on the output file.")
     .AddArgument(x => x.InputFiles,
         Arity.OneOrMany,
         description: "One or more input files or glob patterns to add to the archive")
@@ -54,6 +51,9 @@ root
         // Extract the archive
         await Task.CompletedTask;
     });
+
+// Adds a switch [--help, ?, -?] that triggers the help system
+root.AddHelpSwitch();
 
 try
 {
