@@ -1,4 +1,7 @@
-﻿namespace Vertical.Cli.Configuration;
+﻿using Vertical.Cli.Configuration;
+
+// ReSharper disable once CheckNamespace
+namespace Vertical.Cli;
 
 /// <summary>
 /// Represents the root-most command of an application.

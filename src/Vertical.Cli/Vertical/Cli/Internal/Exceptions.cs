@@ -34,8 +34,10 @@ public static class Exceptions
         Exception exception)
     {
         return new CommandLineException(
+            CommandLineError.Conversion,
             $"{path} {FormatSymbol(symbol)}: Could not convert value \"{value}\" to type {typeof(TValue)}",
             path,
+            symbol.Command,
             symbol,
             exception);
     }
@@ -46,8 +48,10 @@ public static class Exceptions
         var verb = count == 1 ? "was" : "were";
         
         return new CommandLineException(
+            CommandLineError.Arity,
             $"{path} {FormatSymbol(symbol)}: expects {symbol.Arity.MinCount} {use}, but {count} {verb} provided.",
             path,
+            symbol.Command,
             symbol);
     }
 
@@ -57,16 +61,20 @@ public static class Exceptions
         var verb = count == 1 ? "was" : "were";
         
         return new CommandLineException(
+            CommandLineError.Arity,
             $"{path} {FormatSymbol(symbol)}: allows {symbol.Arity.MinCount} {use}, but {count} {verb} provided.",
             path,
+            symbol.Command,
             symbol);
     }
 
-    internal static Exception UnmappedArgument(string path, string unbound)
+    internal static Exception UnmappedArgument(CliCommand command, string path, string unbound)
     {
         return new CommandLineException(
+            CommandLineError.UnmappedArgument,
             $"{path}: unknown option, argument, or command '{unbound}'",
-            path);
+            path,
+            command);
     }
 
     private static string FormatSymbol(CliSymbol symbol)
@@ -76,19 +84,17 @@ public static class Exceptions
             : $"[argument '{symbol.BindingName}']";
     }
 
-    internal static Exception ValidationFailed(string path,  IEnumerable<ValidationError> errors)
+    internal static Exception ValidationFailed(string path, IEnumerable<ValidationError> errors)
     {
-        var sb = new StringBuilder();
-        var count = 0;
-        sb.AppendLine($"{path}: One or more arguments are invalid:");
-        
-        foreach (var error in errors)
-        {
-            if (count++ > 0) sb.AppendLine();
-            var message = error.Error ?? "Provided value is invalid.";
-            sb.Append($" -> {FormatSymbol(error.Symbol)}: {message}");
-        }
+        var error = errors.First();
+        var errorMessage = error.Error ?? "value provided is not valid.";
+        var message = $"{path}: {FormatSymbol(error.Symbol)}: {errorMessage}";
 
-        return new CommandLineException(sb.ToString(), path);
+        return new CommandLineException(
+            CommandLineError.Validation,
+            message,
+            path,
+            error.Symbol.Command,
+            error.Symbol);
     }
 }

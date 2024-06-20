@@ -40,9 +40,9 @@ public sealed class DefaultHelpOptions
             sb.Append(char.ToUpper(next));
             return next;
         });
-    
+
     /// <summary>
     /// Gets whether to double-space lists.
     /// </summary>
-    public bool DoubleSpace { get; init; }
+    public bool DoubleSpace { get; init; } = true;
 }

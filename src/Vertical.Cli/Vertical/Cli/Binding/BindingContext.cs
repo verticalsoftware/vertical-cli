@@ -14,10 +14,6 @@ namespace Vertical.Cli.Binding;
 [NoGeneratorBinding]
 public sealed partial class BindingContext
 {
-    private record InternalCallSite(
-        Predicate<Type> ModelSelector,
-        Func<CliCommand, CancellationToken, Task<int>> CallSite);
-    
     private readonly IReadOnlyDictionary<string, CliSymbol> _symbols;
     private readonly ILookup<string, string> _valueLookup;
     private readonly CliOptions _options;
@@ -175,7 +171,7 @@ public sealed partial class BindingContext
         var unmappedArguments = UnmappedArguments().ToArray();
         if (unmappedArguments.Length != 0)
         {
-            throw Exceptions.UnmappedArgument(Path,unmappedArguments.First());
+            throw Exceptions.UnmappedArgument(CommandTarget, Path,unmappedArguments.First());
         }
     }
 

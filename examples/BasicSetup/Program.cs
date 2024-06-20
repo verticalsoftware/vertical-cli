@@ -1,63 +1,93 @@
 ﻿using Vertical.Cli;
-using Vertical.Cli.Configuration;
-using Vertical.Cli.Help;
-using Vertical.Cli.Validation;
 
-var rootCommand = new RootCommand<BaseModel>("dotnet", description: ".NET SDK tooling");
-
-rootCommand
+// Defines the root command (aka the app)
+var root = new RootCommand<Options>("arc", "An archiving utility.");
+root
+    // Adds a switch [--help, ?, -?] that triggers the help system
     .AddHelpSwitch()
-    .ConfigureOptions(options => options.HelpProvider = new DefaultHelpProvider(new DefaultHelpOptions
-    {
-        DoubleSpace = true,
-        NameComparer = IdentifierComparer.Sorted
-    }))
-    .AddAction(["-v", "--version"], () => Console.WriteLine("1.0.0-dev"), description: "Displays the application version")
-    .AddOption(x => x.Verbosity, ["--verbosity"],
+    
+    // Only applies to sub-commands
+    .AddOption(x => x.Compression,
+        names: ["--compression"],
         scope: CliScope.Descendants,
-        description: "Output verbosity (Verbose, Normal, Minimal)");
-
-rootCommand.AddSubCommand<BuildModel>(["build"], "Builds a .NET assembly")
-    .AddArgument(x => x.ProjectPath, Arity.One,
-        description: "Path to the project file",
-        validation: v => v.Exists())
-    .AddOption(x => x.Configuration, ["-c", "--configuration"],
-        defaultProvider: () => "Debug",
-        description: "Configuration name to build")
-    .AddOption(x => x.OutputDirectory, ["-o", "--output"],
-        defaultProvider: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
-        description: "Directory where the built artifacts will be written")
-    .AddSwitch(x => x.Force, ["-f", "--force"],
-        description: "Forces all dependencies to be resolved")
-    .AddSwitch(x => x.NoRestore, ["--no-restore"],
-        description: "Don't execute implicit restore")
-    .HandleAsync(async (model, cancellation) =>
+        defaultProvider: () => Compression.Zip,
+        description: "Compression type to use (None, AutoDetect, Zip, Deflate)")
+    ;
+    
+// Add the create mode command
+root
+    .AddSubCommand<CreateOptions>("create", "Creates a new archive.")
+    .AddSwitch(x => x.ComputeChecksum,
+        names: ["--check", "--compute-checksum"],
+        description: "Compute and display the checksum on the output file.")
+    .AddOption(x => x.OutputFile,
+        names: ["-o", "--out"],
+        description: "Path/name of the output file.",
+        arity: Arity.One, // require value
+        validation: value => value.DoesNotExist()) // don't overwrite existing file
+    .AddArgument(x => x.InputFiles,
+        Arity.OneOrMany,
+        description: "One or more input files or glob patterns to add to the archive")
+    .HandleAsync(async (options, cancellationToken) =>
     {
-        Console.WriteLine($"Building {model.ProjectPath}, configuration={model.Configuration}");
+        // Create the archive...
+        await Task.CompletedTask;
+    });
+
+// Add the extract mode command
+root
+    .AddSubCommand<ExtractOptions>("extract", "Extracts an archive.")
+    .AddOption(x => x.Checksum,
+        names: ["--check"],
+        description: "Validates the archive's checksum")
+    .AddArgument(x => x.InputFile,
+        arity: Arity.One,
+        description: "Path to the input file",
+        validation: value => value.Exists())
+    .AddOption(x => x.OutputDirectory,
+        names: ["-o", "--out"],
+        defaultProvider: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
+        description: "Path to the output directory")
+    .HandleAsync(async (options, cancellationToken) =>
+    {
+        // Extract the archive
         await Task.CompletedTask;
     });
 
 try
 {
-    await rootCommand.InvokeAsync(args, CancellationToken.None);
+    return await root.InvokeAsync(args);
 }
 catch (CommandLineException exception)
 {
     Console.WriteLine(exception.Message);
+    return -1;
 }
 
-public enum Verbosity { Verbose, Normal, Minimal }
-
-public abstract class BaseModel
+// Models
+enum Compression
 {
-    public Verbosity Verbosity { get; set; }
+    None,
+    AutoDetect,
+    Zip,
+    Deflate
 }
 
-public class BuildModel : BaseModel
+abstract class Options
 {
-    public FileInfo ProjectPath { get; set; } = default!;
-    public string Configuration { get; set; } = default!;
+    public Compression Compression { get; set; }
+}
+
+class CreateOptions : Options
+{
+    public bool ComputeChecksum { get; set; }
+    public FileInfo OutputFile { get; set; } = default!;
+    public IEnumerable<FileInfo> InputFiles { get; set; } = default!;
+}
+
+class ExtractOptions : Options
+{
+    public string? Checksum { get; set; }
+    public FileInfo InputFile { get; set; } = default!;
     public DirectoryInfo OutputDirectory { get; set; } = default!;
-    public bool Force { get; set; }
-    public bool NoRestore { get; set; }
 }

@@ -1,4 +1,6 @@
-﻿namespace Vertical.Cli.Configuration;
+﻿using Vertical.Cli.Internal;
+
+namespace Vertical.Cli.Configuration;
 
 /// <summary>
 /// Extends functionality of commands and symbols.
@@ -35,15 +37,16 @@ public static class CliExtensions
     /// <returns>An enumerable that emits each <see cref="CliSymbol"/></returns>
     public static IEnumerable<CliSymbol> AggregateSymbols(this CliCommand command)
     {
-        for (var current = command; current != null; current = current.Parent)
+        return command.SelectManyRecursive(current =>
         {
             Predicate<CliSymbol> filter = ReferenceEquals(command, current)
                 ? symbol => symbol.Scope != CliScope.Descendants
                 : symbol => symbol.Scope != CliScope.Self;
 
-            foreach (var symbol in current.Symbols.Where(item => filter(item)))
-                yield return symbol;
-        }
+            return (
+                current.Symbols.Where(item => filter(item)),
+                current.Parent);
+        });
     }
 
     /// <summary>
@@ -53,13 +56,15 @@ public static class CliExtensions
     /// <returns>An enumeration of <see cref="ModelessTaskConfiguration"/> objects in the path.</returns>
     public static IEnumerable<ModelessTaskConfiguration> AggregateModelessTasks(this CliCommand command)
     {
-        foreach (var task in command.ModelessTasks.Where(t => t.Scope != CliScope.Descendants))
-            yield return task;
-
-        for (var target = command.Parent; target != null; target = target.Parent)
+        return command.SelectManyRecursive(current =>
         {
-            foreach (var task in target.ModelessTasks.Where(t => t.Scope != CliScope.Self))
-                yield return task;
-        }
+            Predicate<ModelessTaskConfiguration> filter = ReferenceEquals(command, current)
+                ? symbol => symbol.Scope != CliScope.Descendants
+                : symbol => symbol.Scope != CliScope.Self;
+
+            return (
+                current.ModelessTasks.Where(item => filter(item)),
+                current.Parent);
+        });
     }
 }

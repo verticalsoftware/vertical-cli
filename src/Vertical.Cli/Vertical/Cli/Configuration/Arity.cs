@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Diagnostics;
 
-namespace Vertical.Cli.Configuration;
+// ReSharper disable once CheckNamespace
+namespace Vertical.Cli;
 
 /// <summary>
 /// Defines the usage arity of a command.

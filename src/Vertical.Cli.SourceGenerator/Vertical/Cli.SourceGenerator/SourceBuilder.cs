@@ -43,7 +43,7 @@ public class SourceBuilder(SourceGenerationModel model)
         code.AppendLine("/// <exception cref=\"Vertical.Cli.CommandLineException\">");
         code.AppendLine("/// The model failed binding, a value couldn't be converted, or one or more unmapped arguments were found.");
         code.AppendLine("/// </exception>");
-        code.Append("public static async global::System.Threading.Tasks.Task<int> InvokeAsync");
+        code.Append("internal static async global::System.Threading.Tasks.Task<int> InvokeAsync");
         code.AppendBlock(BlockStyle.ParameterList, (ref CodeBlock inner) =>
         {
             var csv = new Separator(SeparatorStyle.CsvList);
@@ -84,6 +84,7 @@ public class SourceBuilder(SourceGenerationModel model)
         var id = 1;
         foreach (var modelType in modelTypes)
         {
+            if (id > 1) code.AppendLine();
             if (WriteModelBinding(ref code, modelType, id))
                 ++id;
         }
@@ -127,7 +128,7 @@ public class SourceBuilder(SourceGenerationModel model)
         code.AppendLine($"return await callSite{id}(model{id}, cancellationToken);");
     }
 
-    private void WriteModelConstructor(
+    private static void WriteModelConstructor(
         ref CodeBlock code,
         INamedTypeSymbol modelType,
         IMethodSymbol constructor,
@@ -231,26 +232,25 @@ public class SourceBuilder(SourceGenerationModel model)
         INamedTypeSymbol modelType,
         IMethodSymbol constructor)
     {
+        var typeSet = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+
         var convertibleTypes = constructor
             .Parameters
             .Select(parameter => parameter.Type)
-            .Concat(modelType.GetAllProperties().Select(property => property.Type))
-            .Distinct(SymbolEqualityComparer.Default)
-            .Cast<ITypeSymbol>();
+            .Concat(modelType.GetAllProperties().Select(property => property.Type));
 
         var written = false;
 
         foreach (var type in convertibleTypes)
         {
             if (!written) code.AppendLine("// Add converters required for this model type");
-            WriteConverterImplementation(ref code, type);
-            written = true;
+            written |= WriteConverterImplementation(ref code, type, typeSet);
         }
 
         return written;
     }
 
-    private static void WriteConverterImplementation(ref CodeBlock code, ITypeSymbol type)
+    private static bool WriteConverterImplementation(ref CodeBlock code, ITypeSymbol type, HashSet<ITypeSymbol> typeSet)
     {
         var resolvedType = type switch
         {
@@ -259,6 +259,9 @@ public class SourceBuilder(SourceGenerationModel model)
                 genericArgumentType!,
             _ => type
         };
+
+        if (!typeSet.Add(resolvedType))
+            return false;
 
         var invocation = resolvedType switch
         {
@@ -288,10 +291,11 @@ public class SourceBuilder(SourceGenerationModel model)
             
             _ => default
         };
-        
+
         if (invocation == null)
-            return;
+            return false;
         
         code.AppendLine($"converters.Add({invocation});");
+        return true;
     }
 }

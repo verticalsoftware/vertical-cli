@@ -16,10 +16,15 @@ internal class HelpTaskConfiguration : ModelessTaskConfiguration
 
     public override Task<int> InvokeAsync(CliCommand command, CliOptions options)
     {
+        WriteHelpToConsole(command, options);
+        return Task.FromResult(_result);
+    }
+
+    internal static void WriteHelpToConsole(CliCommand command, CliOptions options)
+    {
         var provider = options.HelpProvider;
         var content = provider.GetContent(command);
         
         Console.Write(content);
-        return Task.FromResult(_result);
     }
 }

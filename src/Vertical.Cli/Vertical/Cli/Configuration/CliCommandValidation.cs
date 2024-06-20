@@ -106,26 +106,20 @@ public partial class CliCommand<TModel>
     private void VerifySymbolArity(ICollection<string> messages)
     {
         var symbols = Symbols
-            .Where(symbol => symbol.Type == SymbolType.Argument)
-            .Reverse()
-            .Skip(1);
+            .Where(symbol => symbol.Type == SymbolType.Argument && symbol.Arity.MinCount != symbol.Arity.MaxCount)
+            .ToArray();
 
-        var zeroOrOneSymbols = 0;
-
-        foreach (var symbol in symbols)
+        switch (symbols.Length)
         {
-            var arity = symbol.Arity;
-
-            if (arity.MaxCount == null || arity.MinCount != arity.MaxCount)
-            {
-                messages.Add($"{FormatSymbol(symbol)}: Single variadic argument must appear last.");
+            case 0:
+            case 1:
                 return;
-            }
-
-            if (arity == Arity.ZeroOrOne && ++zeroOrOneSymbols > 1)
-            {
-                messages.Add($"{FormatSymbol(symbol)}: Only a single (0,1) arity argument allowed.");
-            }
+            case {} when !ReferenceEquals(symbols.Last(), Symbols.Last()):
+                messages.Add($"{FormatSymbol(symbols.Last())}: Single variadic positional argument must be defined last.");
+                break;
+            default:
+                messages.Add($"Command {PrimaryIdentifier}: Only one variadic positional argument can be defined.");
+                break;
         }
     }
 

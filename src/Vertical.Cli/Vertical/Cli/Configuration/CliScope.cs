@@ -1,4 +1,5 @@
-﻿namespace Vertical.Cli.Configuration;
+﻿// ReSharper disable once CheckNamespace
+namespace Vertical.Cli;
 
 /// <summary>
 /// Defines the scope of a symbol.

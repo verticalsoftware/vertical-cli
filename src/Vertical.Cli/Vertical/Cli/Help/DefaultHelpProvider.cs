@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Vertical.Cli.Configuration;
+using Vertical.Cli.Internal;
 
 namespace Vertical.Cli.Help;
 
@@ -72,8 +73,14 @@ public sealed class DefaultHelpProvider : IHelpProvider
             sb.AppendLine();
         }
 
+        var fullName = string.Join(
+            ' ',
+            renderInfo.Target
+                .SelectRecursive(source => (source.PrimaryIdentifier, source.Parent))
+                .Reverse());
+
         sb.AppendLine("Usage:");
-        BuildUsage(renderInfo, renderInfo.Target);
+        BuildUsage(renderInfo, renderInfo.Target, fullName);
         foreach (var subCommand in renderInfo.Target.SubCommands)
         {
             BuildUsage(renderInfo, subCommand, renderInfo.Target.PrimaryIdentifier);
@@ -83,17 +90,15 @@ public sealed class DefaultHelpProvider : IHelpProvider
     private void BuildUsage(
         RenderInfo renderInfo,
         CliCommand command,
-        string? parentIdentifier = null)
+        string fullName)
     {
         if (command.Symbols.All(symbol => symbol.Scope is CliScope.Descendants))
             return; // Not executable
 
         var sb = renderInfo.Buffer;
-        
+
         sb.Append(renderInfo.TabX1);
-        if (parentIdentifier != null)
-            sb.Append(parentIdentifier + ' ');
-        sb.Append(command.PrimaryIdentifier);
+        sb.Append(fullName);
         BuildUsageOperands(sb, command);
     }
 
@@ -205,7 +210,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
             {
                 sb.Append(" <");
                 BuildOperandNotation(sb, option);
-                sb.Append(">");
+                sb.Append('>');
             }
 
             sb.AppendLine();

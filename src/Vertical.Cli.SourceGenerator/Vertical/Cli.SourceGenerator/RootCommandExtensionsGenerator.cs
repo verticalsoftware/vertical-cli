@@ -108,14 +108,10 @@ public class RootCommandExtensionsGenerator : IIncrementalGenerator
                 ContainingAssembly.Name: "Vertical.Cli",
                 ContainingNamespace:
                 {
-                    Name: "Configuration",
-                    ContainingNamespace:
-                    {
-                        Name: "Cli",
-                        ContainingNamespace.Name: "Vertical"
-                    }
+                    Name: "Cli",
+                    ContainingNamespace.Name: "Vertical"
                 },
-                Name: "RootCommand" or "SubCommand"
+                Name: "RootCommand"
             } typeSymbol)
             return null;
 

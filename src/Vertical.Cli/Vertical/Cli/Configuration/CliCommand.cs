@@ -69,6 +69,13 @@ public abstract class CliCommand : CliObject, ICliSymbol
     /// Gets the collection of short tasks.
     /// </summary>
     public IEnumerable<ModelessTaskConfiguration> ModelessTasks => _modelessTasks;
+    
+    /// <summary>
+    /// Displays help content to the standard output stream.
+    /// </summary>
+    /// <param name="command">Command to show help content for, defaults to the current instance.</param>
+    public void DisplayHelp(CliCommand? command = null) => HelpTaskConfiguration
+        .WriteHelpToConsole(command ?? this, this.GetOptions());
 
     /// <summary>
     /// Performs verbose checking of the configuration.
@@ -223,7 +230,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
             SymbolType.Switch,
             memberExpression.GetMemberName(),
             names,
-            Arity.ZeroOrOne,
+            Arity.One,
             scope,
             defaultProvider ?? (() => false),
             description);

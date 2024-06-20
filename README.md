@@ -47,3 +47,6 @@ record Arguments(FileInfo Source, FileInfo Destination, bool Overwrite);
 - Define a hierarchy of commands each with derived models
 - Uses a source generator to bind models removing the need for reflection (AOT friendly)
 - Display automatically generated help content
+
+
+See full [docs](https://github.com/verticalsoftware/vertical-cli/blob/main/assets/docs.md).
