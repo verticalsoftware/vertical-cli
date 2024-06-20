@@ -8,6 +8,26 @@ namespace Vertical.Cli.Help;
 /// </summary>
 public sealed class DefaultHelpOptions
 {
+    private static readonly Action<StringBuilder, CliSymbol> DefaultOperandNameFormatter =
+        (sb, symbol) =>
+        {
+            if (!string.IsNullOrWhiteSpace(symbol.OperandSyntax))
+            {
+                sb.Append(symbol.OperandSyntax);
+                return;
+            }
+
+            symbol
+                .BindingName
+                .Aggregate(char.MinValue, (prev, next) =>
+                {
+                    if (char.IsUpper(next) && char.IsLower(prev))
+                        sb.Append('_');
+                    sb.Append(char.ToUpper(next));
+                    return next;
+                });
+        };
+    
     /// <summary>
     /// Gets the help content provider.
     /// </summary>
@@ -31,15 +51,7 @@ public sealed class DefaultHelpOptions
     /// <summary>
     /// Gets a function that formats operand argument names.
     /// </summary>
-    public Action<StringBuilder, CliSymbol> OperandNameFormatter { get; init; } = (sb, symbol) => symbol
-        .BindingName
-        .Aggregate(char.MinValue, (prev, next) =>
-        {
-            if (char.IsUpper(next) && char.IsLower(prev))
-                sb.Append('_');
-            sb.Append(char.ToUpper(next));
-            return next;
-        });
+    public Action<StringBuilder, CliSymbol> OperandNameFormatter { get; init; } = DefaultOperandNameFormatter;
 
     /// <summary>
     /// Gets whether to double-space lists.

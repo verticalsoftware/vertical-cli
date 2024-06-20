@@ -234,7 +234,8 @@ public sealed class DefaultHelpProvider : IHelpProvider
     private void BuildOperandNotation(StringBuilder sb, CliSymbol symbol)
     {
         _options.OperandNameFormatter(sb, symbol);
-        if (symbol.Arity.MaxCount.GetValueOrDefault(0) > 1)
+        
+        if (symbol.Arity.MaxCount is null or > 1)
             sb.Append("...");
     }
 

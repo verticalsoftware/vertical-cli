@@ -28,6 +28,9 @@ public abstract class ModelessTaskConfiguration : ICliSymbol
     /// </summary>
     public string? Description { get; }
 
+    /// <inheritdoc />
+    public string? OperandSyntax => null;
+
     /// <summary>
     /// Gets the scope.
     /// </summary>

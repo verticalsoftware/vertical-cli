@@ -11,7 +11,8 @@ root
         names: ["--compression"],
         scope: CliScope.Descendants,
         defaultProvider: () => Compression.Zip,
-        description: "Compression type to use (None, AutoDetect, Zip, Deflate)")
+        description: "Compression type to use (None, AutoDetect, Zip, Deflate)",
+        operandSyntax: "None|GZip|Deflate")
     ;
     
 // Add the create mode command

@@ -87,6 +87,9 @@ public abstract class CliCommand : CliObject, ICliSymbol
 
     /// <inheritdoc />
     public override string ToString() => Names.Length > 1 ? $"[{string.Join(',', Names)}]" : Names[0];
+
+    /// <inheritdoc />
+    public string? OperandSyntax => null;
 }
 
 /// <summary>
@@ -127,6 +130,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
     /// command path.
     /// </param>
     /// <param name="description">A description of the command that can be displayed in help content.</param>
+    /// <param name="operandSyntax">The syntax to display for the value operand.</param>
     /// <param name="validation">
     /// An action that provides an evaluator that determines the validity of the value provided by the client.
     /// </param>
@@ -136,6 +140,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         Arity? arity = null,
         CliScope scope = CliScope.Self,
         string? description = null,
+        string? operandSyntax = null,
         Action<ValidationBuilder<TModel, TValue>>? validation = null)
     {
         Guard.IsNotNull(memberExpression, nameof(memberExpression));
@@ -148,7 +153,8 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
             arity ?? Arity.One,
             scope,
             null,
-            description);
+            description,
+            operandSyntax);
 
         AddSymbol(symbol);
         TryAddValidator(symbol, memberExpression, validation);
@@ -168,6 +174,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
     /// </param>
     /// <param name="defaultProvider">A function that provides a default value if the client does not provide one. </param>
     /// <param name="description">A description of the command that can be displayed in help content.</param>
+    /// <param name="operandSyntax">The notation to display for the operand value.</param>
     /// <param name="validation">
     /// An action that provides an evaluator that determines the validity of the value provided by the client.
     /// </param>
@@ -179,6 +186,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         CliScope scope = CliScope.Self,
         Func<TValue>? defaultProvider = null,
         string? description = null,
+        string? operandSyntax = null,
         Action<ValidationBuilder<TModel, TValue>>? validation = null)
     {
         Guard.IsNotNull(memberExpression, nameof(memberExpression));
@@ -193,7 +201,8 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
             arity ?? Arity.ZeroOrOne,
             scope,
             defaultProvider,
-            description);
+            description,
+            operandSyntax);
         
         AddSymbol(symbol);
         TryAddValidator(symbol, memberExpression, validation);
@@ -233,7 +242,8 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
             Arity.One,
             scope,
             defaultProvider ?? (() => false),
-            description);
+            description,
+            null);
         
         AddSymbol(symbol);
         TryAddValidator(symbol, memberExpression, validation);

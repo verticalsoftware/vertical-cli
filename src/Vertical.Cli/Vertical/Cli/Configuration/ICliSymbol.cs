@@ -19,4 +19,9 @@ public interface ICliSymbol
     /// Gets the description.
     /// </summary>
     string? Description { get; }
+    
+    /// <summary>
+    /// Gets the operand syntax to display in help content.
+    /// </summary>
+    string? OperandSyntax { get; }
 }
