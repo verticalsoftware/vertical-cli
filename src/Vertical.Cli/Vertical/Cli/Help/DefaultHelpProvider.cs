@@ -169,7 +169,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
                 sb.AppendLine();
             
             sb.Append(renderInfo.TabX1);
-            BuildOperandNotation(sb, argument);
+            BuildOperandNotation(sb, argument, []);
             sb.AppendLine();
             if (!TryGetContent(argument, out var content))
                 continue;
@@ -208,9 +208,8 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
             if (item is CliSymbol option && !(option.ValueType == typeof(bool) || option.ValueType == typeof(bool?)))
             {
-                sb.Append(" <");
-                BuildOperandNotation(sb, option);
-                sb.Append('>');
+                sb.Append(' ');
+                BuildOperandNotation(sb, option, ['<','>']);
             }
 
             sb.AppendLine();
@@ -225,15 +224,19 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
     private void BuildArityEnclosedNotation(StringBuilder sb, CliSymbol symbol)
     {
-        var arityNotation = symbol.Arity.MinCount > 0 ? "<>" : "[]";
-        sb.Append(arityNotation[0]);
-        BuildOperandNotation(sb, symbol);
-        sb.Append(arityNotation[1]);
+        char[] arityNotation = symbol.Arity.MinCount > 0 ? ['<','>'] : ['[',']'];
+        BuildOperandNotation(sb, symbol, arityNotation);
     }
 
-    private void BuildOperandNotation(StringBuilder sb, CliSymbol symbol)
+    private void BuildOperandNotation(StringBuilder sb, CliSymbol symbol, char[] arityNotation)
     {
+        if (arityNotation.Length == 2)
+            sb.Append(arityNotation[0]);
+        
         _options.OperandNameFormatter(sb, symbol);
+
+        if (arityNotation.Length == 2)
+            sb.Append(arityNotation[1]);
         
         if (symbol.Arity.MaxCount is null or > 1)
             sb.Append("...");
