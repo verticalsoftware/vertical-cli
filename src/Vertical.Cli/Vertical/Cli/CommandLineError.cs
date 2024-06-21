@@ -8,7 +8,7 @@ public enum CommandLineError
     /// <summary>
     /// Indicates a string argument value could not be converted to the expected model property type.
     /// </summary>
-    Conversion,
+    ValueConversion,
     
     /// <summary>
     /// Indicates an arity requirement for an option or arguments was not met.
@@ -23,5 +23,10 @@ public enum CommandLineError
     /// <summary>
     /// Indicates the client provided a value that failed validation.
     /// </summary>
-    Validation
+    Validation,
+    
+    /// <summary>
+    /// An error was detected in a response file.
+    /// </summary>
+    ResponseFile
 }

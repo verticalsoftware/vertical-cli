@@ -33,4 +33,9 @@ public sealed class CliOptions
     /// Gets or sets a function that is invoked when a command handler is not available.
     /// </summary>
     public Func<BindingContext, CancellationToken, Task<int>>? FallbackHandler { get; set; }
+    
+    /// <summary>
+    /// Gets or sets whether to enable response files.
+    /// </summary>
+    public bool EnableResponseFiles { get; set; }
 }

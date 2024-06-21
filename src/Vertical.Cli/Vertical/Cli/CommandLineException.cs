@@ -11,7 +11,7 @@ public sealed class CommandLineException : Exception
         CommandLineError error,
         string message,
         string path,
-        CliCommand command,
+        CliCommand? command = null,
         CliSymbol? symbol = null,
         Exception? innerException = null)
         : base(message, innerException)
@@ -35,7 +35,7 @@ public sealed class CommandLineException : Exception
     /// <summary>
     /// Gets the command.
     /// </summary>
-    public CliCommand Command { get; }
+    public CliCommand? Command { get; }
 
     /// <summary>
     /// Gets the affected symbol, if available.

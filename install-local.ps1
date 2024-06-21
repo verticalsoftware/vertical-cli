@@ -1,14 +1,25 @@
 ﻿$nugetPath = "$env:USERPROFILE\.nuget\packages"
 $installPath = "$nugetPath\vertical-cli"
+$packagePath = "$installPath\1.0.0"
 
-if (Test-Path $installPath) {
-    Write-Host "Removing existing installation from $installPath"
-    Remove-Item -Recurse $installPath
+if (Test-Path $packagePath) {
+    Write-Host "Removing existing installation from $packagePath"
+    Remove-Item -Recurse $packagePath
 }
 
-dotnet restore
+if (Test-Path .\lib) {
+    Remove-Item -Recurse .\lib
+}
+
+if (Test-Path .\pack) {    
+    Remove-Item -Recurse .\pack
+}
+
+dotnet clean
+dotnet restore --force
 dotnet build src\Vertical.Cli.SourceGenerator -o .\lib
-dotnet pack src\Vertical.Cli --no-restore --no-build -o .\pack -c Debug
+dotnet pack src\Vertical.Cli --no-restore -o .\pack -c Debug
 dotnet nuget push .\pack\vertical-cli.1.0.0.nupkg -s $nugetPath
 
 Remove-Item -Recurse .\pack
+Remove-Item -Recurse .\lib

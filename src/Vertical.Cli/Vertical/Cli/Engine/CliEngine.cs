@@ -25,7 +25,12 @@ public static class CliEngine
     {
         Guard.IsNotNull(command, nameof(command));
         Guard.IsNotNull(arguments, nameof(arguments));
-        
+
+        if (command.Options.EnableResponseFiles)
+        {
+            arguments = ArgumentPreProcessor.Process(arguments);
+        }
+
         var argumentSyntaxes = ArgumentParser.Parse(arguments);
         var queue = new Queue<ArgumentSyntax>(argumentSyntaxes);
         var path = new List<string>(6);

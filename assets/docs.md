@@ -203,3 +203,11 @@ The parser will throw `CommandLineException` for invalid client input. The follo
 - An argument could not be mapped to a configured symbol
 
 The exception object provides the error type, message, command, and symbol (if available).
+
+### Response files
+
+Response files are files that contain tokens that can be injected as additional arguments to the application. This feature can be enabled by setting `options.EnableResponseFiles = true`. The parser behaves as follows:
+- Tokens on the same line that are separated by whitespace are treated as separate arguments
+- Any content inside double quotes is preserved as is
+- Any token that is prefixed with `@` is considered a path to another response file, and will be processed
+- Any content after '#' on the same line is ignored

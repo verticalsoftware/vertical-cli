@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Vertical.Cli.Configuration;
+using Vertical.Cli.Parsing;
 using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Internal;
@@ -34,7 +35,7 @@ public static class Exceptions
         Exception exception)
     {
         return new CommandLineException(
-            CommandLineError.Conversion,
+            CommandLineError.ValueConversion,
             $"{path} {FormatSymbol(symbol)}: Could not convert value \"{value}\" to type {typeof(TValue)}",
             path,
             symbol.Command,
@@ -96,5 +97,20 @@ public static class Exceptions
             path,
             error.Symbol.Command,
             error.Symbol);
+    }
+
+    internal static Exception ResponseFileNotFound(FileInfo file, Stack<ArgumentPreProcessor.Context> stack)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal static Exception InvalidResponseFileDirective(Stack<ArgumentPreProcessor.Context> stack)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal static Exception NonTerminatedQuote(Stack<ArgumentPreProcessor.Context> stack)
+    {
+        throw new NotImplementedException();
     }
 }
