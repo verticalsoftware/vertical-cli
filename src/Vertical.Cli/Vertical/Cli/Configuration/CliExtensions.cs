@@ -8,6 +8,23 @@ namespace Vertical.Cli.Configuration;
 public static class CliExtensions
 {
     /// <summary>
+    /// Gets a path string.
+    /// </summary>
+    /// <param name="symbol">Symbol</param>
+    /// <param name="separator">Separator used to concatenate identifiers.</param>
+    /// <returns>
+    /// A string that represents the full path of the given symbol, starting with the root command.
+    /// </returns>
+    public static string GetPathString(this ICliSymbol symbol, char separator = '/')
+    {
+        var path = symbol
+            .SelectRecursive(item => (item.PrimaryIdentifier, item.ParentSymbol))
+            .Reverse();
+
+        return string.Join(separator, path);
+    }
+    
+    /// <summary>
     /// Gets the root options.
     /// </summary>
     /// <param name="command">Command</param>

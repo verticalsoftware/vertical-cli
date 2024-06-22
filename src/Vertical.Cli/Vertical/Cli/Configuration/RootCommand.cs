@@ -44,6 +44,7 @@ public sealed class RootCommand<TModel> :
         }
         
         AddModelessTask(new HelpTaskConfiguration(
+            this,
             SymbolId.Next(),
             names ?? ["--help", "?", "-?"],
             description ?? "Display help content",

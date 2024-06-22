@@ -5,12 +5,13 @@ internal class HelpTaskConfiguration : ModelessTaskConfiguration
     private readonly int _result;
 
     internal HelpTaskConfiguration(
+        CliCommand command,
         int index,
         string[] names, 
         string? description, 
         CliScope scope,
         int result) 
-        : base(index, names, description, scope)
+        : base(command, index, names, description, scope)
     {
         _result = result;
     }

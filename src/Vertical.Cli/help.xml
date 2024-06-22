@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<vertical.cli>
+    <command id="arc">
+        <description>
+            An archiving utility.
+        </description>
+        <symbols>
+            <symbol id="--compression"
+        </symbols>
+    </command>
+</vertical.cli>

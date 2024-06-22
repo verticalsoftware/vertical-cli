@@ -56,6 +56,9 @@ public abstract class CliSymbol : CliObject, ICliSymbol
     /// </summary>
     public int Index { get; }
 
+    /// <inheritdoc />
+    public ICliSymbol? ParentSymbol => Command;
+
     /// <summary>
     /// Gets whether the symbol is named.
     /// </summary>

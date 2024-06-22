@@ -29,4 +29,9 @@ public interface ICliSymbol
     /// Gets the index of the item.
     /// </summary>
     int Index { get; }
+    
+    /// <summary>
+    /// Gets the parent symbol.
+    /// </summary>
+    ICliSymbol? ParentSymbol { get; }
 }

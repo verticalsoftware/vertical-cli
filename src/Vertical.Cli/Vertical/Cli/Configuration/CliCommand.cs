@@ -61,6 +61,9 @@ public abstract class CliCommand : CliObject, ICliSymbol
     /// </summary>
     public CliCommand? Parent { get; }
 
+    /// <inheritdoc />
+    public ICliSymbol? ParentSymbol => Parent;
+    
     /// <summary>
     /// Gets the symbols defined in the collection.
     /// </summary>
@@ -313,6 +316,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         Guard.IsNotNull(handler);
 
         AddModelessTask(new ActionTaskConfiguration(
+            this,
             SymbolId.Next(),
             names,
             description, 
@@ -345,6 +349,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         Guard.IsNotNull(handler);
 
         AddModelessTask(new ActionTaskConfiguration(
+            this,
             SymbolId.Next(),
             names,
             description,
@@ -373,6 +378,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         Guard.IsNotNull(handler);
         
         AddModelessTask(new ActionTaskConfiguration(
+            this,
             SymbolId.Next(),
             names,
             description,

@@ -6,16 +6,26 @@
 public abstract class ModelessTaskConfiguration : ICliSymbol
 {
     internal ModelessTaskConfiguration(
+        CliCommand command,
         int index,
         string[] names,
         string? description,
         CliScope scope)
     {
+        Command = command;
         Index = index;
         Names = names;
         Description = description;
         Scope = scope;
     }
+
+    /// <summary>
+    /// Gets the parent command.
+    /// </summary>
+    public CliCommand Command { get; }
+
+    /// <inheritdoc />
+    public ICliSymbol? ParentSymbol => Command;
 
     /// <summary>
     /// Gets the symbol index.

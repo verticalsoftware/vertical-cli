@@ -5,12 +5,13 @@ internal sealed class ActionTaskConfiguration : ModelessTaskConfiguration
     private readonly Func<CliCommand, CliOptions, Task<int>> _handler;
 
     internal ActionTaskConfiguration(
+        CliCommand command,
         int index,
         string[] names,
         string? description,
         CliScope scope,
         Func<CliCommand, CliOptions, Task<int>> handler)
-        : base(index, names, description, scope)
+        : base(command, index, names, description, scope)
     {
         _handler = handler;
     }
