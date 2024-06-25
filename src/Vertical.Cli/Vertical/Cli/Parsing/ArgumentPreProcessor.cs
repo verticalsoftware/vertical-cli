@@ -101,7 +101,9 @@ internal sealed class ArgumentPreProcessor
                     break;
                 
                 case Token.ResponseDirective:
-                    ReadResponseFile(new FileInfo(value), list);
+                    var current = _stack.Peek();
+                    var path = Path.Combine(current.File.DirectoryName!, value);
+                    ReadResponseFile(new FileInfo(path), list);
                     break;
             }
         }

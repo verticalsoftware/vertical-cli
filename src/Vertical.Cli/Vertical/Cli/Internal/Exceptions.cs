@@ -101,16 +101,39 @@ public static class Exceptions
 
     internal static Exception ResponseFileNotFound(FileInfo file, Stack<ArgumentPreProcessor.Context> stack)
     {
-        throw new NotImplementedException();
+        return new CommandLineException(
+            CommandLineError.ResponseFile,
+            $"Response file not found: {file.FullName}",
+            string.Empty);
     }
 
     internal static Exception InvalidResponseFileDirective(Stack<ArgumentPreProcessor.Context> stack)
     {
-        throw new NotImplementedException();
+        var sb = new StringBuilder();
+        sb.AppendLine("Invalid response file directive");
+        foreach (var item in stack)
+        {
+            sb.AppendLine($"  at {item.File} line {item.Line}");
+        }
+
+        return new CommandLineException(
+            CommandLineError.ResponseFile,
+            sb.ToString(),
+            string.Empty);
     }
 
     internal static Exception NonTerminatedQuote(Stack<ArgumentPreProcessor.Context> stack)
     {
-        throw new NotImplementedException();
+        var sb = new StringBuilder();
+        sb.AppendLine("Unterminated double quote");
+        foreach (var item in stack)
+        {
+            sb.AppendLine($"  at {item.File} line {item.Line}");
+        }
+
+        return new CommandLineException(
+            CommandLineError.ResponseFile,
+            sb.ToString(),
+            string.Empty);
     }
 }
