@@ -36,7 +36,7 @@ internal sealed class ArgumentPreProcessor
 
         if (i > 0)
         {
-            list.AddRange(arguments);
+            list.AddRange(arguments.Take(i));
         }
 
         ReadResponseFile(new FileInfo(arguments[i][1..]), list);
