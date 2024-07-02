@@ -5,25 +5,55 @@ namespace Vertical.Cli.Parsing;
 internal sealed class ArgumentPreProcessor
 {
     private readonly Func<FileInfo, Stream> _streamFactory;
+    private readonly Func<string, string?> _clientProcessor;
     private readonly Stack<Context> _stack = new();
-    private readonly HashSet<string> _pathsVisited = new();
+    private readonly HashSet<string> _pathsVisited = [];
 
-    private ArgumentPreProcessor(Func<FileInfo, Stream> streamFactory)
+    private sealed class ArgumentList(Func<string, string?> processor)
+    {
+        private readonly List<string> _list = new(64);
+
+        internal void Add(string value)
+        {
+            var transformed = processor(value);
+            if (string.IsNullOrWhiteSpace(transformed))
+                return;
+            _list.Add(transformed);
+        }
+
+        internal void AddRange(IEnumerable<string> values)
+        {
+            foreach (var value in values)
+            {
+                Add(value);
+            }
+        }
+
+        internal string[] ToArray() => _list.ToArray();
+    }
+
+    private ArgumentPreProcessor(Func<FileInfo, Stream> streamFactory, Func<string, string?> clientProcessor)
     {
         _streamFactory = streamFactory;
+        _clientProcessor = clientProcessor;
     }
 
     internal readonly record struct Context(FileInfo File, int Line);
     private enum Token { None, Argument, ResponseDirective, Comment }
 
-    internal static string[] Process(string[] arguments, Func<FileInfo, Stream>? streamFactory = null)
+    internal static string[] Process(string[] arguments, 
+        Func<FileInfo, Stream>? streamFactory = null,
+        Func<string, string?>? clientProcessor = null)
     {
         for (var c = 0; c < arguments.Length; c++)
         {
             if (arguments[c][0] != '@')
                 continue;
 
-            var instance = new ArgumentPreProcessor(streamFactory ?? (file => file.OpenRead()));
+            var instance = new ArgumentPreProcessor(
+                streamFactory ?? (file => file.OpenRead()),
+                clientProcessor ?? (str => str));
+            
             return instance.ReadResponseFiles(arguments, c);
         }
 
@@ -32,7 +62,7 @@ internal sealed class ArgumentPreProcessor
 
     private string[] ReadResponseFiles(string[] arguments, int i)
     {
-        var list = new List<string>(64);
+        var list = new ArgumentList(_clientProcessor);
 
         if (i > 0)
         {
@@ -57,7 +87,7 @@ internal sealed class ArgumentPreProcessor
         return list.ToArray();
     }
 
-    private void ReadResponseFile(FileInfo file, List<string> list)
+    private void ReadResponseFile(FileInfo file, ArgumentList list)
     {
         if (!_pathsVisited.Add(file.FullName))
             return;
@@ -86,7 +116,7 @@ internal sealed class ArgumentPreProcessor
         }
     }
 
-    private void ReadTokens(string line, List<string> list)
+    private void ReadTokens(string line, ArgumentList list)
     {
         var span = line.AsSpan();
 

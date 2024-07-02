@@ -28,7 +28,7 @@ public static class CliEngine
 
         if (command.Options.EnableResponseFiles)
         {
-            arguments = ArgumentPreProcessor.Process(arguments);
+            arguments = ArgumentPreProcessor.Process(arguments, clientProcessor: command.Options.ArgumentPreProcessor);
         }
 
         var argumentSyntaxes = ArgumentParser.Parse(arguments);
