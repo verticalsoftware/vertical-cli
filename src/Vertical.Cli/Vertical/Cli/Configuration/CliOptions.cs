@@ -48,5 +48,5 @@ public sealed class CliOptions
     /// engine. This function is called after response files are read before control enters the parsing
     /// operation.
     /// </remarks>
-    public Func<string, string?>? ArgumentPreProcessor { get; init; }
+    public Func<string, string?>? ArgumentPreProcessor { get; set; }
 }
