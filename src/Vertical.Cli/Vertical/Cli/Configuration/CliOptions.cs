@@ -1,6 +1,7 @@
 ﻿using Vertical.Cli.Binding;
 using Vertical.Cli.Conversion;
 using Vertical.Cli.Help;
+using Vertical.Cli.Parsing;
 
 namespace Vertical.Cli.Configuration;
 
@@ -38,7 +39,7 @@ public sealed class CliOptions
     /// Gets or sets whether to enable response files.
     /// </summary>
     public bool EnableResponseFiles { get; set; }
-    
+
     /// <summary>
     /// Gets or sets a function that pre-processes/transforms arguments.
     /// </summary>
@@ -48,5 +49,5 @@ public sealed class CliOptions
     /// engine. This function is called after response files are read before control enters the parsing
     /// operation.
     /// </remarks>
-    public Func<string, string?>? ArgumentPreProcessor { get; set; }
+    public ArgumentPreProcessor[] ArgumentPreProcessors { get; set; } = [];
 }

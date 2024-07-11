@@ -19,7 +19,7 @@ public static class Exceptions
     public static Exception InvocationFailed<TModel>(RootCommand<TModel> command, string[] arguments)
         where TModel : class
     {
-        return new Exception();
+        return new InvalidOperationException("Invocation failed");
     }
 
     internal static Exception NoDefaultConverter<TValue>()
@@ -99,7 +99,7 @@ public static class Exceptions
             error.Symbol);
     }
 
-    internal static Exception ResponseFileNotFound(FileInfo file, Stack<ArgumentPreProcessor.Context> stack)
+    internal static Exception ResponseFileNotFound(FileInfo file, Stack<ResponseFilePreProcessor.StackFrame> stack)
     {
         return new CommandLineException(
             CommandLineError.ResponseFile,
@@ -107,7 +107,7 @@ public static class Exceptions
             string.Empty);
     }
 
-    internal static Exception InvalidResponseFileDirective(Stack<ArgumentPreProcessor.Context> stack)
+    internal static Exception InvalidResponseFileDirective(Stack<ResponseFilePreProcessor.StackFrame> stack)
     {
         var sb = new StringBuilder();
         sb.AppendLine("Invalid response file directive");
@@ -122,7 +122,7 @@ public static class Exceptions
             string.Empty);
     }
 
-    internal static Exception NonTerminatedQuote(Stack<ArgumentPreProcessor.Context> stack)
+    internal static Exception NonTerminatedQuote(Stack<ResponseFilePreProcessor.StackFrame> stack)
     {
         var sb = new StringBuilder();
         sb.AppendLine("Unterminated double quote");

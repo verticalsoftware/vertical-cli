@@ -3,7 +3,7 @@ using Shouldly;
 
 namespace Vertical.Cli.Parsing;
 
-public class ArgumentPreProcessorTests
+public class ResponseFilePreProcessorTests
 {
     [Fact]
     public void Injects_Single_Response_File()
@@ -14,7 +14,7 @@ public class ArgumentPreProcessorTests
             "file1.txt file2.txt",
             "--user-id=admin"
         ];
-        var args = ArgumentPreProcessor.Process(["@file"], _ => MakeStream(file));
+        var args = GetResult(["@file"], _ => MakeStream(file));
         
         args.ShouldBe([
             "-a",
@@ -32,7 +32,7 @@ public class ArgumentPreProcessorTests
             ["--verbosity", "info", "input1.txt", "input2.txt input3.txt"]
         ]);
 
-        var args = ArgumentPreProcessor.Process(["@file1.rsp", "@file2.rsp"], _ => MakeStream(files.Dequeue()));
+        var args = GetResult(["@file1.rsp", "@file2.rsp"], _ => MakeStream(files.Dequeue()));
         
         args.ShouldBe([
             "--user-id=admin", 
@@ -58,7 +58,7 @@ public class ArgumentPreProcessorTests
             "(secret) # not a real secret"
         ];
 
-        var args = ArgumentPreProcessor.Process(["@file.rsp"], _ => MakeStream(file));
+        var args = GetResult(["@file.rsp"], _ => MakeStream(file));
         
         args.ShouldBe([
             "--user-id",
@@ -71,7 +71,7 @@ public class ArgumentPreProcessorTests
     [Fact]
     public void Injects_Quoted_String()
     {
-        var args = ArgumentPreProcessor.Process(["@file.rsp"], _ => MakeStream([
+        var args = GetResult(["@file.rsp"], _ => MakeStream([
             "-a",
             "\"now is the time\"",
             "-b"
@@ -82,6 +82,16 @@ public class ArgumentPreProcessorTests
             "now is the time",
             "-b"
         ]);
+    }
+
+    private static IEnumerable<string> GetResult(string[] args, Func<FileInfo, Stream> streamProvider)
+    {
+        var list = new LinkedList<string>(args);
+        ResponseFilePreProcessor.Handle(
+            list,
+            streamProvider);
+
+        return list;
     }
 
     private static MemoryStream MakeStream(string[] lines)

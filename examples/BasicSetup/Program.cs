@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli;
+using Vertical.Cli.Parsing;
 
 // Defines the root command (aka the app)
 var root = new RootCommand<Options>("arc", "An archiving utility.");
@@ -54,6 +55,19 @@ root
 
 // Adds a switch [--help, ?, -?] that triggers the help system
 root.AddHelpSwitch();
+
+root.ConfigureOptions(options =>
+{
+    options.ArgumentPreProcessors = 
+    [
+        (args, next) =>
+        {
+            EnvironmentVariablePreProcessor.Handle(args);
+            ResponseFilePreProcessor.Handle(args);
+            EnvironmentVariablePreProcessor.Handle(args, next);
+        }
+    ];
+});
 
 try
 {

@@ -12,7 +12,7 @@ public static class ArgumentParser
     /// <returns><see cref="IReadOnlyCollection{T}"/></returns>
     public static IReadOnlyCollection<ArgumentSyntax> Parse(IReadOnlyCollection<string> arguments)
     {
-        var list = new List<ArgumentSyntax>(arguments.Count);
+        var list = new List<ArgumentSyntax>(32);
 
         list.AddRange(arguments
             .TakeWhile(argument => argument != "--")

@@ -26,12 +26,10 @@ public static class CliEngine
         Guard.IsNotNull(command, nameof(command));
         Guard.IsNotNull(arguments, nameof(arguments));
 
-        if (command.Options.EnableResponseFiles)
-        {
-            arguments = ArgumentPreProcessor.Process(arguments, clientProcessor: command.Options.ArgumentPreProcessor);
-        }
-
-        var argumentSyntaxes = ArgumentParser.Parse(arguments);
+        var preprocessedArguments = ArgumentPreProcessorPipeline.Invoke(
+            arguments,
+            command.Options.ArgumentPreProcessors);
+        var argumentSyntaxes = ArgumentParser.Parse(preprocessedArguments);
         var queue = new Queue<ArgumentSyntax>(argumentSyntaxes);
         var path = new List<string>(6);
         
