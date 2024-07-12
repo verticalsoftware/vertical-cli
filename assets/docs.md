@@ -204,6 +204,20 @@ The parser will throw `CommandLineException` for invalid client input. The follo
 
 The exception object provides the error type, message, command, and symbol (if available).
 
+### Argument Pre-processors
+
+Arguments can be pre-processed (delete, insert, change, etc.) in a pipeline. Delegates handle pre-processing, where the form is:
+
+```csharp
+public delegate void ArgumentPreProcessor(LinkedList<string> arguments, Action<LinkedList<string>> next);
+```
+
+The delegate is offered a mutable list of arguments which it can change. Furthermore, the delegate body can determine when and if to call the next action in the chain. Pre-processors can be defined in `CliOptions`. This library has the following built in processors (none are configured by default):
+
+- `ResponseFilePreProcessor`: Treats arguments with leading `@` as paths to response files. The files are read and the arguments in them are injected into the argument list.
+- `EnvironmentVariablePreProcessor`: Looks for tokens in arguments that represent environment variables, e.g. `--user=$USER` (*nix) or `--user=$env:USERNAME` (Windows).
+- `SpecialFolderPreProcessor`: Looks for tokens in arguments that identify constants in the `Environment.SpecialFolder` enum, e.g. `--path=$(SpecialFolder.LocalApplicationData)`.
+
 ### Response files
 
 Response files are files that contain tokens that can be injected as additional arguments to the application. This feature can be enabled by setting `options.EnableResponseFiles = true`. The parser behaves as follows:

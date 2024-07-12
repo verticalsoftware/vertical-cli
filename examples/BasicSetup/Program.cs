@@ -60,12 +60,8 @@ root.ConfigureOptions(options =>
 {
     options.ArgumentPreProcessors = 
     [
-        (args, next) =>
-        {
-            EnvironmentVariablePreProcessor.Handle(args);
-            ResponseFilePreProcessor.Handle(args);
-            EnvironmentVariablePreProcessor.Handle(args, next);
-        }
+        ArgumentPreProcessors.AddResponseFileArguments,
+        ArgumentPreProcessors.ReplaceEnvironmentVariables
     ];
 });
 

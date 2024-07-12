@@ -2,10 +2,7 @@
 
 namespace Vertical.Cli.Parsing;
 
-/// <summary>
-/// Defines a pre-processor that injects arguments read from response files.
-/// </summary>
-public static class ResponseFilePreProcessor
+internal static class ResponseFilePreProcessor
 {
     internal readonly record struct StackFrame(FileInfo File, int Line);
 
@@ -17,33 +14,7 @@ public static class ResponseFilePreProcessor
     
     private enum Token { None, Argument, ResponseDirective, Comment }
 
-    /// <summary>
-    /// Performs pre-processing using the default stream provider.
-    /// </summary>
-    /// <param name="argumentList">The mutable argument list.</param>
-    public static void Handle(LinkedList<string> argumentList)
-    {
-        Handle(argumentList, fileInfo => File.OpenRead(fileInfo.FullName));
-    }
-    
-    /// <summary>
-    /// Performs pre-processing using the default stream provider, and invokes the next
-    /// pre-processor.
-    /// </summary>
-    /// <param name="argumentList">The mutable argument list.</param>
-    /// <param name="next">An action that invokes the next pre-processor.</param>
-    public static void Handle(LinkedList<string> argumentList, Action<LinkedList<string>> next)
-    {
-        Handle(argumentList, fileInfo => File.OpenRead(fileInfo.FullName));
-        next(argumentList);
-    }
-
-    /// <summary>
-    /// Performs pre-processing using the specified stream provider.
-    /// </summary>
-    /// <param name="argumentList">The mutable argument list.</param>
-    /// <param name="streamProvider">A function that returns a readable stream.</param>
-    public static void Handle(LinkedList<string> argumentList, Func<FileInfo, Stream> streamProvider)
+    internal static void Handle(LinkedList<string> argumentList, Func<FileInfo, Stream> streamProvider)
     {
         for (var node = argumentList.First; node != null; node = node.Next)
         {
