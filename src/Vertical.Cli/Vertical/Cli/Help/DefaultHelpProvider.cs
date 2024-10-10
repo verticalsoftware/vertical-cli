@@ -49,6 +49,8 @@ public sealed class DefaultHelpProvider : IHelpProvider
         BuildArgumentsSection(renderInfo);
         BuildOptionsSection(renderInfo);
 
+        renderInfo.Buffer.AppendLine();
+        
         return renderInfo.Buffer.ToString();
     }
 
@@ -92,9 +94,6 @@ public sealed class DefaultHelpProvider : IHelpProvider
         CliCommand command,
         string fullName)
     {
-        if (command.Symbols.All(symbol => symbol.Scope is CliScope.Descendants))
-            return; // Not executable
-
         var sb = renderInfo.Buffer;
 
         sb.Append(renderInfo.TabX1);
@@ -106,15 +105,26 @@ public sealed class DefaultHelpProvider : IHelpProvider
         StringBuilder sb,
         CliCommand command)
     {
-        foreach (var symbol in command.Symbols.Where(s => s.Type == SymbolType.Argument))
+        if (command.SubCommands.Any())
+        {
+            var isStandAloneCommand = command.Symbols.Any(symbol => symbol.Scope != CliScope.Descendants);
+            var commandNotation = GetArityNotation(!isStandAloneCommand);
+            sb.Append(' ');
+            sb.Append(commandNotation[0]);
+            sb.Append("command");
+            sb.Append(commandNotation[1]);
+        }
+        
+        foreach (var symbol in command.Symbols.Where(s => s.Type == SymbolType.Argument &&
+                                                          s.Scope != CliScope.Descendants))
         {
             sb.Append(' ');
             BuildArityEnclosedNotation(sb, symbol);
         }
 
-        if (command.Symbols.Any(s => s.Type != SymbolType.Argument))
+        if (command.Symbols.Any(s => s.Type != SymbolType.Argument && s.Scope != CliScope.Descendants))
         {
-            sb.Append(" [Options]");
+            sb.Append(" [options]");
         }
 
         sb.AppendLine();
@@ -224,9 +234,11 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
     private void BuildArityEnclosedNotation(StringBuilder sb, CliSymbol symbol)
     {
-        char[] arityNotation = symbol.Arity.MinCount > 0 ? ['<','>'] : ['[',']'];
+        var arityNotation = GetArityNotation(symbol.Arity.MinCount > 0);
         BuildOperandNotation(sb, symbol, arityNotation);
     }
+
+    private static char[] GetArityNotation(bool required) => required ? ['<', '>'] : ['[', ']'];
 
     private void BuildOperandNotation(StringBuilder sb, CliSymbol symbol, char[] arityNotation)
     {

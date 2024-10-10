@@ -57,7 +57,7 @@ public static class CliEngine
                 target,
                 pathString,
                 [],
-                Enumerable.Empty<string>().ToLookup(s => string.Empty),
+                Enumerable.Empty<string>().ToLookup(_ => string.Empty),
                 command.Options,
                 shortTask.InvokeAsync(target, command.Options));
         }
