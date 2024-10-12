@@ -83,10 +83,6 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
         sb.AppendLine("Usage:");
         BuildUsage(renderInfo, renderInfo.Target, fullName);
-        foreach (var subCommand in renderInfo.Target.SubCommands)
-        {
-            BuildUsage(renderInfo, subCommand, renderInfo.Target.PrimaryIdentifier);
-        }
     }
 
     private void BuildUsage(
@@ -98,6 +94,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
         sb.Append(renderInfo.TabX1);
         sb.Append(fullName);
+        
         BuildUsageOperands(sb, command);
     }
 
