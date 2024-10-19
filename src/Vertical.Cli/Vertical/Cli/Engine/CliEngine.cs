@@ -82,10 +82,11 @@ public static class CliEngine
         IReadOnlyCollection<string> arguments) where TModel : class
     {
         var syntaxList = ArgumentParser.Parse(arguments);
-        
-        command.Options.ArgumentTransform?.Invoke(syntaxList);
-        
-        return syntaxList;
+
+        return command
+            .Options
+            .ArgumentTransforms
+            .Aggregate(syntaxList, (args, next) => next(args));
     }
 
     private static bool TryMatchModelessTaskConfiguration(

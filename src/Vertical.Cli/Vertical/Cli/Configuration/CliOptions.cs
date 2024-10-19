@@ -18,32 +18,16 @@ public sealed class CliOptions
     /// Gets the collection of value converters to use.
     /// </summary>
     public List<ValueConverter> ValueConverters { get; } = [];
-    
+
     /// <summary>
     /// Gets an action used to transform arguments.
     /// </summary>
-    public Action<List<ArgumentSyntax>>? ArgumentTransform { get; }
-
-    /// <summary>
-    /// Gets whether to ignore arguments that don't match to symbols
-    /// configured in the command (will not bypass model bindings).
-    /// </summary>
-    public bool IgnoreUnmappedArguments { get; set; } = false;
+    public List<ArgumentTransformer> ArgumentTransforms { get; } = [];
     
     /// <summary>
     /// Gets the object that creates help content.
     /// </summary>
     public IHelpProvider HelpProvider { get; set; } = DefaultHelpProvider.Instance;
-    
-    /// <summary>
-    /// Gets or sets a function that is invoked when a command handler is not available.
-    /// </summary>
-    public Func<BindingContext, CancellationToken, Task<int>>? FallbackHandler { get; set; }
-    
-    /// <summary>
-    /// Gets or sets whether to enable response files.
-    /// </summary>
-    public bool EnableResponseFiles { get; set; }
 
     /// <summary>
     /// Gets or sets a function that pre-processes/transforms arguments.
