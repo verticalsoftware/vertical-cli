@@ -9,8 +9,8 @@ public static class ArgumentParser
     /// Parses a collection of arguments to <see cref="ArgumentSyntax"/>
     /// </summary>
     /// <param name="arguments">Collection of arguments.</param>
-    /// <returns><see cref="IReadOnlyCollection{T}"/></returns>
-    public static IReadOnlyCollection<ArgumentSyntax> Parse(IReadOnlyCollection<string> arguments)
+    /// <returns><see cref="List{T}"/></returns>
+    public static List<ArgumentSyntax> Parse(IReadOnlyCollection<string> arguments)
     {
         var list = new List<ArgumentSyntax>(32);
 

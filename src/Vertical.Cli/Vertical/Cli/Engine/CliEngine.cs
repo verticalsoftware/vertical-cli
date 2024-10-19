@@ -29,8 +29,8 @@ public static class CliEngine
         var preprocessedArguments = ArgumentPreProcessorPipeline.Invoke(
             arguments,
             command.Options.ArgumentPreProcessors);
-        var argumentSyntaxes = ArgumentParser.Parse(preprocessedArguments);
-        var queue = new Queue<ArgumentSyntax>(argumentSyntaxes);
+        var argumentSyntaxList = BuildArgumentSyntaxList(command, preprocessedArguments);
+        var queue = new Queue<ArgumentSyntax>(argumentSyntaxList);
         var path = new List<string>(6);
         
         // Resolve which command to invoke - peek/pick from leading arguments.
@@ -75,6 +75,17 @@ public static class CliEngine
             symbols, 
             valueLookup, 
             options);
+    }
+
+    private static List<ArgumentSyntax> BuildArgumentSyntaxList<TModel>(
+        RootCommand<TModel> command,
+        IReadOnlyCollection<string> arguments) where TModel : class
+    {
+        var syntaxList = ArgumentParser.Parse(arguments);
+        
+        command.Options.ArgumentTransform?.Invoke(syntaxList);
+        
+        return syntaxList;
     }
 
     private static bool TryMatchModelessTaskConfiguration(

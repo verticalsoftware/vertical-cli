@@ -18,6 +18,11 @@ public sealed class CliOptions
     /// Gets the collection of value converters to use.
     /// </summary>
     public List<ValueConverter> ValueConverters { get; } = [];
+    
+    /// <summary>
+    /// Gets an action used to transform arguments.
+    /// </summary>
+    public Action<List<ArgumentSyntax>>? ArgumentTransform { get; }
 
     /// <summary>
     /// Gets whether to ignore arguments that don't match to symbols
