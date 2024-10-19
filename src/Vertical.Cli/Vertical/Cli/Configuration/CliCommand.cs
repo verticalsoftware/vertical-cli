@@ -153,6 +153,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         Expression<Func<TModel, TValue>> memberExpression,
         Arity? arity = null,
         CliScope scope = CliScope.Self,
+        Func<TValue>? defaultProvider = null,
         string? description = null,
         string? operandSyntax = null,
         Action<ValidationBuilder<TModel, TValue>>? validation = null)
@@ -167,7 +168,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
             [],
             arity ?? Arity.One,
             scope,
-            null,
+            defaultProvider,
             description,
             operandSyntax);
 
