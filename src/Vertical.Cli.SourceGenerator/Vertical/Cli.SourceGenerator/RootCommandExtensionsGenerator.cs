@@ -20,16 +20,26 @@ public class RootCommandExtensionsGenerator : IIncrementalGenerator
         
         context.RegisterSourceOutput(collected, (prodContext, source) =>
         {
+            const string file = "RootCommandExtensions.g.cs";
+            
             var definitions = source
                 .Right
                 .Where(definition => definition is not null)
                 .Cast<CommandDefinition>()
                 .ToArray();
 
+            if (definitions.Length == 0)
+            {
+                prodContext.AddSource(
+                    file,
+                    "// No commands have been configured in the source application");
+                return;
+            }
+
             var model = new SourceGenerationModel(definitions);
             var builder = new SourceBuilder(model!);
             
-            prodContext.AddSource("RootCommandExtensions.g.cs", builder.Generate());
+            prodContext.AddSource(file, builder.Generate());
         });
     }
 

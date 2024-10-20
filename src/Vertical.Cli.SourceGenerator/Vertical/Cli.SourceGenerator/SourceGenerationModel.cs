@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-
-namespace Vertical.Cli.SourceGenerator;
+﻿namespace Vertical.Cli.SourceGenerator;
 
 public sealed class SourceGenerationModel
 {
