@@ -5,32 +5,16 @@ public class EnvironmentVariablePreProcessorTests
     [Fact]
     public void Environment_Variables_Replaced()
     {
-        var variables = Environment.GetEnvironmentVariables();
-        var keys = variables
-            .Keys
-            .Cast<string>()
-            .Take(5)
-            .ToArray();
-
-        var args = keys.Select(MakeOption);
+        Environment.SetEnvironmentVariable("VERTICAL_CLI_ARG_A", "value-a");
+        Environment.SetEnvironmentVariable("VERTICAL_CLI_ARG_B", "value-b");
+        
+        string[] args = ["--option=$VERTICAL_CLI_ARG_A", "--option=$VERTICAL_CLI_ARG_B"];
         var list = new LinkedList<string>(args);
         
         EnvironmentVariablePreProcessor.Handle(list);
 
-        var expected = keys.Select(key => MakeExpectedValue(variables[key]!)).ToArray();
+        string[] expected = ["--option=value-a", "--option=value-b"];
 
         Assert.Equal(expected, list);
-    }
-
-    private static string MakeOption(string key)
-    {
-        return Environment.OSVersion.Platform == PlatformID.Win32NT
-            ? $"--option=$env:{key}"
-            : $"--option=${key}";
-    }
-
-    private static string MakeExpectedValue(object value)
-    {
-        return $"--option={value}";
     }
 }
