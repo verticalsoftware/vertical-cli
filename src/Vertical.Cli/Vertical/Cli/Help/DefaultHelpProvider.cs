@@ -200,17 +200,16 @@ public sealed class DefaultHelpProvider : IHelpProvider
         if (items.Length == 0)
             return;
 
-        var count = 0;
         var wrappingWidth = renderInfo.Width - 2 * _options.IndentSpaces;
 
         var optionGroups = BuildOptionGroups(items);
 
         foreach (var optionGroup in optionGroups)
         {
-            var displayName = optionGroup.Key == "__default" ? "Options" : $"{optionGroup.Key} options";
+            var count = 0;
 
             sb.AppendLine();
-            sb.AppendLine($"{displayName}:");
+            sb.AppendLine($"{optionGroup.Key}:");
 
             foreach (var item in optionGroup)
             {
@@ -239,10 +238,10 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
     private IEnumerable<IGrouping<string, ICliSymbol>> BuildOptionGroups(IEnumerable<ICliSymbol> symbols)
     {
-        string[] groups = ["__default", .._options.OptionGroups ?? []];
+        string[] groups = ["Options", .._options.OptionGroups ?? []];
 
         return symbols
-            .GroupBy(symbol => symbol.OptionGroup ?? "__default")
+            .GroupBy(symbol => symbol.OptionGroup ?? "Options")
             .OrderBy(group => Array.IndexOf(groups, group.Key));
     }
 
