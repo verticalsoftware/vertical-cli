@@ -238,7 +238,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
     private IEnumerable<IGrouping<string, ICliSymbol>> BuildOptionGroups(IEnumerable<ICliSymbol> symbols)
     {
-        string[] groups = ["Options", .._options.OptionGroups ?? []];
+        var groups = _options.OptionGroups ?? [];
 
         return symbols
             .GroupBy(symbol => symbol.OptionGroup ?? "Options")
