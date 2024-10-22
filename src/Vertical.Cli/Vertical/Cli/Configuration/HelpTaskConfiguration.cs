@@ -8,10 +8,11 @@ internal class HelpTaskConfiguration : ModelessTaskConfiguration
         CliCommand command,
         int index,
         string[] names, 
-        string? description, 
+        string? description,
+        string? optionGroup,
         CliScope scope,
         int result) 
-        : base(command, index, names, description, scope)
+        : base(command, index, names, description, optionGroup, scope)
     {
         _result = result;
     }

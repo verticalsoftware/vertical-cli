@@ -10,6 +10,7 @@ public abstract class ModelessTaskConfiguration : ICliSymbol
         int index,
         string[] names,
         string? description,
+        string? optionGroup,
         CliScope scope)
     {
         Command = command;
@@ -17,6 +18,7 @@ public abstract class ModelessTaskConfiguration : ICliSymbol
         Names = names;
         Description = description;
         Scope = scope;
+        OptionGroup = optionGroup;
     }
 
     /// <summary>
@@ -46,7 +48,7 @@ public abstract class ModelessTaskConfiguration : ICliSymbol
     public string? Description { get; }
 
     /// <inheritdoc />
-    public string? OptionGroup => null;
+    public string? OptionGroup { get; }
 
     /// <inheritdoc />
     public string? OperandSyntax => null;

@@ -11,7 +11,7 @@ internal sealed class ActionTaskConfiguration : ModelessTaskConfiguration
         string? description,
         CliScope scope,
         Func<CliCommand, CliOptions, Task<int>> handler)
-        : base(command, index, names, description, scope)
+        : base(command, index, names, description, optionGroup: null, scope)
     {
         _handler = handler;
     }

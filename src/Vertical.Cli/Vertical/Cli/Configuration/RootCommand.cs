@@ -29,12 +29,14 @@ public sealed class RootCommand<TModel> :
     /// </summary>
     /// <param name="names">The names the switch can be identified by.</param>
     /// <param name="description">Description of the help option.</param>
+    /// <param name="optionGroup">Name of the option group the help switch will belong to.</param>
     /// <param name="handler">Handler that displays the help content.</param>
     /// <param name="result">Result to return from the default handler.</param>
     /// <returns>A reference to this instance.</returns>
     public RootCommand<TModel> AddHelpSwitch(
         string[]? names = null,
         string? description = null,
+        string? optionGroup = null,
         Func<CliCommand, CliOptions, Task<int>>? handler = null,
         int result = 0)
     {
@@ -48,6 +50,7 @@ public sealed class RootCommand<TModel> :
             SymbolId.Next(),
             names ?? ["--help", "?", "-?"],
             description ?? "Display help content",
+            optionGroup,
             CliScope.SelfAndDescendants,
             result));
 
