@@ -202,31 +202,48 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
         var count = 0;
         var wrappingWidth = renderInfo.Width - 2 * _options.IndentSpaces;
-        sb.AppendLine();
-        sb.AppendLine("Options:");
 
-        foreach (var item in items.Order(_options.NameComparer))
+        var optionGroups = BuildOptionGroups(items);
+
+        foreach (var optionGroup in optionGroups)
         {
-            if (_options.DoubleSpace && ++count > 1)
-                sb.AppendLine();
-            
-            sb.Append(renderInfo.TabX1);
-            sb.Append(string.Join(", ", item.Names));
-
-            if (item is CliSymbol option && !(option.ValueType == typeof(bool) || option.ValueType == typeof(bool?)))
-            {
-                sb.Append(' ');
-                BuildOperandNotation(sb, option, ['<','>']);
-            }
+            var displayName = optionGroup.Key == "__default" ? "Options" : $"{optionGroup.Key} options";
 
             sb.AppendLine();
-            
-            if (!TryGetContent(item, out var content))
-                continue;
+            sb.AppendLine($"{displayName}:");
 
-            sb.Append(renderInfo.TabX2);
-            Helpers.AppendWrapped(sb, content, wrappingWidth, renderInfo.TabX2, appendNewLine: true);
+            foreach (var item in optionGroup)
+            {
+                if (_options.DoubleSpace && ++count > 1)
+                    sb.AppendLine();
+            
+                sb.Append(renderInfo.TabX1);
+                sb.Append(string.Join(", ", item.Names));
+
+                if (item is CliSymbol option && !(option.ValueType == typeof(bool) || option.ValueType == typeof(bool?)))
+                {
+                    sb.Append(' ');
+                    BuildOperandNotation(sb, option, ['<','>']);
+                }
+
+                sb.AppendLine();
+            
+                if (!TryGetContent(item, out var content))
+                    continue;
+
+                sb.Append(renderInfo.TabX2);
+                Helpers.AppendWrapped(sb, content, wrappingWidth, renderInfo.TabX2, appendNewLine: true);
+            }
         }
+    }
+
+    private IEnumerable<IGrouping<string, ICliSymbol>> BuildOptionGroups(IEnumerable<ICliSymbol> symbols)
+    {
+        string[] groups = ["__default", .._options.OptionGroups ?? []];
+
+        return symbols
+            .GroupBy(symbol => symbol.OptionGroup ?? "__default")
+            .OrderBy(group => Array.IndexOf(groups, group.Key));
     }
 
     private void BuildArityEnclosedNotation(StringBuilder sb, CliSymbol symbol)

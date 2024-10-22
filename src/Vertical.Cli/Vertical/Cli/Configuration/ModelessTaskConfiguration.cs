@@ -46,6 +46,9 @@ public abstract class ModelessTaskConfiguration : ICliSymbol
     public string? Description { get; }
 
     /// <inheritdoc />
+    public string? OptionGroup => null;
+
+    /// <inheritdoc />
     public string? OperandSyntax => null;
 
     /// <summary>

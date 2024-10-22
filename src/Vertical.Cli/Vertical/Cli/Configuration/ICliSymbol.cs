@@ -21,6 +21,11 @@ public interface ICliSymbol
     string? Description { get; }
     
     /// <summary>
+    /// Gets the option group.
+    /// </summary>
+    string? OptionGroup { get; }
+    
+    /// <summary>
     /// Gets the operand syntax to display in help content.
     /// </summary>
     string? OperandSyntax { get; }

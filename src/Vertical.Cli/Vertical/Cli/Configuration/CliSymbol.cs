@@ -14,6 +14,7 @@ public abstract class CliSymbol : CliObject, ICliSymbol
         Arity arity,
         CliScope scope,
         string? description,
+        string? optionGroup,
         string? operandNotation)
         : base(names, description, bindingName)
     {
@@ -24,12 +25,16 @@ public abstract class CliSymbol : CliObject, ICliSymbol
         Arity = arity;
         Scope = scope;
         OperandSyntax = operandNotation;
+        OptionGroup = optionGroup;
     }
     
     /// <summary>
     /// Gets the object's scope.
     /// </summary>
     public CliScope Scope { get; }
+
+    /// <inheritdoc />
+    public string? OptionGroup { get; }
 
     /// <summary>
     /// Gets the operand notation.
@@ -96,8 +101,9 @@ public class CliSymbol<TValue> : CliSymbol
         CliScope scope,
         Func<TValue>? defaultProvider,
         string? description,
+        string? optionGroup,
         string? operandNotation)
-    : base(command, type, index, bindingName, names, arity, scope, description, operandNotation)
+    : base(command, type, index, bindingName, names, arity, scope, description, optionGroup, operandNotation)
     {
         DefaultProvider = defaultProvider;
     }

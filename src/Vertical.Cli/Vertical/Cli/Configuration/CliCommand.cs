@@ -98,6 +98,9 @@ public abstract class CliCommand : CliObject, ICliSymbol
     public override string ToString() => Names.Length > 1 ? $"[{string.Join(',', Names)}]" : Names[0];
 
     /// <inheritdoc />
+    public string? OptionGroup => null;
+
+    /// <inheritdoc />
     public string? OperandSyntax => null;
 
     /// <inheritdoc />
@@ -143,7 +146,9 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
     /// A <see cref="CliScope"/> that specifies the applicability of the option in the
     /// command path.
     /// </param>
+    /// <param name="defaultProvider">Function that provides a default value</param>
     /// <param name="description">A description of the command that can be displayed in help content.</param>
+    /// <param name="optionGroup">Name of the option group</param>
     /// <param name="operandSyntax">The syntax to display for the value operand.</param>
     /// <param name="validation">
     /// An action that provides an evaluator that determines the validity of the value provided by the client.
@@ -170,6 +175,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
             scope,
             defaultProvider,
             description,
+            optionGroup: null,
             operandSyntax);
 
         AddSymbol(symbol);
@@ -190,6 +196,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
     /// </param>
     /// <param name="defaultProvider">A function that provides a default value if the client does not provide one. </param>
     /// <param name="description">A description of the command that can be displayed in help content.</param>
+    /// <param name="optionGroup">Name of the option group</param>
     /// <param name="operandSyntax">The notation to display for the operand value.</param>
     /// <param name="validation">
     /// An action that provides an evaluator that determines the validity of the value provided by the client.
@@ -202,6 +209,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         CliScope scope = CliScope.Self,
         Func<TValue>? defaultProvider = null,
         string? description = null,
+        string? optionGroup = null,
         string? operandSyntax = null,
         Action<ValidationBuilder<TModel, TValue>>? validation = null)
     {
@@ -219,6 +227,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
             scope,
             defaultProvider,
             description,
+            optionGroup,
             operandSyntax);
         
         AddSymbol(symbol);
@@ -236,6 +245,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
     /// A <see cref="CliScope"/> that specifies the applicability of the option in the command path.</param>
     /// <param name="defaultProvider">A function that provides a default value if the client does not provide one. </param>
     /// <param name="description">A description of the command that can be displayed in help content.</param>
+    /// <param name="optionGroup">Name of the option group</param>
     /// <param name="validation">
     /// An action that provides an evaluator that determines the validity of the value provided by the client.
     /// </param>
@@ -245,6 +255,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         CliScope scope = CliScope.Self,
         Func<bool>? defaultProvider = null,
         string? description = null,
+        string? optionGroup = null,
         Action<ValidationBuilder<TModel, bool>>? validation = null)
     {
         Guard.IsNotNull(memberExpression, nameof(memberExpression));
@@ -261,6 +272,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
             scope,
             defaultProvider ?? (() => false),
             description,
+            optionGroup,
             null);
         
         AddSymbol(symbol);

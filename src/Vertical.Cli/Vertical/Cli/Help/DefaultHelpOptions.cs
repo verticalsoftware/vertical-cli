@@ -37,6 +37,11 @@ public sealed class DefaultHelpOptions
     /// Gets the number of spaces for each indent operation.
     /// </summary>
     public int IndentSpaces { get; init; } = 3;
+    
+    /// <summary>
+    /// Gets the option groups and display order.
+    /// </summary>
+    public string[]? OptionGroups { get; init; }
 
     /// <summary>
     /// Gets a function that computes the desired render width.
