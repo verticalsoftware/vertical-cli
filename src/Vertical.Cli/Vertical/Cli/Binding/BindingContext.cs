@@ -16,7 +16,6 @@ public sealed partial class BindingContext
 {
     private readonly IReadOnlyDictionary<string, CliSymbol> _symbols;
     private readonly ILookup<string, string> _valueLookup;
-    private readonly CliOptions _options;
     private readonly Task<int>? _shortTask;
 
     internal BindingContext(
@@ -29,8 +28,8 @@ public sealed partial class BindingContext
     {
         Path = path;
         CommandTarget = commandTarget;
+        Options = options;
         _valueLookup = valueLookup;
-        _options = options;
         _shortTask = shortTask;
         _symbols = symbols.ToDictionary(symbol => symbol.BindingName);
     }
@@ -49,6 +48,11 @@ public sealed partial class BindingContext
     /// Gets the model type of the target command.
     /// </summary>
     public Type ModelType => CommandTarget.ModelType;
+
+    /// <summary>
+    /// Gets the cli options.
+    /// </summary>
+    public CliOptions Options { get; }
 
     /// <summary>
     /// Gets the call site.
@@ -200,7 +204,7 @@ public sealed partial class BindingContext
     private ValueConverter<TValue> GetConverter<TValue>()
     {
         var targetType = typeof(TValue);
-        var clientConverter = _options
+        var clientConverter = Options
             .ValueConverters
             .FirstOrDefault(converter => converter.TargetType == targetType);
 

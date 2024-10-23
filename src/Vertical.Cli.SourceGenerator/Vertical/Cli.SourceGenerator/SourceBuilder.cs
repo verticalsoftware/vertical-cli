@@ -52,16 +52,37 @@ public class SourceBuilder(SourceGenerationModel model)
             inner.AppendListItem(csv, "string[] arguments");
             inner.AppendListItem(csv, "global::System.Threading.CancellationToken cancellationToken = default");
         });
+        code.AppendBlock(BlockStyle.MethodBody, (ref CodeBlock inner) =>
+        {
+            inner.AppendUnIndentedLine("#if DEBUG");
+            inner.AppendLine("command.VerifyConfiguration();");
+            inner.AppendUnIndentedLine("#endif");
+            inner.AppendLine("var context = global::Vertical.Cli.Engine.CliEngine.GetContext(command, arguments);");
+            inner.AppendLine("return await context.InvokeAsync(cancellationToken);");       
+        });
+        code.AppendLine();
+        
+        code.AppendLine("/// <summary>");
+        code.AppendLine("/// Invokes the application with a binding context");
+        code.AppendLine("/// </summary>");
+        code.AppendLine("/// <param name=\"context\">Context that contains the semantic arguments and call site.</param>");
+        code.AppendLine("/// <param name=\"cancellationToken\">Token that can be observed for cancellation requests..</param>");
+        code.AppendLine("/// <returns>The value returned by the command handler.</returns>");
+        code.AppendLine("/// <exception cref=\"Vertical.Cli.CommandLineException\">");
+        code.AppendLine("/// The model failed binding, a value couldn't be converted, or one or more unmapped arguments were found.");
+        code.AppendLine("/// </exception>");
+        code.Append("internal static async global::System.Threading.Tasks.Task<int> InvokeAsync");
+        code.AppendBlock(BlockStyle.ParameterList, (ref CodeBlock inner) =>
+        {
+            var csv = new Separator(SeparatorStyle.CsvList);
+            inner.AppendListItem(csv, "this global::Vertical.Cli.Binding.BindingContext context");
+            inner.AppendListItem(csv, "global::System.Threading.CancellationToken cancellationToken = default");
+        });
         code.AppendBlock(BlockStyle.MethodBody, WriteExtensionClassMethodBody);
     }
 
     private void WriteExtensionClassMethodBody(ref CodeBlock code)
     {
-        code.AppendUnIndentedLine("#if DEBUG");
-        code.AppendLine("command.VerifyConfiguration();");
-        code.AppendUnIndentedLine("#endif");
-        code.AppendLine("var context = global::Vertical.Cli.Engine.CliEngine.GetContext(command, arguments);");
-        code.AppendLine();
         code.AppendLine("// See if arguments trigger a modeless task.");
         code.AppendLine("if (context.TryGetModelessTask(out var task))");
         code.AppendBlock(BlockStyle.BracedBody, (ref CodeBlock inner) =>
@@ -70,7 +91,7 @@ public class SourceBuilder(SourceGenerationModel model)
         });
         code.AppendLine();
         code.AppendLine("var modelType = context.ModelType;");
-        code.AppendLine("var converters = command.Options.ValueConverters;");
+        code.AppendLine("var converters = context.Options.ValueConverters;");
         code.AppendLine();
         code.AppendLine("// Throws CommandLineException if there are unmapped arguments");
         code.AppendLine("context.AssertArguments();");
