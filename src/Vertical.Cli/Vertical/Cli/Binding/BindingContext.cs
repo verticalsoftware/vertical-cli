@@ -24,11 +24,13 @@ public sealed partial class BindingContext
         IEnumerable<CliSymbol> symbols,
         ILookup<string, string> valueLookup,
         CliOptions options,
+        IReadOnlyList<ArgumentSyntax> argumentList,
         Task<int>? shortTask = null)
     {
         Path = path;
         CommandTarget = commandTarget;
         Options = options;
+        ArgumentList = argumentList;
         _valueLookup = valueLookup;
         _shortTask = shortTask;
         _symbols = symbols.ToDictionary(symbol => symbol.BindingName);
@@ -53,6 +55,11 @@ public sealed partial class BindingContext
     /// Gets the cli options.
     /// </summary>
     public CliOptions Options { get; }
+
+    /// <summary>
+    /// Gets the syntax list.
+    /// </summary>
+    public IReadOnlyList<ArgumentSyntax> ArgumentList { get; }
 
     /// <summary>
     /// Gets the call site.

@@ -148,7 +148,6 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
     /// </param>
     /// <param name="defaultProvider">Function that provides a default value</param>
     /// <param name="description">A description of the command that can be displayed in help content.</param>
-    /// <param name="optionGroup">Name of the option group</param>
     /// <param name="operandSyntax">The syntax to display for the value operand.</param>
     /// <param name="validation">
     /// An action that provides an evaluator that determines the validity of the value provided by the client.

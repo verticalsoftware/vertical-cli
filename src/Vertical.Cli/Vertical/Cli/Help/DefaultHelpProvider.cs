@@ -195,6 +195,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
             .Where(sym => sym.Type != SymbolType.Argument)
             .Cast<ICliSymbol>()
             .Concat(renderInfo.Target.AggregateModelessTasks())
+            .Order(_options.NameComparer)
             .ToArray();
 
         if (items.Length == 0)

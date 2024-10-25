@@ -32,15 +32,9 @@ public partial class CliCommand<TModel>
                 Type: not SymbolType.Action
             });
 
-        switch (requiresHandler)
+        if (requiresHandler && _handler is null)
         {
-            case true when _handler is null:
-                messages.Add($"Command {PrimaryIdentifier}: Scoped symbols defined, but handler not provided.");
-                break;
-            
-            case false when _handler is not null:
-                messages.Add($"Command {PrimaryIdentifier}: No scoped symbols defined, but handler provided.");
-                break;
+            messages.Add($"Command {PrimaryIdentifier}: Scoped symbols defined, but handler not provided.");
         }
     }
 

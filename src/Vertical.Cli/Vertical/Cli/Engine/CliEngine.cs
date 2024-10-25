@@ -59,6 +59,7 @@ public static class CliEngine
                 [],
                 Enumerable.Empty<string>().ToLookup(_ => string.Empty),
                 command.Options,
+                argumentSyntaxList,
                 shortTask.InvokeAsync(target, command.Options));
         }
 
@@ -74,7 +75,8 @@ public static class CliEngine
             pathString, 
             symbols, 
             valueLookup, 
-            options);
+            options,
+            argumentSyntaxList);
     }
 
     private static List<ArgumentSyntax> BuildArgumentSyntaxList<TModel>(
