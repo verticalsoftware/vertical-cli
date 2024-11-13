@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using CommunityToolkit.Diagnostics;
 using Vertical.Cli.Binding;
+using Vertical.Cli.Help;
 using Vertical.Cli.Metadata;
 using Vertical.Cli.Validation;
 
@@ -22,15 +23,21 @@ public abstract class CliCommand : CliObject, ICliSymbol
         string[] names,
         string? description,
         SymbolId symbolId,
+        HelpRemarks[]? remarks,
         CliCommand? parent)
         : base(names, description)
     {
         ModelType = modelType;
         Index = index;
         Parent = parent;
+        Remarks = remarks;
         SymbolId = symbolId;
+        Remarks = remarks;
     }
 
+    /// <summary>
+    /// Gets the symbol id.
+    /// </summary>
     internal SymbolId SymbolId { get; }
 
     /// <summary>
@@ -60,6 +67,11 @@ public abstract class CliCommand : CliObject, ICliSymbol
     /// Gets the parent command, or <c>null</c> if this is the root command.
     /// </summary>
     public CliCommand? Parent { get; }
+
+    /// <summary>
+    /// Gets the remarks.
+    /// </summary>
+    public HelpRemarks[]? Remarks { get; }
 
     /// <inheritdoc />
     public ICliSymbol? ParentSymbol => Parent;
@@ -122,8 +134,9 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         string? description,
         SymbolId symbolId,
         Func<TModel, CancellationToken, Task<int>>? handler = null,
+        HelpRemarks[]? remarks = null,
         CliCommand? parent = null) 
-        : base(typeof(TModel), index, names, description, symbolId, parent)
+        : base(typeof(TModel), index, names, description, symbolId, remarks, parent)
     {
         _handler = handler;
     }
@@ -279,15 +292,18 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         
         return this;
     }
-    
+
     /// <summary>
     /// Adds a sub command to this instance.
     /// </summary>
     /// <param name="name">Name the command is identified by.</param>
     /// <param name="description">A description of the command.</param>
+    /// <param name="remarks">Remarks to include in help content.</param>
     /// <typeparam name="TChildModel">Model type.</typeparam>
     /// <returns>A reference to a new <see cref="CliCommand"/> instance.</returns>
-    public CliCommand<TChildModel> AddSubCommand<TChildModel>(string name, string? description = null)
+    public CliCommand<TChildModel> AddSubCommand<TChildModel>(string name, 
+        string? description = null,
+        HelpRemarks[]? remarks = null)
         where TChildModel : class, TModel
     {
         return AddSubCommand<TChildModel>([name], description);
@@ -298,12 +314,21 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
     /// </summary>
     /// <param name="names">Name or names the command is identified by.</param>
     /// <param name="description">A description of the command.</param>
+    /// <param name="remarks">Remarks to include in help content.</param>
     /// <typeparam name="TChildModel">Model type.</typeparam>
     /// <returns>A reference to a new <see cref="CliCommand"/> instance.</returns>
-    public CliCommand<TChildModel> AddSubCommand<TChildModel>(string[] names, string? description = null)
+    public CliCommand<TChildModel> AddSubCommand<TChildModel>(string[] names, 
+        string? description = null,
+        HelpRemarks[]? remarks = null)
         where TChildModel : class, TModel
     {
-        var subCommand = new CliCommand<TChildModel>(SymbolId.Next(), names, description, SymbolId, parent: this);
+        var subCommand = new CliCommand<TChildModel>(SymbolId.Next(), 
+            names, 
+            description, 
+            SymbolId, 
+            remarks: remarks, 
+            parent: this);
+        
         base.AddSubCommand(subCommand);
         
         return subCommand;

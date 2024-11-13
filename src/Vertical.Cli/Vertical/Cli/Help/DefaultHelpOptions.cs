@@ -46,7 +46,7 @@ public sealed class DefaultHelpOptions
     /// <summary>
     /// Gets a function that computes the desired render width.
     /// </summary>
-    public Func<int> RenderWidth { get; init; } = () => Console.WindowWidth;
+    public Func<int> RenderWidth { get; init; } = () => Console.WindowWidth - 3;
 
     /// <summary>
     /// Gets a comparer used to sort commands and symbols.

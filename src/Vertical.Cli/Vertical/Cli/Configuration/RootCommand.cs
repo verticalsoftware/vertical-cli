@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 
 // ReSharper disable once CheckNamespace
 namespace Vertical.Cli;
@@ -14,8 +15,9 @@ public sealed class RootCommand<TModel> :
     /// <inheritdoc />
     public RootCommand(
         string name,
-        string? description = null) 
-        : base(Configuration.SymbolId.Root, [name], description, new SymbolId())
+        string? description = null,
+        HelpRemarks[]? remarks = null) 
+        : base(SymbolId.Root, [name], description, new SymbolId(), remarks: remarks)
     {
     }
 

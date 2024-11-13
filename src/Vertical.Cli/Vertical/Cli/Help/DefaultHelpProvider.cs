@@ -45,6 +45,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
         
         BuildDescriptionSection(renderInfo);
         BuildUsageSection(renderInfo);
+        BuildRemarksSection(renderInfo);
         BuildSubCommandsSection(renderInfo);
         BuildArgumentsSection(renderInfo);
         BuildOptionsSection(renderInfo);
@@ -83,6 +84,34 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
         sb.AppendLine("Usage:");
         BuildUsage(renderInfo, renderInfo.Target, fullName);
+    }
+
+    private static void BuildRemarksSection(RenderInfo renderInfo)
+    {
+        var sb = renderInfo.Buffer;
+
+        if (renderInfo.Target.Remarks is not { Length: > 0 })
+            return;
+
+        foreach (var remark in renderInfo.Target.Remarks)
+        {
+            if (sb.Length > 0)
+            {
+                sb.AppendLine();
+            }
+
+            sb.AppendLine(remark.Title);
+
+            foreach (var paragraph in remark.Paragraphs)
+            {
+                sb.Append(renderInfo.TabX1);
+                Helpers.AppendWrapped(sb, 
+                    paragraph, 
+                    renderInfo.Width, 
+                    renderInfo.TabX1, 
+                    appendNewLine: true);
+            }
+        }
     }
 
     private void BuildUsage(
