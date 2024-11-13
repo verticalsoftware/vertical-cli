@@ -102,13 +102,18 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
             sb.AppendLine(remark.Title);
 
-            foreach (var paragraph in remark.Paragraphs)
+            foreach (var (paragraph, i) in remark.Paragraphs.Select((p, i) => (p, i)))
             {
+                if (i > 0)
+                {
+                    sb.AppendLine();
+                }
+                
                 sb.Append(renderInfo.TabX1);
-                Helpers.AppendWrapped(sb, 
-                    paragraph, 
-                    renderInfo.Width, 
-                    renderInfo.TabX1, 
+                Helpers.AppendWrapped(sb,
+                    paragraph,
+                    renderInfo.Width,
+                    renderInfo.TabX1,
                     appendNewLine: true);
             }
         }

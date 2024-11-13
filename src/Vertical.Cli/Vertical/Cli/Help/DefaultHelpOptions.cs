@@ -36,7 +36,7 @@ public sealed class DefaultHelpOptions
     /// <summary>
     /// Gets the number of spaces for each indent operation.
     /// </summary>
-    public int IndentSpaces { get; init; } = 5;
+    public int IndentSpaces { get; init; } = 4;
     
     /// <summary>
     /// Gets the option groups and display order.
@@ -46,7 +46,7 @@ public sealed class DefaultHelpOptions
     /// <summary>
     /// Gets a function that computes the desired render width.
     /// </summary>
-    public Func<int> RenderWidth { get; init; } = () => Console.WindowWidth - 3;
+    public Func<int> RenderWidth { get; init; } = () => Console.WindowWidth - 10;
 
     /// <summary>
     /// Gets a comparer used to sort commands and symbols.

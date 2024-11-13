@@ -306,7 +306,7 @@ public partial class CliCommand<TModel> : CliCommand where TModel : class
         HelpRemarks[]? remarks = null)
         where TChildModel : class, TModel
     {
-        return AddSubCommand<TChildModel>([name], description);
+        return AddSubCommand<TChildModel>([name], description, remarks);
     }
 
     /// <summary>

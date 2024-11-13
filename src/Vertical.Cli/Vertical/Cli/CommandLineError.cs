@@ -28,5 +28,10 @@ public enum CommandLineError
     /// <summary>
     /// An error was detected in a response file.
     /// </summary>
-    ResponseFile
+    ResponseFile,
+    
+    /// <summary>
+    /// Indicates the target command is not invocable.
+    /// </summary>
+    NoCallSite
 }

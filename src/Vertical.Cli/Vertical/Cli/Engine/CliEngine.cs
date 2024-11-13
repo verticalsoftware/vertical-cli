@@ -67,6 +67,15 @@ public static class CliEngine
             .AggregateSymbols()
             .ToArray();
 
+        if (symbols.Length == 0)
+        {
+            throw new CommandLineException(
+                CommandLineError.NoCallSite,
+                "Command does not have a call site",
+                target.GetPathString(),
+                target);
+        }
+
         var valueLookup = ArgumentValueLookup.Create(queue, symbols);
         var options = command.Options;
 
