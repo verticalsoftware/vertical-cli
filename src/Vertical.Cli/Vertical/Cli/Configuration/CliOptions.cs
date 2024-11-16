@@ -1,5 +1,4 @@
-﻿using Vertical.Cli.Binding;
-using Vertical.Cli.Conversion;
+﻿using Vertical.Cli.Conversion;
 using Vertical.Cli.Help;
 using Vertical.Cli.Parsing;
 
@@ -17,12 +16,12 @@ public sealed class CliOptions
     /// <summary>
     /// Gets the collection of value converters to use.
     /// </summary>
-    public List<ValueConverter> ValueConverters { get; } = [];
+    public List<ValueConverter> ValueConverters { get; set; } = [];
 
     /// <summary>
     /// Gets an action used to transform arguments.
     /// </summary>
-    public List<ArgumentTransformer> ArgumentTransforms { get; } = [];
+    public List<ArgumentTransformer> ArgumentTransforms { get; set; } = [];
     
     /// <summary>
     /// Gets the object that creates help content.

@@ -91,7 +91,7 @@ public class SourceBuilder(SourceGenerationModel model)
         });
         code.AppendLine();
         code.AppendLine("var modelType = context.ModelType;");
-        code.AppendLine("var converters = context.Options.ValueConverters;");
+        code.AppendLine("var converters = new global::Vertical.Cli.Conversion.ValueConverterMap(context.Options.ValueConverters);");
         code.AppendLine();
         code.AppendLine("// Throws CommandLineException if there are unmapped arguments");
         code.AppendLine("context.AssertArguments();");
@@ -316,7 +316,7 @@ public class SourceBuilder(SourceGenerationModel model)
         if (invocation == null)
             return false;
         
-        code.AppendLine($"converters.Add({invocation});");
+        code.AppendLine($"converters.TryAdd({invocation});");
         return true;
     }
 }
