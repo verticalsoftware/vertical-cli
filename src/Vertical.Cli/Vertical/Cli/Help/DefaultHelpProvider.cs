@@ -32,7 +32,12 @@ public sealed class DefaultHelpProvider : IHelpProvider
     public DefaultHelpProvider(DefaultHelpOptions options) => _options = options;
 
     /// <inheritdoc />
-    public string GetContent(CliCommand command)
+    public void RenderContent(CliCommand command, CliOptions options)
+    {
+        Console.Write(GetContent(command));
+    }
+
+    private string GetContent(CliCommand command)
     {
         var indentSpaces = Math.Max(0, _options.IndentSpaces);
         var renderInfo = new RenderInfo(
@@ -43,12 +48,17 @@ public sealed class DefaultHelpProvider : IHelpProvider
             new string(' ', indentSpaces),
             new string(' ', indentSpaces * 2));
         
+        BuildRemarksSection(renderInfo, HelpPlacement.Top);
         BuildDescriptionSection(renderInfo);
+        BuildRemarksSection(renderInfo, HelpPlacement.BeforeUsage);
         BuildUsageSection(renderInfo);
-        BuildRemarksSection(renderInfo);
+        BuildRemarksSection(renderInfo, HelpPlacement.BeforeCommands);
         BuildSubCommandsSection(renderInfo);
+        BuildRemarksSection(renderInfo, HelpPlacement.BeforeArguments);
         BuildArgumentsSection(renderInfo);
+        BuildRemarksSection(renderInfo, HelpPlacement.BeforeOptions);
         BuildOptionsSection(renderInfo);
+        BuildRemarksSection(renderInfo, HelpPlacement.Bottom);
 
         renderInfo.Buffer.AppendLine();
         
@@ -86,12 +96,17 @@ public sealed class DefaultHelpProvider : IHelpProvider
         BuildUsage(renderInfo, renderInfo.Target, fullName);
     }
 
-    private static void BuildRemarksSection(RenderInfo renderInfo)
+    private static void BuildRemarksSection(RenderInfo renderInfo, HelpPlacement placement)
     {
-        var sb = renderInfo.Buffer;
-
-        if (renderInfo.Target.Remarks is not { Length: > 0 })
+        if (renderInfo.Target.Remarks == null)
             return;
+
+        var remarks = renderInfo.Target.Remarks.Where(remark => remark.Placement == placement).ToArray();
+        
+        if (remarks.Length == 0)
+            return;
+        
+        var sb = renderInfo.Buffer;
 
         foreach (var remark in renderInfo.Target.Remarks)
         {

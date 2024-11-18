@@ -26,8 +26,6 @@ internal class HelpTaskConfiguration : ModelessTaskConfiguration
     internal static void WriteHelpToConsole(CliCommand command, CliOptions options)
     {
         var provider = options.HelpProvider;
-        var content = provider.GetContent(command);
-        
-        Console.Write(content);
+        provider.RenderContent(command, options);
     }
 }
