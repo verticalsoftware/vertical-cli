@@ -12,41 +12,54 @@ dotnet add package vertical-cli --prerelease
 ### Configure and run
 
 ```csharp
-using System;
-using System.IO;
-using Vertical.Cli.Configuration;
+// Define a model
+public record ZipOptions(FileInfo Source, FileInfo Destination, bool Overwrite);
 
-// Define a command
-var command = new RootCommand<Arguments>("fcopy");
-command
-    .AddArgument(x => x.Source)
-    .AddArgument(x => x.Destination)
-    .AddSwitch(x => x.Overwrite, ["-o", "--overwrite"])
-    .HandleAsync(async (model, cancellationToken) => 
-    {
-        if (model.Source.Exists() && !model.Overwrite)
-        {
-            Console.WriteLine("Desintation file exists and will not be overwritten.");
+// Build an application with two commands
+var app = new CliApplicationBuilder("gzip")
+    .RouteAsync<ZipOptions>("gzip create", async (model, cancelToken) => {
+        if (model.Destination.Exists && !model.Overwrite){
+            Console.WriteLine("Target file already exists");
+            return -1;
         }
-        await using var source = model.Source.OpenRead();
-        await using var dest = model.Destination.OpenWrite();
-        await source.CopyToAsync(dest, cancellationToken);
-    });
+        await using var inputStream = File.OpenRead(model.Source);
+        await using var outputStream = File.OpenWrite(model.Destination);
+        await using var zipStream = new GZipStream(outputStream, CompressionMode.Compress);
+        await inputStream.CopyToAsync(zipStream, cancelToken);
 
-await command.InvokeAsync(arguments);
+        Console.WriteLine($"Compressed file {model.Destination} created.");
+    })
+    .RouteAsync<ZipOptions>("gzip extract", async (model, cancelToken) => {
+        if (model.Destination.Exists && !model.Overwrite){
+            Console.WriteLine("Target file already exists");
+            return -1;
+        }
+        await using var inputStream = File.OpenRead(model.Source);
+        await using var outputStream = File.OpenWrite(model.Destination);
+        await using var zipStream = new GZipStream(inputStream, CompressionMode.Decompress);
+        await zipStream.CopyToAsync(outputStream, cancelToken);
 
-// Define a model that will receive the arguments
-record Arguments(FileInfo Source, FileInfo Destination, bool Overwrite);
+        Console.WriteLine($"File {model.Source} extracted.");
+    })
+    .MapModel<ZipOptions>(map => map
+        .Argument(x => x.Source)
+        .Argument(x => x.Destination)
+        .Switch(x => x.Overwrite, ["--overwrite"]))
+    .Build();
+
+await app.InvokeAsync(args);
+
+// Run:
+// $ gzip picture.png picture.gz --overwrite
 ```
 
 ## Features
 
 - Binds command line arguments to strongly typed models
-- Configure positional arguments. options and switches using posix and GNU notation
-- Configure contextual parameter validation
+- Configure positional arguments. options and switches using short and long form notations
 - Define a hierarchy of commands each with derived models
 - Uses a source generator to bind models removing the need for reflection (AOT friendly)
-- Display automatically generated help content
-
+- Uses analyzers to provide wranings and errors for common misconfiguration issues
+- Display generated help content
 
 See full [docs](https://github.com/verticalsoftware/vertical-cli/blob/main/assets/docs.md).

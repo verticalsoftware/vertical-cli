@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="vertical-spectreconsolelogger" Version="0.10.1-dev.20241201.35" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="HelpResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>help.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="HelpResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>HelpResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

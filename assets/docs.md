@@ -1,227 +1,206 @@
-﻿# vertical-cli
+# vertical-cli
 
-This library is used in console applications to bind string arguments to strongly typed models. The application is responsible for defining the models, the command or commands the application supports, the option and argument symbols, and the command logic implementation.
+## Overview
 
-## Lexicon
-
-### Commands
-
-A command represents a distinct function of the application. A `vertical-cli` application must define a command in order to integrate parsing. The command defines the model type the framework binds to, the options and arguments, and a function that implements the application's logic.
-
-Applications can define a hierarchy, where commands can have nested commands. The easiest way to illustrate this is to look at an example of .net CLI tooling:
-
-```shell
-$ dotnet nuget push ./lib/vertical-cli.1.0.0.nupkg
-```
-
-In this example, a command structure would be:
-- `dotnet` is defined as the root command (the application)
-- `nuget` is a subcommand of `dotnet`
-- `push` is a subcommand of `nuget`
-
-### Symbols
-
-Command define symbols that instruct the parser what arguments get to bind to what model properties. Conceptually, the parser can identify the following command line syntaxes:
-
-- Posix options: A single dash followed by one or more single character identifiers (e.g. `-a`, `-abc`). Multiple characters are expanded into their own symbols, for example `-abc` would be treated as `-a -b -c`.
-- GNU long-form options: A double dash followed by an identifier (e.g. `--user-id`).
-- Options with operand values: Posix or GNU option followed by `:` or `=` and a value (e.g. `-u:admin`, `--user-id=admin`).
-- Positional arguments: Arguments not associated with an option. Context is inferred by their position.
-- Operand arguments: Arguments associated with an option. Context is inferred by their position after the option symbol.
-- Option terminator: A double dash (`--`) that instructs the parser that the values that follow are not option symbols.
-
-### Arity & Scope
-
-Symbol definitions define arity and scope. Arity refers to the minimum required and maximum allowed values for a symbol.
-- Switches are automatically assigned an arity of `(1,1)` with a default value of false.
-- Options can be variadic. Multiple values can be provided by repeating the syntax, e.g. `archive --in ./src --in ./test`.
-- The last positional argument can be variadic.
-
-Commands can propagate symbol definitions to subcommands by specifying a scope, which can one of:
-- `Self` - The symbol applies only to the command where it was defined
-- `SelfAndDescendents` - The symbol applies to the command where it was defined and any subcommands
-- `Descendents` - The symbol applies only to subcommands. This is useful when the command itself performs no function.
+The goal of the library is to be able to build verbose CLI applications where arguments can easily be mapped to types, and types can be shared across different functions of the application.
 
 ## Configuration
 
-### Basic
+### Getting started
 
-The following example demonstrates setup of a fictitious compression tool called `arc`. It demonstrates most of the capability within the setup. Example usage as an application would be:
+The framework needs two details to operate: the command or commands the application has, and how it should bind the CLI string arguments to the application's model types. Similiar to the builders used to create hosted or ASP.NET applications, the `CliApplicationBuilder` class is where these details are specified.
 
-```shell
-> arc create --compression zip ---check -out ./archive.arc ./**/*.mov
-> arc extract --check --out ./unzipped ./archive.arc
-```
+Begin by creating a new `CliApplicationBuilder` instance, providing the name of your application to the constructor.
 
 ```csharp
-using Vertical.Cli;
-using Vertical.Cli.Configuration;
-using Vertical.Cli.Validation;
+var builder = new CliApplicationBuilder(applicationName: "app");
+```
 
-// Defines the root command (aka the app)
-var root = new RootCommand<Options>("arc", "An archiving utility.");
-root
-    // Adds a switch [--help, ?, -?] that triggers the help system
-    .AddHelpSwitch()
+### Defining commands
 
-    // Only applies to sub-commands
-    .AddOption(x => x.Compression,
-        names: ["--compression"],
-        scope: CliScope.Descendants,
-        defaultProvider: () => Compression.Zip,
-        description: "Compression type to use (None, AutoDetect, Zip, Deflate)"); 
-    
-// Add the create mode command
-root
-    .AddSubCommand<CreateOptions>("create", "Creates a new archive.")
-    .AddSwitch(x => x.ComputeChecksum,
-        names: ["--check", "--compute-checksum"],
-        description: "Compute and display the checksum on the output file.")
-    .AddOption(x => x.OutputFile,
-        names: ["-o", "--out"],
-        description: "Path/name of the output file.",
-        arity: Arity.One, // require value
-        validation: value => value.DoesNotExist()) // don't overwrite existing file
-    .AddArgument(x => x.InputFiles,
-        Arity.OneOrMany,
-        description: "One or more input files or glob patterns to add to the archive")
-    .HandleAsync(async (options, cancellationToken) =>
+A command is a unit of work the application performs. An application can perform a single function (with one command) or many discrete functions (with a hierachy of commands). The framework uses the concept of _routes_ to determine what application code will handle the user's request. Routes can be concrete or abstract. Concrete routes perform an application function whereas abstract routes serve as base routes for sub commands. Routes are defined using a path, an optional help tag, and in the case of a concrete route, a handler function.
+
+A route's path is a string that begins with the application's name and is optionally followed by the names of one or more sub commands separated by spaces. Paths mirror exactly what a user would enter on the command line to invoke the application. If we were to write an configuration that mimics .NET CLI tooling for pushing nuget packages, we would define the following routes:
+- `dotnet`
+- `dotnet nuget`
+- `dotnet nuget push`
+
+The handler function of a route is where the application integrates with the framework and the unit of work is performed. It is either a `Func<TModel, int>` or `Func<TModel, CancellationToken, Task<int>>`. These delegates receive a strongly-typed object that has argument values mapped by the framework.
+
+The following example shows route configurations for `dotnet nuget push` (models discussed in next section):
+
+```csharp
+var builder = new CliApplicationBuilder("dotnet")
+    .Route("dotnet")
+    .Route("dotnet nuget")
+    .RouteAsync<PushPackageModel>("dotnet nuget push", 
+        callSite: async (model, cancellationToken) => { /* Logic */ },
+        helpTag: "Pushes a package to a nuget feed");
+```
+
+### Using models
+
+The engine maps command line arguments to strongly-typed models. A model type is a `record` or a `class` with no explicit constructor and public settable properties. The framework uses application defined property expressions with a source generator to create model instances instead of attributes and reflection. This decouples the type declaration from the library, improves performance, and keeps the application AOT-trim friendly.
+
+In the absence of attribute based mapping, bindings can be configured with `CliApplicationBuilder`. Binding is the process of associating CLI arguments, options, and switches with the model's properties. Compile time checking ensures the property name is always correct. Bindings must include the property expression and one or more identifiers for options and switches.
+
+The following example demonstrates mapping a model to the `dotnet nuget push` command (abbreviated example):
+
+```csharp
+// The model
+public record PushPackageModel(
+    string Root,
+    string? ApiKey,
+    string Source,
+    bool NoSymbols
+)
+
+// Configuration
+builder.MapModel<PushPackageModel>(map => map
+    .Argument(x => x.Root)
+    .Option(x => x.ApiKey, ["-k", "--api-key"])
+    .Option(x => x.Source, ["-s", "--source"])
+    .Switch(x => x.NoSymbols, ["--no-symbols"]));
+```
+
+### Argument types and arity
+
+The framework can parse and bind three types of user provided arguments:
+
+- Positional arguments
+- Options that require an operand value
+- Switches that imply a `true` value to a boolean property
+
+Positional arguments and options have an _arity_ that specifies how many values are required or allowed. Arity is expressed as a minimum and maximum count, where the maximum count can be <c>null</c> to indicate the number of uses is unlimited. If not otherwise specified, positional arguments assume a default arity of one use while options assume a default arity of zero or one use. If an arity's maximum count is greater than 1 or <c>null</c>, then the mapped property must be an array or collection.
+
+> 📝  Note
+>
+> If more than one positional argument is mapped, only the _last_ one can have a null maximum count.
+
+The `Arity` struct defines the following static members for convenience:
+- `Arity.ZeroOrOne`
+- `Arity.ZeroOrMany`
+- `Arity.One`
+- `Arity.OneOrMany`
+- `Arity.Exactly(count)`
+
+## Providing default values
+
+Default values can be provided for positional arguments and options. This is accomplished by specifying a function in the `Argument` or `Option` methods during mapping. The provided value is used only when the minimum arity of the argument or option is zero, and the user does not provide a value on the command line.
+
+## Running the application
+
+After configuration is complete, call the `Build()` method to get a `CliApplication` instance. The source generator will create an extension method to which the program's arguments can be directed to.
+
+```csharp
+var app = new CliApplicationBuilder("app")
+    // Configure...
+    .Build();
+
+return await app.InvokeAsync(args);
+```
+
+## Adding Functionality
+
+### Extending conversion support
+
+The framework automatically converts string arguments to the types defined in the application's model properties. Out-of-box, it supports all the primitive types found in the `System` namespace, any type that implements `IParsable<T>`, enums, `FileInfo`, `DirectoryInfo`, `Uri`, and `Version`. It can also map values to `Array` or any generic or immutable collection interface or type (except dictionaries). If a type cannot be natively converted by the framework, the least intrusive thing to do is implement `IParsable<T>` on the type if the application can modify its declaration. Otherwise, types can be converted by the framework using a derived `ValueConverter<T>` instance. The example below demonstrates this:
+
+```csharp
+// Un-convertible type
+public readonly struct PhoneNumber(string countryCode, string areaCode, string number)
+{
+    // ...
+}
+
+// Implement a converter
+public sealed class PhoneNumberConverter : ValueConverter<PhoneNumber>
+{
+    public PhoneNumber Convert(string str)
     {
-        // Create the archive...
-        await Task.CompletedTask;
-    });
+        if (Regex.Match(str, @"\+(\d+) (\d{3})-(\d{4})") is { Success: true } match)
+        {
+            var groups = match.Groups;
+            return new PhoneNumber(groups[1].Value, groups[2].Value groups[3].Valkue);
+        }
 
-// Add the extract mode command
-root
-    .AddSubCommand<ExtractOptions>("extract", "Extracts an archive.")
-    .AddOption(x => x.Checksum,
-        names: ["--check"],
-        description: "Validates the archive's checksum")
-    .AddArgument(x => x.InputFile,
-        arity: Arity.One,
-        description: "Path to the input file",
-        validation: value => value.Exists())
-    .AddOption(x => x.OutputDirectory,
-        names: ["-o", "--out"],
-        defaultProvider: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
-        description: "Path to the output directory")
-    .HandleAsync(async (options, cancellationToken) =>
+        throw new FormatException("Value is not a valid phone number");
+    }
+}
+
+// Register in ConfigurationBuilder
+builder.AddConverters([ new PhoneNumberConverter() ]);
+```
+
+### Integrating help
+
+The framework can provide help to the user by displaying a summary of commands, options, arguments, etc. While adding help tags to routes and model bindings is not required, it will improve the documentation of the application. Help is invoked using a special switch that can be added by calling `MapHelpSwitch()` on the builder object. By default, the switch will be identified as `--help`, but another identifier can be specified.
+
+By calling `MapHelpSwitch()`, the framework will display help content for every _defined_ route. This is why in the very first example, we defined the `dotnet` and `dotnet nuget` routes even though they are abstract and don't perform anything.
+
+
+There are two predefined help providers: a compact format provider (similar to what .NET tooling) and unix style provider (similar to man pages). If an application wants to customize how elements are displayed, it can create an instance of one of the built-in help providers and specify a `HelpFormattingOptions` object where formatting can be controlled. If an application wants to completely control help rendering without using either built-in provider, it can implement the `IHelpProvider` interface. Below are some examples, but be sure to look at the `CliDemo` project in the examples folder.
+
+```csharp
+// Use the default help provider
+builder.MapHelpSwitch();
+
+// Use a specific help provider
+builder.MapHelpSwitch(HelpProvider.UnixStyle);
+
+// Customize how elements are formatted
+var formattingOptions = new HelpFormattingOptions()
+{
+    // Render the operands in a different color
+    OutputFormatter = (element, str) => $"\x1b[38;5;175m{str}\x1b[0m"
+};
+
+builder.MapHelpSwitch(() => HelpProvider.CreateCompactFormatProvider(formattingOptions))
+
+// Completely control help rendering
+public sealed class AppHelpProvider : IHelpProvider
+{
+    public async Task WriteContentAsync(HelpContext context)
     {
-        // Extract the archive
-        await Task.CompletedTask;
-    });
-
-try
-{
-    return await root.InvokeAsync(args);
-}
-catch (CommandLineException exception)
-{
-    Console.WriteLine(exception.Message);
-    return -1;
+        // Use the context to determine the help subject
+    }
 }
 
-// Models
-enum Compression
-{
-    None,
-    AutoDetect,
-    Zip,
-    Deflate
-}
-
-abstract class Options
-{
-    public Compression Compression { get; set; }
-}
-
-class CreateOptions : Options
-{
-    public bool ComputeChecksum { get; set; }
-    public FileInfo OutputFile { get; set; } = default!;
-    public IEnumerable<FileInfo> InputFiles { get; set; } = default!;
-}
-
-class ExtractOptions : Options
-{
-    public string? Checksum { get; set; }
-    public FileInfo InputFile { get; set; } = default!;
-    public DirectoryInfo OutputDirectory { get; set; } = default!;
-}
+builder.MapHelpSwitch(() => new AppHelpProcider());
 ```
 
-### Handlers
+### Validating models
 
-Commands that have symbols that are scoped `Self` or `SelfAndDescendents`, or inherit any commands from its parent must implement a handler. Implementations are defined by using `command.Handle` and `command.HandleAsync`. These implementations are functions that receive the model and perform the application's logic. 
-
-### Value Conversion
-
-The library must convert `string` arguments to types exposed by models. Out-of-box, the following types are supported:
-
-- Any type that implements `IParseable<TSelf>`, and for value types, `Nullable<T>` variants. This covers most integral types in the `System` namespace.
-- `string`
-- `FileInfo` and `DirectoryInfo`
-- `Uri`
-
-Binding is also supported for any collection type or interface in the `System.Collections.Generic` and `System.Collections.Immutable` namespace (except for dictionary types).
-
-The easiest way to have the parser bind to a custom type is to implement `IParseable<TSelf>`. If that is not an option, a custom converter can be added to options.
+Every property binding can be accompanied by one or more validation rules. The `Argument` and `Option` methods both have a `validation` parameter that can be used to configure the rules. There are many built-in validations available depending on the value type, and values can be checked using the context of the entire materialized model when needed. The following examples demonstrate adding validation rules:
 
 ```csharp
-readonly record struct Point(int X, int Y);
+// Check some type of comparable value
+builder.MapModel<Model>(map => map
+    .Option(x => x.Salaray, ["--salary"]. validation: rule => rule
+        .GreaterThan(50000, message: "Don't be cheap!")));
 
-var rootCommand = new RootCommand<Model>("program")
-    .ConfigureOptions(options => options.ValueConverters.Add(str => {
-        var match = Regex.Match(str, @"^(\d+),(\d+)$");
-        return new Point(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value));
-    }));
+// Check a file exists
+builder.MapModel<Model>(map => map.Option(x => x.SourceFile, ["--source"], 
+    validation: rule => rule.Exists()));
+
+// Check if a value is part of a set:
+builer.MapModel<Model>(map => map
+    .Option(x => x.LogLevel, ["-v"],
+    validation: rule => rule.In([ "detailed", "normal", "minimal" ])))
+
+// Perform a check not built-in
+builder.MapModel<Model>(map => map.Option(x => x.AppointmentDate,
+    ["--date"],
+    validation: rule => rule.Must((_, value) => value.Hour is < 12 and > 13,
+        message: "Everyone will be at lunch!")));
+
+// Peform a model-contextual check
+builder.MapModel<Model>(map => map.Option(x => x.OutputFile,
+    ["--out"],
+    validation: rule => rule.Must((model, file) => !file.Exists || model.Overwrite));
 ```
 
-### Custom Validation
+> 📝 Note
+>
+> All methods on the `ValidationBuilder` class have "OrNull" variations. Use those for property types that are null annotated.
 
-Many standard validations are built into the library, but if custom validation is required, a contextual evaluation can be performed by configuring a symbol's validator.
-
-```csharp
-var rootCommand = new RootCOmmand<Model>("program")
-    // Assume model.Source and x.Dest are both FileInfo
-    .AddOption(x => x.Dest,
-        validation: value.Must(
-            (model, dest) => model.Source.FullName != dest.FullName,
-            "Source and destination file paths cannot be the same."));
-```
-
-### Built-in Help System
-
-Application's can be configured to display help by adding a help switch to the root command. By default, the framework will display help for the identified command. Applications can provide customized content by implementing `IHelpProvider` and replacing the default instance in the root options object. Help can also be manually invoked at any time by calling `DisplayHelp` on any `CliCommand` instance.
-
-### Handling Client Errors
-
-The parser will throw `CommandLineException` for invalid client input. The following produce errors:
-- Value type conversion fails
-- A symbol's arity requirement is not met
-- Validation of a value fails one or more configured rules
-- An argument could not be mapped to a configured symbol
-
-The exception object provides the error type, message, command, and symbol (if available).
-
-### Argument Pre-processors
-
-Arguments can be pre-processed (delete, insert, change, etc.) in a pipeline. Delegates handle pre-processing, where the form is:
-
-```csharp
-public delegate void ArgumentPreProcessor(LinkedList<string> arguments, Action<LinkedList<string>> next);
-```
-
-The delegate is offered a mutable list of arguments which it can change. Furthermore, the delegate body can determine when and if to call the next action in the chain. Pre-processors can be defined in `CliOptions`. This library has the following built in processors (none are configured by default):
-
-- `ResponseFilePreProcessor`: Treats arguments with leading `@` as paths to response files. The files are read and the arguments in them are injected into the argument list.
-- `EnvironmentVariablePreProcessor`: Looks for tokens in arguments that represent environment variables, e.g. `--user=$USER` (*nix) or `--user=$env:USERNAME` (Windows).
-- `SpecialFolderPreProcessor`: Looks for tokens in arguments that identify constants in the `Environment.SpecialFolder` enum, e.g. `--path=$(SpecialFolder.LocalApplicationData)`.
-
-### Response files
-
-Response files are files that contain tokens that can be injected as additional arguments to the application. This feature can be enabled by setting `options.EnableResponseFiles = true`. The parser behaves as follows:
-- Tokens on the same line that are separated by whitespace are treated as separate arguments
-- Any content inside double quotes is preserved as is
-- Any token that is prefixed with `@` is considered a path to another response file, and will be processed
-- Any content after '#' on the same line is ignored

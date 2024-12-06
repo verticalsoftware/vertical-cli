@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Generators": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "../../examples/CliDemo/CliDemo.csproj"
+    },
+    "Analyzers": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "../../examples/CliDemo/CliDemo.csproj"
+    }
+  }
+}

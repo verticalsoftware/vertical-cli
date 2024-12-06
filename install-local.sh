@@ -9,9 +9,10 @@ fi
 
 dotnet clean
 dotnet restore --force
-dotnet build src/Vertical.Cli.SourceGenerator -o ./lib
-dotnet pack src/Vertical.Cli --no-restore -o ./pack -c Debug /p:Version=$version --include-symbols
+dotnet build src/source-generator -o ./analyzers
+dotnet build src/analyzers -o ./analyzers
+dotnet pack src/lib --no-restore -o ./pack -c Debug /p:Version=$version --include-symbols
 dotnet nuget push "./pack/vertical-cli.$version.nupkg" -s $nugetPath
 
 rm -rf ./pack
-rm -rf ./lib
+rm -rf ./analyzers
