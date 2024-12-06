@@ -4,6 +4,24 @@
 
 The goal of the library is to be able to build verbose CLI applications where arguments can easily be mapped to types, and types can be shared across different functions of the application.
 
+Contents:
+- [Configuration](#configuration)
+    - [Getting started](#getting-started)
+    - [Defining commands](#defining-commands)
+    - [Using models](#using-models)
+    - [Argument types and arity](#argument-types-and-arity)
+    - [Providing default values](#providing-default-values)
+- [Running the application](#running-the-application)
+- [Adding functionality](#adding-functionality)
+    - [Extending conversion support](#extending-conversion-support)
+    - [Validating models](#validating-models)
+    - [Integrating help](#integrating-help)
+    - [Handling client errors](#hanlding-client-errors)
+- [Advanced usage](#adnvanced-usage)
+    - [Assign unbound properties](#assign-unbound-properties)
+    - [Using dependency injection](#using-dependency-injection)
+- [Contributing](#contributing)
+
 ## Configuration
 
 ### Getting started
@@ -63,6 +81,10 @@ builder.MapModel<PushPackageModel>(map => map
     .Switch(x => x.NoSymbols, ["--no-symbols"]));
 ```
 
+> 📝  Note
+>
+> If the application shares models (i.e. models derive from other models), it is best practice to map only the declared properties of each model in separate `MapModel` calls.
+
 ### Argument types and arity
 
 The framework can parse and bind three types of user provided arguments:
@@ -84,7 +106,7 @@ The `Arity` struct defines the following static members for convenience:
 - `Arity.OneOrMany`
 - `Arity.Exactly(count)`
 
-## Providing default values
+### Providing default values
 
 Default values can be provided for positional arguments and options. This is accomplished by specifying a function in the `Argument` or `Option` methods during mapping. The provided value is used only when the minimum arity of the argument or option is zero, and the user does not provide a value on the command line.
 
@@ -132,6 +154,41 @@ public sealed class PhoneNumberConverter : ValueConverter<PhoneNumber>
 builder.AddConverters([ new PhoneNumberConverter() ]);
 ```
 
+### Validating models
+
+Every property binding can be accompanied by one or more validation rules. The `Argument` and `Option` methods both have a `validation` parameter that can be used to configure the rules. There are many built-in validations available depending on the value type, and values can be checked using the context of the entire materialized model when needed. The following examples demonstrate adding validation rules:
+
+```csharp
+// Check some type of comparable value
+builder.MapModel<Model>(map => map
+    .Option(x => x.Salaray, ["--salary"]. validation: rule => rule
+        .GreaterThan(50000, message: "Don't be cheap!")));
+
+// Check a file exists
+builder.MapModel<Model>(map => map.Option(x => x.SourceFile, ["--source"], 
+    validation: rule => rule.Exists()));
+
+// Check if a value is part of a set:
+builer.MapModel<Model>(map => map
+    .Option(x => x.LogLevel, ["-v"],
+    validation: rule => rule.In([ "detailed", "normal", "minimal" ])))
+
+// Perform a check not built-in
+builder.MapModel<Model>(map => map.Option(x => x.AppointmentDate,
+    ["--date"],
+    validation: rule => rule.Must((_, value) => value.Hour is < 12 and > 13,
+        message: "Everyone will be at lunch!")));
+
+// Peform a model-contextual check
+builder.MapModel<Model>(map => map.Option(x => x.OutputFile,
+    ["--out"],
+    validation: rule => rule.Must((model, file) => !file.Exists || model.Overwrite));
+```
+
+> 📝 Note
+>
+> All methods on the `ValidationBuilder` class have "OrNull" variations. Use those for property types that are null annotated.
+
 ### Integrating help
 
 The framework can provide help to the user by displaying a summary of commands, options, arguments, etc. While adding help tags to routes and model bindings is not required, it will improve the documentation of the application. Help is invoked using a special switch that can be added by calling `MapHelpSwitch()` on the builder object. By default, the switch will be identified as `--help`, but another identifier can be specified.
@@ -169,38 +226,80 @@ public sealed class AppHelpProvider : IHelpProvider
 builder.MapHelpSwitch(() => new AppHelpProcider());
 ```
 
-### Validating models
+### Hanlding client errors
 
-Every property binding can be accompanied by one or more validation rules. The `Argument` and `Option` methods both have a `validation` parameter that can be used to configure the rules. There are many built-in validations available depending on the value type, and values can be checked using the context of the entire materialized model when needed. The following examples demonstrate adding validation rules:
+Users will undoubtedly mispell identifiers, provide invalid values, or input incorrect commands, etc. The framework will throw `CliArgumentException` in these scenarios. Along with the error message, the exception type will provide the following depending on the error code:
+- Unique error code
+- The matched route (if available)
+- The argument or arguments that in question
+- The parameter in question
+- The converter implementation
+
+Applications can gracefully handle these error generally by catching `CliArgumentException` and printing the message. If the help system is being used, the application can automatically display help content for the route. The following example demonstrates this:
 
 ```csharp
-// Check some type of comparable value
-builder.MapModel<Model>(map => map
-    .Option(x => x.Salaray, ["--salary"]. validation: rule => rule
-        .GreaterThan(50000, message: "Don't be cheap!")));
+var app = new CliApplicationBuilder("app")
+    // Configure...
+    .Build();
 
-// Check a file exists
-builder.MapModel<Model>(map => map.Option(x => x.SourceFile, ["--source"], 
-    validation: rule => rule.Exists()));
+try
+{
+    return await app.InvokeAsync(args);
+}    
+catch (CliArgumentException exception)
+{    
+    Console.WriteLine(exception.Message);
 
-// Check if a value is part of a set:
-builer.MapModel<Model>(map => map
-    .Option(x => x.LogLevel, ["-v"],
-    validation: rule => rule.In([ "detailed", "normal", "minimal" ])))
-
-// Perform a check not built-in
-builder.MapModel<Model>(map => map.Option(x => x.AppointmentDate,
-    ["--date"],
-    validation: rule => rule.Must((_, value) => value.Hour is < 12 and > 13,
-        message: "Everyone will be at lunch!")));
-
-// Peform a model-contextual check
-builder.MapModel<Model>(map => map.Option(x => x.OutputFile,
-    ["--out"],
-    validation: rule => rule.Must((model, file) => !file.Exists || model.Overwrite));
+    if (exception.Route is not null)
+    {
+        await app.InvokeHelpAsync(exception.Route.Path);
+    }
+}
 ```
 
-> 📝 Note
->
-> All methods on the `ValidationBuilder` class have "OrNull" variations. Use those for property types that are null annotated.
+## Adnvanced usage
 
+### Assign unbound properties
+
+Application models may have properties that aren't bound to arguments, but need to be set with values before they arrive at the handler function. In this case, values can be assigned manually when mapping models as demonstrated in the example below:
+
+```csharp
+// Provide an unbound value to the model
+builder.MapModel<Model>(map => map.ValueBinding(x => x.Data, () => 
+    new Dicionary<string, string>()
+    {
+        ["userId"] = "billy",
+        ["email"] = "bmadison@happyproductions.com"
+    });
+```
+
+### Using dependency injection
+
+In order to keep the library dependency free, dependency injetion is not integrated into the framework. However, a handler function can be easily replaced with a class that implements the `IAsyncCallSite<TModel>` interface. The following example demonstrates a pattern that can be used to achieve this effect:
+
+```csharp
+// Define the implementation
+public sealed class RouteHandler : IAsyncCallSite<Model>
+{
+    public async Task<int> HandleAsync(Model model, CancellationToken cancellationToken)
+    {
+        await Task.Delay(1000);
+        return 0;
+    }
+}
+
+// Program.cs
+await using var serviceProvider = new ServiceCollection()
+    .AddSingleton<RouteHandler>()
+    .BuildServiceProvider();
+
+var app = new CliApplicationBuilder("app").RouteAsync(
+    "app", 
+    () => serviceProvider.GetRequiredService<RouteHandler>());
+
+await app.InvokeAsync(args);
+```
+
+## Contributing
+
+Report bugs and request feature enhancements by [creating an issue](https://github.com/verticalsoftware/vertical-cli/issues/new).
