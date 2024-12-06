@@ -46,7 +46,7 @@ var app = new CliApplicationBuilder("sqz")
 
 try
 {
-    await app.InvokeAsync("create source.txt source_compressed.txt".Split(' '));
+    await app.InvokeAsync(args);
 }
 catch (CliArgumentException exception) when (exception is
                                              {

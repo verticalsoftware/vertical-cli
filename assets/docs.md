@@ -195,6 +195,9 @@ The framework can provide help to the user by displaying a summary of commands, 
 
 By calling `MapHelpSwitch()`, the framework will display help content for every _defined_ route. This is why in the very first example, we defined the `dotnet` and `dotnet nuget` routes even though they are abstract and don't perform anything.
 
+Example output:
+
+![Sample](./help.png)
 
 There are two predefined help providers: a compact format provider (similar to what .NET tooling) and unix style provider (similar to man pages). If an application wants to customize how elements are displayed, it can create an instance of one of the built-in help providers and specify a `HelpFormattingOptions` object where formatting can be controlled. If an application wants to completely control help rendering without using either built-in provider, it can implement the `IHelpProvider` interface. Below are some examples, but be sure to look at the `CliDemo` project in the examples folder.
 
@@ -226,12 +229,12 @@ public sealed class AppHelpProvider : IHelpProvider
 builder.MapHelpSwitch(() => new AppHelpProcider());
 ```
 
-### Hanlding client errors
+### Handling client errors
 
 Users will undoubtedly mispell identifiers, provide invalid values, or input incorrect commands, etc. The framework will throw `CliArgumentException` in these scenarios. Along with the error message, the exception type will provide the following depending on the error code:
 - Unique error code
 - The matched route (if available)
-- The argument or arguments that in question
+- The argument or arguments in question
 - The parameter in question
 - The converter implementation
 

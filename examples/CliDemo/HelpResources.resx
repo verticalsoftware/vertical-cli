@@ -28,7 +28,7 @@
         <value>Creates a new compressed file from a source, optionally encrypting it with one of the supported .NET encryption algorithms.</value>
     </data>
     <data name="CommonOptions.EncryptionAlg" xml:space="preserve">
-        <value>The encryption algorithm to use when creating or uncompressing a file (none, AES, DES, TripleDES, RC2, Rijndael).</value>
+        <value>The encryption algorithm to use when creating or uncompressing a file (none, AES, DES, TripleDES, RC2).</value>
     </data>
     <data name="CommonOptions.Cipher" xml:space="preserve">
         <value>Cipher key/passphrase used to secure the encrypted file (required when --encryption is specified).</value>
