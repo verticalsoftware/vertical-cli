@@ -24,7 +24,7 @@ public class CommonOptions
     public EncryptionAlg EncryptionAlg { get; set; }
     public string? Cipher { get; set; }
     public LogLevel LogLevel { get; set; }
-    public object ApplicationData { get; set; } = default!;
+    public Dictionary<string, string> ApplicationData { get; set; } = [];
 }
 
 public class OperationOptions : CommonOptions

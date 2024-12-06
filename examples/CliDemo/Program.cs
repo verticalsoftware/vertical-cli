@@ -24,7 +24,11 @@ var app = new CliApplicationBuilder("sqz")
         .Option(x => x.CompressionType, ["--compression"], defaultProvider: () => CompressionType.GZip)
         .Option(x => x.EncryptionAlg, ["--encryption"])
         // Demonstrate binding arbitrary values that aren't provided by CLI arguments
-        .ValueBinding(x => x.ApplicationData, () => new object()))
+        .ValueBinding(x => x.ApplicationData, () => new Dictionary<string, string>()
+        {
+            ["User"] = "billy",
+            ["Email"] = "billymadison@happy.com"
+        }))
     
     .MapModel<OperationOptions>(map => map
         .Switch(x => x.PrintSha, ["--sha"])
@@ -42,7 +46,7 @@ var app = new CliApplicationBuilder("sqz")
 
 try
 {
-    await app.InvokeAsync(args);
+    await app.InvokeAsync("create source.txt source_compressed.txt".Split(' '));
 }
 catch (CliArgumentException exception) when (exception is
                                              {

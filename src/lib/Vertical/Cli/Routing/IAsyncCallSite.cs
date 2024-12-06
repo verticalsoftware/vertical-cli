@@ -3,7 +3,7 @@ namespace Vertical.Cli.Routing;
 /// <summary>
 /// Represents an asynchronous call site.
 /// </summary>
-public interface ICallSite<in TModel> where TModel : class
+public interface IAsyncCallSite<in TModel> where TModel : class
 {
     /// <summary>
     /// When implemented, handles the call site's functionality.

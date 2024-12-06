@@ -66,7 +66,7 @@ public sealed class CliApplicationBuilder
     /// <returns>A reference to this instance.</returns>
     public CliApplicationBuilder RouteAsync(string path, object? helpTag = null)
     {
-        return RouteAsync<EmptyModel>(path, null, helpTag);
+        return RouteAsync(path, default(AsyncCallSite<EmptyModel>), helpTag);
     }
 
     /// <summary>
@@ -87,6 +87,24 @@ public sealed class CliApplicationBuilder
 
         routingConfiguration.AddRoute(path, callSite, helpTag);
         return this;
+    }
+
+    /// <summary>
+    /// Creates a route with an implementation defined by a service.
+    /// </summary>
+    /// <param name="path">A string that describes the path to match.</param>
+    /// <param name="callSiteFactory">A function that returns the handler implementation instance.</param>
+    /// <param name="helpTag">Data used by the help provider.</param>
+    /// <typeparam name="TModel">Model type</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public CliApplicationBuilder RouteAsync<TModel>(string path,
+        Func<IAsyncCallSite<TModel>> callSiteFactory,
+        object? helpTag = null)
+        where TModel : class
+    {
+        return RouteAsync(path, new AsyncCallSite<TModel>(async (model, cancellationToken) => 
+                await callSiteFactory().HandleAsync(model, cancellationToken)),
+            helpTag);
     }
 
     /// <summary>

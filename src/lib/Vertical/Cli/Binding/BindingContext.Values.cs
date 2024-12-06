@@ -21,12 +21,11 @@ public partial class BindingContext
 
     private T SelectSingleValue<T>(string bindingName, IEnumerable<ArgumentSyntax> arguments)
     {
-        var argumentArray = arguments.ToArray();
         var bindingSource = GetBindingSource(bindingName);
 
         if (bindingSource is CliParameter parameter)
         {
-            return SelectSingleParameterValue<T>(parameter, argumentArray);
+            return SelectSingleParameterValue<T>(parameter, arguments.ToArray());
         }
 
         return bindingSource.TryGetValue(out var obj)
@@ -55,12 +54,11 @@ public partial class BindingContext
 
     private IEnumerable<T> SelectCollectionValues<T>(string bindingName, IEnumerable<ArgumentSyntax> arguments)
     {
-        var argumentArray = arguments.ToArray();
         var bindingSource = GetBindingSource(bindingName);
 
         if (bindingSource is CliParameter parameter)
         {
-            return SelectCollectionParameterValues<T>(parameter, argumentArray);
+            return SelectCollectionParameterValues<T>(parameter, arguments.ToArray());
         }
 
         return bindingSource.TryGetValue(out var obj) && obj != null
