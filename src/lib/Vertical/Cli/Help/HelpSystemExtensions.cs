@@ -15,12 +15,13 @@ public static class HelpSystemExtensions
     /// Invokes help for the given path.
     /// </summary>
     /// <param name="application">Application instance</param>
-    /// <param name="path">Path</param>
+    /// <param name="path">Path to the route to display help for, or <c>null</c> to display help for the app.</param>
     /// <returns>Task</returns>
     /// <exception cref="CliConfigurationException"></exception>
-    public static async Task<int> InvokeHelpAsync(this CliApplication application, RoutePath path)
+    public static async Task<int> InvokeHelpAsync(this CliApplication application, RoutePath? path = null)
     {
-        var arguments = $"{path} {application.HelpSwitch}".Split(' ');
+        var pathString = path?.Pattern ?? application.Name;
+        var arguments = $"{pathString} {application.HelpSwitch}".Split(' ');
         var bindingContext = CliEngine.GetBindingContext(application, arguments, bindApplicationName: false);
 
         if (await bindingContext.TryInvokeInternalCallSite(CancellationToken.None) is { } result)
