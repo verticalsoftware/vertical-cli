@@ -32,15 +32,17 @@ public static class HelpSystemExtensions
     internal static RouteDefinition Create(
         Func<IHelpProvider>? helpProvider, 
         string identifier, 
-        object? helpTag)
+        string? helpTag)
     {
         if (ArgumentSyntax.Parse(identifier) is { PrefixType: OptionPrefixType.None })
         {
             throw new ArgumentException($"Invalid help switch identifier '{identifier}'", nameof(identifier));
         }
+
+        var path = new RoutePath($"^.*?{identifier}$");
         
         return new RouteDefinition(
-            new RoutePath($"^.*? {identifier}$"),
+            path,
             typeof(EmptyModel),
             (application, arguments, _) =>
             {
@@ -62,6 +64,7 @@ public static class HelpSystemExtensions
                         helpTag ?? "Displays help for the current command"));
             },
             isCallable: true,
+            str => path.Match(str).Success ? int.MaxValue : 0,
             helpTag);
     }
 

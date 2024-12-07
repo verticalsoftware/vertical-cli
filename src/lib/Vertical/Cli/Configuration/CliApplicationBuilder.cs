@@ -1,7 +1,5 @@
-using Vertical.Cli.Binding;
 using Vertical.Cli.Conversion;
 using Vertical.Cli.Help;
-using Vertical.Cli.Parsing;
 using Vertical.Cli.Routing;
 
 namespace Vertical.Cli.Configuration;
@@ -25,16 +23,26 @@ public sealed class CliApplicationBuilder
     private readonly List<IValueConverter> valueConverters = [];
     private readonly Dictionary<Type, ModelConfiguration> modelConfigurations = new();
     private string? helpSwitch;
-    
+
     /// <summary>
-    /// Creates a route to other commands.
+    /// Gets the application name.
+    /// </summary>
+    public string ApplicationName => applicationName;
+
+    /// <summary>
+    /// Creates a route that does not require a model.
     /// </summary>
     /// <param name="path">A string that describes the path to match.</param>
     /// <param name="helpTag">Data used by the help provider.</param>
+    /// <param name="callSite">A function that performs the application's logic.</param>
     /// <returns>A reference to this instance.</returns>
-    public CliApplicationBuilder Route(string path, object? helpTag = null)
+    public CliApplicationBuilder Route(string path, CallSite? callSite = null, string? helpTag = null)
     {
-        return Route<EmptyModel>(path, null, helpTag);
+        return Route<EmptyModel>(path,
+            callSite != null
+                ? (_ => callSite())
+                : null,
+            helpTag);
     }
     
     /// <summary>
@@ -48,7 +56,7 @@ public sealed class CliApplicationBuilder
     /// <returns>A reference to this instance.</returns>
     public CliApplicationBuilder Route<TModel>(string path, 
         CallSite<TModel>? callSite = null,
-        object? helpTag = null)
+        string? helpTag = null)
         where TModel : class
     {
         var wrappedCallSite = callSite != null
@@ -59,14 +67,17 @@ public sealed class CliApplicationBuilder
     }
     
     /// <summary>
-    /// Creates a route to other commands.
+    /// Creates an asynchronously handled route.
     /// </summary>
     /// <param name="path">A string that describes the path to match.</param>
     /// <param name="helpTag">Data used by the help provider.</param>
+    /// <param name="callSite">A function that performs the application's logic.</param>
     /// <returns>A reference to this instance.</returns>
-    public CliApplicationBuilder RouteAsync(string path, object? helpTag = null)
+    public CliApplicationBuilder RouteAsync(string path, AsyncCallSite? callSite = null, string? helpTag = null)
     {
-        return RouteAsync(path, default(AsyncCallSite<EmptyModel>), helpTag);
+        return RouteAsync<EmptyModel>(path,
+            callSite != null ? (_, cancel) => callSite(cancel) : null,
+            helpTag);
     }
 
     /// <summary>
@@ -80,7 +91,7 @@ public sealed class CliApplicationBuilder
     /// <returns>A reference to this instance.</returns>
     public CliApplicationBuilder RouteAsync<TModel>(string path, 
         AsyncCallSite<TModel>? callSite = null,
-        object? helpTag = null)
+        string? helpTag = null)
         where TModel : class
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -99,7 +110,7 @@ public sealed class CliApplicationBuilder
     /// <returns>A reference to this instance.</returns>
     public CliApplicationBuilder RouteAsync<TModel>(string path,
         Func<IAsyncCallSite<TModel>> callSiteFactory,
-        object? helpTag = null)
+        string? helpTag = null)
         where TModel : class
     {
         return RouteAsync(path, new AsyncCallSite<TModel>(async (model, cancellationToken) => 
@@ -118,7 +129,7 @@ public sealed class CliApplicationBuilder
     public CliApplicationBuilder MapHelpSwitch(
         Func<IHelpProvider>? helpProvider = null,
         string? identifier = null,
-        object? helpTag = null)
+        string? helpTag = null)
     {
         helpSwitch = identifier ?? "--help";
         

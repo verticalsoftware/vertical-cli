@@ -44,11 +44,11 @@ public sealed class Router
         var pathString = string.Join(' ', arguments.Select(arg => arg.Text));
 
         var routes = RouteDefinitions
-            .Select(route => (route, match: route.Path.Match(pathString)))
-            .Where(t => t.match.Success)
+            .Select(route => (route, match: route.Match(pathString)))
+            .Where(t => t.match > 0)
             .ToArray();
             
-        route = routes.Length > 0 ? routes.MaxBy(t => t.match.Length).route : null;
+        route = routes.Length > 0 ? routes.MaxBy(t => t.match).route : null;
             
         return route != null;
     }

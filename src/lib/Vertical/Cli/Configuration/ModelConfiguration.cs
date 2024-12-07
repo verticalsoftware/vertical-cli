@@ -32,7 +32,7 @@ public abstract class ModelConfiguration
         string[] identifiers, 
         Arity arity,
         Func<TValue>? defaultProvider,
-        object? helpTag)
+        string? helpTag)
         where TModel : class
     {
         var bindingName = (binding.Body as MemberExpression)!.Member.Name;
@@ -110,8 +110,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         Expression<Func<TModel, TValue>> binding,
         Arity? arity = null,
         Action<ValidationBuilder<TModel, TValue>>? validation = null,
-
-    object? helpTag = null)
+        string? helpTag = null)
     {
         var parameter = AddParameter(
             SymbolKind.Argument,
@@ -143,7 +142,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         Arity? arity = null,
         Func<TValue>? defaultProvider = null,
         Action<ValidationBuilder<TModel, TValue>>? validation = null,
-        object? helpTag = null)
+        string? helpTag = null)
     {
         var parameter = AddParameter(
             SymbolKind.Option,
@@ -170,7 +169,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         Expression<Func<TModel, bool>> binding,
         string[] identifiers,
         Action<ValidationBuilder<TModel, bool>>? validation = null,
-        object? helpTag = null)
+        string? helpTag = null)
     {
         var parameter = AddParameter(
             SymbolKind.Switch,

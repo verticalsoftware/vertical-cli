@@ -58,7 +58,7 @@ public sealed class HelpFormattingOptions
     /// Gets a function that formats route descriptions.
     /// </summary>
     public Func<RouteDefinition, string> RouteDescriptionFormatter { get; init; } =
-        route => route.HelpTag as string ?? string.Empty;
+        route => route.HelpTag ?? string.Empty;
     
     /// <summary>
     /// Gets a function that formats argument usage syntax.
@@ -121,7 +121,7 @@ public sealed class HelpFormattingOptions
     /// Gets a function that formats parameter descriptions.
     /// </summary>
     public Func<CliParameter, string> ParameterDescriptionFormatter { get; init; } = parameter =>
-        parameter.HelpTag as string ?? string.Empty;
+        parameter.HelpTag ?? string.Empty;
     
     private static string CreateArgumentUsageSyntax(CliParameter arg)
     {

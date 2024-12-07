@@ -10,15 +10,18 @@ namespace Vertical.Cli.Routing;
 public sealed class RouteDefinition
 {
     private readonly BindingFactory bindingFactory;
+    private readonly Func<string, int> matcher;
 
     internal RouteDefinition(
         RoutePath path,
         Type modelType,
         BindingFactory bindingFactory,
         bool isCallable,
-        object? helpTag)
+        Func<string, int> matcher,
+        string? helpTag)
     {
         this.bindingFactory = bindingFactory;
+        this.matcher = matcher;
         Path = path;
         ModelType = modelType;
         IsCallable = isCallable;
@@ -33,7 +36,7 @@ public sealed class RouteDefinition
     /// <summary>
     /// Gets the help tag associated with the route.
     /// </summary>
-    public object? HelpTag { get; }
+    public string? HelpTag { get; }
     
     /// <summary>
     /// Gets the model type.
@@ -56,6 +59,13 @@ public sealed class RouteDefinition
         LinkedList<ArgumentSyntax> argumentList,
         RouteDefinition route) 
         => bindingFactory(application, argumentList, route);
+
+    /// <summary>
+    /// Matches this route to the given path.
+    /// </summary>
+    /// <param name="path">Path to match</param>
+    /// <returns>The number of characters matched</returns>
+    public int Match(string path) => matcher(path);
 
     /// <inheritdoc />
     public override string ToString() => Path.ToString();

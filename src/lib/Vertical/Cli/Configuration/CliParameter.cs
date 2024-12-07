@@ -16,7 +16,7 @@ public abstract class CliParameter : IBindingSource
         string bindingName,
         string[] identifiers,
         Arity arity,
-        object? helpTag)
+        string? helpTag)
     {
         Index = index;
         ModelType = modelType;
@@ -87,7 +87,7 @@ public abstract class CliParameter : IBindingSource
     /// <summary>
     /// Gets the help tag.
     /// </summary>
-    public object? HelpTag { get; }
+    public string? HelpTag { get; }
     
     internal string DisplayName => SymbolKind == SymbolKind.Argument
         ? $"Argument '{BindingName}'"
@@ -112,7 +112,7 @@ internal sealed class CliParameter<TValue> : CliParameter
         string[] identifiers,
         Arity arity,
         Func<TValue>? defaultProvider,
-        object? helpTag) 
+        string? helpTag) 
         : base(index, modelType, typeof(TValue), symbolKind, bindingName, identifiers, arity, helpTag)
     {
         this.defaultProvider = defaultProvider;

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Vertical.Cli.Binding;
 
 namespace Vertical.Cli.Routing;
@@ -17,7 +18,7 @@ internal sealed class RoutingConfiguration : IRoutingConfiguration
         definitions.Add(route);
     }
 
-    public void AddRoute<TModel>(RoutePath path, AsyncCallSite<TModel>? callSite, object? helpTag)
+    public void AddRoute<TModel>(RoutePath path, AsyncCallSite<TModel>? callSite, string? helpTag)
         where TModel : class
     {
         AddDefinition(new RouteDefinition(
@@ -25,6 +26,7 @@ internal sealed class RoutingConfiguration : IRoutingConfiguration
             typeof(TModel),
             CreateDefaultBindingFactory(callSite),
             isCallable: callSite != null,
+            str => path.Match(str).Length,
             helpTag));
     }
 
