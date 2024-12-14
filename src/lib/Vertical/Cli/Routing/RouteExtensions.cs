@@ -13,7 +13,9 @@ public static class RouteExtensions
     /// <returns><c>bool</c></returns>
     public static bool IsDescendantOf(this RoutePath path, RoutePath ancestor)
     {
-        return !ReferenceEquals(path, ancestor) && GetHierarchyDistance(ancestor.Pattern, path.Pattern) > 0;
+        return
+            ancestor.Pattern.Length < path.Pattern.Length &&
+            path.Pattern.StartsWith(ancestor.Pattern);
     }
 
     /// <summary>
@@ -22,9 +24,18 @@ public static class RouteExtensions
     /// <param name="path">This instance</param>
     /// <param name="ancestor">The route used to determine lineage</param>
     /// <returns><c>bool</c></returns>
-    public static bool IsChildOf(this RoutePath path, RoutePath ancestor)
+    public static bool IsChildOf(this RoutePath path, RoutePath ancestor) => ancestor.Equals(path.GetParentPath());
+
+    /// <summary>
+    /// Gets the parent path.
+    /// </summary>
+    /// <param name="path">The path</param>
+    /// <returns><see cref="RoutePath"/> or <c>null</c> if the specified instance is a root path.</returns>
+    public static RoutePath? GetParentPath(this RoutePath path)
     {
-        return !ReferenceEquals(path, ancestor) && GetHierarchyDistance(ancestor.Pattern, path.Pattern) == 1;
+        var spaceIndex = path.Pattern.LastIndexOf(' ');
+
+        return spaceIndex == -1 ? null : new RoutePath(path.Pattern[..spaceIndex]);
     }
 
     /// <summary>
@@ -35,35 +46,6 @@ public static class RouteExtensions
     /// <returns></returns>
     public static string GetDescendantPath(this RoutePath path, RoutePath descendant)
     {
-        return descendant.Pattern[path.Pattern.Length..];
-    }
-
-    private static int GetHierarchyDistance(string parent, string child)
-    {
-        // Find where child intersects with parent
-        var pos = 0;
-        var len = Math.Min(parent.Length, child.Length);
-
-        while (pos < len)
-        {
-            if (parent[pos] != child[pos])
-                break;
-            ++pos;
-        }
-
-        if (pos == 0)
-            return -1;
-
-        var spaceCount = 0;
-        
-        while (pos < child.Length)
-        {
-            if (child[pos] == ' ')
-                ++spaceCount;
-
-            ++pos;
-        }
-
-        return spaceCount;
+        return descendant.Pattern[(path.Pattern.Length+1)..];
     }
 }

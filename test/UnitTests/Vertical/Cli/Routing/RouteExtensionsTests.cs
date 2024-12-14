@@ -23,6 +23,14 @@ public class RouteExtensionsTests
             Add("dz5", "dz5 create append", true);
         }
     }
+
+    [Fact]
+    public void GetParentPath_Returns_Expected()
+    {
+        new RoutePath("dz5").GetParentPath().ShouldBeNull();
+        new RoutePath("dz5 create").GetParentPath()!.Pattern.ShouldBe("dz5");
+        new RoutePath("dz5 create new").GetParentPath()!.Pattern.ShouldBe("dz5 create");
+    }
     
     [Theory]
     [ClassData(typeof(ChildOfData))]
