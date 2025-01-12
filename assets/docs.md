@@ -199,7 +199,7 @@ Example output:
 
 ![Sample](./help.png)
 
-There are two predefined help providers: a compact format provider (similar to what .NET tooling) and unix style provider (similar to man pages). If an application wants to customize how elements are displayed, it can create an instance of one of the built-in help providers and specify a `HelpFormattingOptions` object where formatting can be controlled. If an application wants to completely control help rendering without using either built-in provider, it can implement the `IHelpProvider` interface. Below are some examples, but be sure to look at the `CliDemo` project in the examples folder.
+There are two predefined help providers: a compact format provider (similar to .NET tooling) and unix style provider (similar to man pages). If an application wants to customize how elements are displayed, it can create an instance of one of the built-in help providers and specify a `HelpFormattingOptions` object where formatting can be controlled. If an application wants to completely control help rendering without using either built-in provider, it can implement the `IHelpProvider` interface. Below are some examples, but be sure to look at the `CliDemo` project in the examples folder.
 
 ```csharp
 // Use the default help provider

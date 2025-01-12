@@ -114,11 +114,7 @@ public sealed class BindingInfo
 
     private static string? GetConverterExpression(ITypeSymbol valueType)
     {
-        var isParsable = valueType.Interfaces.Any(t => t is
-        {
-            Name: "IParsable",
-            ContainingNamespace.Name: "System"
-        });
+        var isParsable = IsParsable(valueType);
 
         return valueType switch
         {
@@ -131,7 +127,8 @@ public sealed class BindingInfo
             { BaseType: { Name: "Enum", ContainingNamespace.Name: "System" } } =>
                 $"new {ConversionNs}.EnumConverter<{valueType}>()",
             
-            INamedTypeSymbol { Name: "Nullable", ContainingNamespace.Name: "System" } nullableParsable when isParsable =>
+            INamedTypeSymbol { Name: "Nullable", ContainingNamespace.Name: "System" } nullableParsable when 
+                IsParsable(nullableParsable.TypeArguments[0]) =>
                 $"new {ConversionNs}.NullableParsableConverter<{nullableParsable.TypeArguments[0].ToFqn()}>()",
             
             not null when isParsable => $"new {ConversionNs}.ParsableConverter<{valueType.ToFqn()}>()",
@@ -148,6 +145,15 @@ public sealed class BindingInfo
             
             _ => null
         };
+    }
+
+    private static bool IsParsable(ITypeSymbol type)
+    {
+        return type.Interfaces.Any(t => t is
+        {
+            Name: "IParsable",
+            ContainingNamespace.Name: "System"
+        });
     }
 }
 
