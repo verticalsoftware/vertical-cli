@@ -118,7 +118,8 @@ public partial class BindingContext
         return (parameter.SymbolKind, argument) switch
         {
             { SymbolKind: SymbolKind.Switch } => bool.TrueString,
-            { argument.OperandValue.Length: > 0 } => argument.OperandValue,
+            { argument: { IdentifierSymbol.Length: > 0, OperandValue.Length: > 0 }} when parameter.Identifiers.Any(id =>
+                id.IdentifierSymbol == argument.IdentifierSymbol) => argument.OperandValue,
             _ => argument.Text
         };
     }
