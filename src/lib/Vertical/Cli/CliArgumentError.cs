@@ -33,5 +33,10 @@ public enum CliArgumentError
     /// <summary>
     /// Indicates model validation failed.
     /// </summary>
-    InvalidModel
+    InvalidModel,
+    
+    /// <summary>
+    /// Inciates a response file is invalid.
+    /// </summary>
+    InvalidResponseFile
 }

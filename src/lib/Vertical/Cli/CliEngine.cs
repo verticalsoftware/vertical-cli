@@ -26,7 +26,7 @@ public static class CliEngine
     internal static BindingContext GetBindingContext(CliApplication application, string[] arguments,
         bool bindApplicationName)
     {
-        var argumentList = new LinkedList<ArgumentSyntax>(ArgumentParser.Parse(arguments));
+        var argumentList = BuildArgumentList(arguments);
 
         if (bindApplicationName)
         {
@@ -45,5 +45,47 @@ public static class CliEngine
         
         argumentList.RemoveFirst();
         throw Exceptions.PathNotCallable(application, route, argumentList.ToArray());
+    }
+
+    private static LinkedList<ArgumentSyntax> BuildArgumentList(string[] args)
+    {
+        var list = new LinkedList<ArgumentSyntax>();
+        
+        foreach (var arg in args)
+        {
+            if (!arg.StartsWith('@'))
+            {
+                list.AddLast(ArgumentSyntax.Parse(arg));
+                continue;
+            }
+
+            var path = arg[1..];
+            ParseResponseFileArguments(list, path);
+        }
+
+        return list;
+    }
+
+    private static void ParseResponseFileArguments(LinkedList<ArgumentSyntax> list, string path)
+    {
+        using var reader = GetResponseFileStreamReader(path);
+
+        foreach (var arg in Arguments.ReadAll(reader))
+        {
+            list.AddLast(ArgumentSyntax.Parse(arg));
+        }
+    }
+
+    private static StreamReader GetResponseFileStreamReader(string path)
+    {
+        try
+        {
+            return new StreamReader(File.OpenRead(path));
+        }
+        catch (Exception exception)
+        {
+            throw new CliArgumentException(CliArgumentError.InvalidResponseFile,
+                $"Could not read response file {path}.", innerException: exception);
+        }
     }
 }
