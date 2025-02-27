@@ -260,7 +260,7 @@ catch (CliArgumentException exception)
 }
 ```
 
-## Adnvanced usage
+## Advanced usage
 
 ### Assign unbound properties
 

@@ -123,14 +123,11 @@ public sealed class BindingValuesLookup : ILookup<string, ArgumentSyntax>
                 continue;
             }
 
-            if (node?.Value is { PrefixType: OptionPrefixType.None } operandArgument)
-            {
-                entries.Add((parameter.BindingName, operandArgument));
-                node = argumentList.Remove(node, node.Next);
-                continue;
-            }
-
-            throw Exceptions.OptionValueNotProvided(route, parameter, argument);
+            if (node?.Value is not { PrefixType: OptionPrefixType.None } operandArgument)
+                throw Exceptions.OptionValueNotProvided(route, parameter, argument);
+            
+            entries.Add((parameter.BindingName, operandArgument));
+            node = argumentList.Remove(node, node.Next);
         }
     }
 

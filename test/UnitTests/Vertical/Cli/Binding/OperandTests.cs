@@ -19,15 +19,15 @@ public class OperandTests
         }
     }
 
-    public record Options(KeyValuePair<string, string>[] Properties, string? LogLevel);
+    public record Options(KeyValuePair<string, string>[] Properties, string? LogLevel, bool Test);
     
     [Fact]
-    public void Bind_Argument_Text_Returns_Expected()
+    public void Bind_Option_Argument_Text_Returns_Expected()
     {
         var app = new CliApplicationBuilder("test")
             .AddConverters([new KeyValuePairConverter()])
             .MapModel<Options>(map => map.Option(x => x.Properties, ["--watermark"], Arity.ZeroOrMany))
-            .Route<Options>("test", opt => 0)
+            .Route<Options>("test", _ => 0)
             .Build();
 
         var context = CliEngine.GetBindingContext(app, ["--watermark", "id=value"]);
@@ -38,12 +38,12 @@ public class OperandTests
     }
 
     [Fact]
-    public void Bind_Operand_Value_Returns_Expected()
+    public void Bind_Option_Operand_Value_Returns_Expected()
     {
         var app = new CliApplicationBuilder("test")
             .AddConverters([new StringConverter()])
             .MapModel<Options>(map => map.Option(x => x.LogLevel, ["--level"]))
-            .Route<Options>("test", opt => 0)
+            .Route<Options>("test", _ => 0)
             .Build();
 
         CliEngine
@@ -60,5 +60,19 @@ public class OperandTests
             .GetBindingContext(app, ["--level", "debug"])
             .GetValue<string?>(nameof(Options.LogLevel))
             .ShouldBe("debug");
+    }
+
+    [Fact]
+    public void Bind_Switch_Returns_Expected()
+    {
+        var app = new CliApplicationBuilder("test")
+            .AddConverters([new ParsableConverter<bool>()])
+            .MapModel<Options>(map => map.Switch(x => x.Test, ["--test"]))
+            .Route<Options>("test", _ => 0)
+            .Build();
+
+        CliEngine.GetBindingContext(app, ["--test"])
+            .GetValue<bool>(nameof(Options.Test))
+            .ShouldBeTrue();
     }
 }
