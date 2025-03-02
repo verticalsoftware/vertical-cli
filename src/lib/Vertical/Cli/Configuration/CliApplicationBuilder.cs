@@ -161,6 +161,31 @@ public sealed class CliApplicationBuilder
     }
 
     /// <summary>
+    /// Adds a <see cref="IValueConverter"/> service.
+    /// </summary>
+    /// <param name="converter">The value converter implementation.</param>
+    /// <returns>A reference to this instance.</returns>
+    public CliApplicationBuilder AddConverter(IValueConverter converter)
+    {
+        ArgumentNullException.ThrowIfNull(converter);
+        valueConverters.Add(converter);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a value converter in the form of a function.
+    /// </summary>
+    /// <param name="conversion">A function that receives the string value and converts it to <typeparamref name="T"/></param>
+    /// <typeparam name="T">The value type being converted to from <c>string</c>.</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public CliApplicationBuilder AddConverter<T>(Func<string, T> conversion)
+    {
+        ArgumentNullException.ThrowIfNull(conversion);
+        AddConverter(new DelegateConverter<T>(conversion));
+        return this;
+    }
+
+    /// <summary>
     /// Adds one or more <see cref="IValueConverter"/> services.
     /// </summary>
     /// <param name="converters">Value converter(s) to add.</param>
