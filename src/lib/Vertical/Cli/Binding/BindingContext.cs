@@ -109,14 +109,11 @@ public sealed partial class BindingContext
     /// <returns><c>true</c> if <paramref name="callSite"/> was assigned.</returns>
     public bool TryGetCallSite<TModel>([NotNullWhen(true)] out AsyncCallSite<TModel>? callSite) where TModel : class
     {
-        if (CallSite is AsyncCallSite<TModel> target)
-        {
-            callSite = WrapCallSite(target);
-            return true;
-        }
+        callSite = CallSite?.GetType() == typeof(AsyncCallSite<TModel>)
+            ? (AsyncCallSite<TModel>)CallSite
+            : null;
 
-        callSite = default;
-        return false;
+        return callSite is not null;
     }
 
     /// <summary>
