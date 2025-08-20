@@ -1,70 +1,49 @@
 namespace Vertical.Cli.Configuration;
 
 /// <summary>
-/// Describes the minimum and maximum number of values for a parameter.
+/// Represents the required or acceptable count of usages of a symbol.
 /// </summary>
-public readonly struct Arity
+public sealed class Arity
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Arity"/> struct.
-    /// </summary>
-    /// <param name="minCount">The minimum number of values.</param>
-    /// <param name="maxCount">The maximum number of values, or <c>null</c> if unconstrained.</param>
-    /// <exception cref="ArgumentException"><paramref name="minCount"/> is less than 0.</exception>
-    /// <exception cref="ArgumentException"><paramref name="maxCount"/> is less than <paramref name="minCount"/>.</exception>
-    public Arity(int minCount, int? maxCount)
+    internal Arity(int minCount, int? maxCount)
     {
-        if (minCount < 0)
-        {
-            throw new ArgumentException("minCount cannot be less than 0", nameof(minCount));
-        }
-
-        if (maxCount < minCount)
-        {
-            throw new ArgumentException("maxCount cannot be less than min count", nameof(minCount));
-        }
-
         MinCount = minCount;
         MaxCount = maxCount;
     }
+
+    internal static readonly Arity ZeroOrOne = new(0, 1);
+    internal static readonly Arity ZeroOrMore = new(0, null);
+    internal static readonly Arity One = new(1, 1);
+    internal static readonly Arity OneOrMore = new(1, null);
+    
     
     /// <summary>
-    /// Gets the minimum number of values.
+    /// Gets the minimum count.
     /// </summary>
-    public int MinCount { get; } = 0;
-    
+    public int MinCount { get; }
+
     /// <summary>
-    /// Gets the maximum number of parameters, or <c>null</c> if the count is unconstrained.
+    /// Gets the maximum count, or <c>null</c> if unconstrained.
     /// </summary>
-    public int? MaxCount { get; } = 1;
+    public int? MaxCount { get; }
 
     /// <inheritdoc />
-    public override string ToString() => $"({MinCount}, {MaxCount})";
+    public override string ToString() => $"({MinCount}, {MaxCountString})";
 
     /// <summary>
-    /// Defines an arity with a minimum count of 0 and a maximum count of 1.
+    /// Determines whether the given count satisfies the arity.
     /// </summary>
-    public static Arity ZeroOrOne => new(0, 1);
-    
-    /// <summary>
-    /// Defines an arity with a minimum count of 0.
-    /// </summary>
-    public static Arity ZeroOrMany => new(0, null);
+    /// <param name="count">Count of received values.</param>
+    /// <returns>
+    /// <c>true</c> if count is greater or equal to the minimum count and less or equal to the
+    /// maximum count.
+    /// </returns>
+    public bool IsCountValid(int count)
+    {
+        return count >= MinCount
+               &&
+               (MaxCount is null || count <= MaxCount);
+    }
 
-    /// <summary>
-    /// Defines an arity with a minimum and maximum count of 1.
-    /// </summary>
-    public static Arity One => new(1, 1);
-
-    /// <summary>
-    /// Defines an arity with a minimum count of 1.
-    /// </summary>
-    public static Arity OneOrMany => new(1, null);
-    
-    /// <summary>
-    /// Defines an arity with matching minimum and maximum count.
-    /// </summary>
-    /// <param name="count"></param>
-    /// <returns></returns>
-    public static Arity Exactly(int count) => new(count, count);
+    private string MaxCountString => MaxCount.HasValue ? $"{MaxCount}" : "*";
 }

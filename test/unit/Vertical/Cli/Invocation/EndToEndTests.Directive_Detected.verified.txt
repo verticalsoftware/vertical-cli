@@ -1,0 +1,2 @@
+﻿Set log-level = info
+Creating archive ./var/source.txt -> ./var/dest.txt (using GZip)

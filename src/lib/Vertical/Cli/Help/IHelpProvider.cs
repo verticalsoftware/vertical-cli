@@ -1,14 +1,15 @@
 namespace Vertical.Cli.Help;
 
 /// <summary>
-/// Composes help content and outputs the result to a text writer.
+/// Represents a component of the help system that orchestrates outputting help
+/// content to the console.
 /// </summary>
 public interface IHelpProvider
 {
     /// <summary>
-    /// When implemented, composes help content.
+    /// Renders help content.
     /// </summary>
-    /// <param name="context">A context that contains information about the help topic.</param>
-    /// <returns>Task</returns>
-    Task WriteContentAsync(HelpContext context);
+    /// <param name="helpModel">The model that contains contextual data about the help subject.</param>
+    /// <returns><see cref="Task"/></returns>
+    Task RenderHelpAsync(HelpModel helpModel);
 }

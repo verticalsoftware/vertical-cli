@@ -1,0 +1,230 @@
+﻿[
+  {
+    Token: {
+      Kind: OptionSymbol,
+      Text: -a,
+      ParsePosition: 0,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -a,
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: OptionSymbol,
+      Text: -a,
+      ParsePosition: 0,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -a,
+      Parameter: (none)
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: OptionSymbol,
+      Text: -a,
+      ParsePosition: 1,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -a,
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: OptionSymbol,
+      Text: -abc,
+      ParsePosition: 1,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -abc,
+      Parameter: (none)
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: OptionSymbol,
+      Text: -b,
+      ParsePosition: 1,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -b,
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: OptionSymbol,
+      Text: -abc,
+      ParsePosition: 1,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -abc,
+      Parameter: (none)
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: OptionSymbol,
+      Text: -c,
+      ParsePosition: 1,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -c,
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: OptionSymbol,
+      Text: -abc,
+      ParsePosition: 1,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -abc,
+      Parameter: (none)
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: OptionSymbol,
+      Text: -a,
+      ParsePosition: 2,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -a,
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: OptionSymbol,
+      Text: -abc:parameter,
+      ParsePosition: 2,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -abc,
+      Parameter: parameter
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: OptionSymbol,
+      Text: -b,
+      ParsePosition: 2,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -b,
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: OptionSymbol,
+      Text: -abc:parameter,
+      ParsePosition: 2,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -abc,
+      Parameter: parameter
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: OptionSymbol,
+      Text: -c:parameter,
+      ParsePosition: 2,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -c,
+      Parameter: parameter
+    },
+    ConstituentToken: {
+      Kind: OptionSymbol,
+      Text: -abc:parameter,
+      ParsePosition: 2,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: -abc,
+      Parameter: parameter
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: OptionSymbol,
+      Text: --option,
+      ParsePosition: 3,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: --option,
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: OptionSymbol,
+      Text: --option,
+      ParsePosition: 3,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: --option,
+      Parameter: (none)
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: ArgumentValue,
+      Text: /option,
+      ParsePosition: 4,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: /option,
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: ArgumentValue,
+      Text: /option,
+      ParsePosition: 4,
+      SyntaxKind: PrefixedIdentifier,
+      Symbol: /option,
+      Parameter: (none)
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: ArgumentValue,
+      Text: argument,
+      ParsePosition: 5,
+      SyntaxKind: NonDecorated,
+      Symbol: (none),
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: ArgumentValue,
+      Text: argument,
+      ParsePosition: 5,
+      SyntaxKind: NonDecorated,
+      Symbol: (none),
+      Parameter: (none)
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: Terminator,
+      Text: --,
+      ParsePosition: 6,
+      SyntaxKind: Terminator,
+      Symbol: (none),
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: Terminator,
+      Text: --,
+      ParsePosition: 6,
+      SyntaxKind: Terminator,
+      Symbol: (none),
+      Parameter: (none)
+    },
+    HasBooleanParameter: false
+  },
+  {
+    Token: {
+      Kind: TerminatedValue,
+      Text: terminated,
+      ParsePosition: 7,
+      SyntaxKind: NonDecorated,
+      Symbol: (none),
+      Parameter: (none)
+    },
+    ConstituentToken: {
+      Kind: TerminatedValue,
+      Text: terminated,
+      ParsePosition: 7,
+      SyntaxKind: NonDecorated,
+      Symbol: (none),
+      Parameter: (none)
+    },
+    HasBooleanParameter: false
+  }
+]

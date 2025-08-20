@@ -1,0 +1,34 @@
+﻿[
+  {
+    Kind: Directive,
+    Text: [debug],
+    ParsePosition: -1,
+    SyntaxKind: EnclosedSymbol,
+    Symbol: (none),
+    Parameter: (none)
+  },
+  {
+    Kind: Directive,
+    Text: [diagram],
+    ParsePosition: -1,
+    SyntaxKind: EnclosedSymbol,
+    Symbol: (none),
+    Parameter: (none)
+  },
+  {
+    Kind: ArgumentValue,
+    Text: command,
+    ParsePosition: 0,
+    SyntaxKind: NonDecorated,
+    Symbol: (none),
+    Parameter: (none)
+  },
+  {
+    Kind: ArgumentValue,
+    Text: [option],
+    ParsePosition: 1,
+    SyntaxKind: EnclosedSymbol,
+    Symbol: (none),
+    Parameter: (none)
+  }
+]

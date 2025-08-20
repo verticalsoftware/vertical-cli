@@ -1,0 +1,54 @@
+﻿--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  -r, --runtime-identifier <RUNTIME_IDENTIFIER>   The known .net framework moniker to target (e.g. net6.0, net8.0, net10.0, netstandard2.0, etc). The build artifacts will be placed in a directory
+                                                  name that corresponds to the framework.
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  -r, --runtime-identifier <RUNTIME_IDENTIFIER>   The known .net framework moniker to target (e.g. net6.0, net8.0, net10.0, netstandard2.0, etc). The build
+                                                  artifacts will be placed in a directory name that corresponds to the framework.
+
+
+------------------------------------------------------------------------------------------------------------------------
+  -r, --runtime-identifier <RUNTIME_IDENTIFIER>   The known .net framework moniker to target (e.g. net6.0, net8.0,
+                                                  net10.0, netstandard2.0, etc). The build artifacts will be placed
+                                                  in a directory name that corresponds to the framework.
+
+
+--------------------------------------------------------------------------------
+  -r, --runtime-identifier   The known .net framework moniker to target (e.g.
+  <RUNTIME_IDENTIFIER>       net6.0, net8.0, net10.0, netstandard2.0, etc).
+                             The build artifacts will be placed in a
+                             directory name that corresponds to the
+                             framework.
+
+
+------------------------------------------------------------
+  -r, --runtime-identifier   The known .net framework
+  <RUNTIME_IDENTIFIER>       moniker to target (e.g.
+                             net6.0, net8.0, net10.0,
+                             netstandard2.0, etc). The
+                             build artifacts will be
+                             placed in a directory name
+                             that corresponds to the
+                             framework.
+
+
+----------------------------------------
+  -r,                  The known .net
+  --runtime-identifier framework
+  <RUNTIME_IDENTIFIER> moniker to
+                       target (e.g.
+                       net6.0,
+                       net8.0,
+                       net10.0,
+                       netstandard2.0,
+                        etc). The
+                       build
+                       artifacts will
+                       be placed in a
+                       directory name
+                       that
+                       corresponds to
+                       the framework.
+
+

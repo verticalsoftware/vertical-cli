@@ -1,306 +1,209 @@
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Conversion;
+using Vertical.Cli.Internal;
+using Vertical.Cli.Invocation;
+using Vertical.Cli.IO;
 using Vertical.Cli.Parsing;
-using Vertical.Cli.Routing;
-using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Binding;
 
 /// <summary>
-/// Represents information used for model binding and invocation of
-/// command handlers.
+/// Represents a context used to provide values for model activation.
 /// </summary>
-public sealed partial class BindingContext
+/// <typeparam name="TModel">Model type</typeparam>
+public sealed class BindingContext<TModel> where TModel : class
 {
-    private BindingContext(CliApplication application,
-        IReadOnlyList<ArgumentSyntax> argumentList,
-        RouteTarget routeTarget,
-        BindingValuesLookup bindingValues, 
-        IReadOnlyDictionary<string, IBindingSource> providedBindings,
-        Delegate? callSite)
+    internal BindingContext(
+        IRootConfiguration rootConfiguration,
+        IEnumerable<IPropertyBinding> propertyBindings,
+        ParseResult parseResult,
+        List<UsageError> errors,
+        Func<TModel>? activator,
+        TextReader inputStream)
     {
-        Application = application;
-        ArgumentList = argumentList;
-        RouteDefinition = routeTarget.Route;
-        RouteArguments = routeTarget.Arguments;
-        BindingValues = bindingValues;
-        ProvidedBindings = providedBindings;
-        CallSite = callSite;
-        Parameters = bindingValues.Parameters;
-        ValueConverters = application.Converters.ToDictionary(c => c.ValueType);
+        _rootConfiguration = rootConfiguration;
+        _errors = errors;
+
+        ParseResult = parseResult;
+        Activator = activator;
+        PropertyBindings = propertyBindings.ToDictionary(
+            binding => binding.BindingName, 
+            IPropertyBinding (binding) => binding);
+        InputStream = inputStream;
     }
 
-    private Delegate? CallSite { get; }
+    private readonly IRootConfiguration _rootConfiguration;
+    private readonly List<UsageError> _errors;
 
     /// <summary>
-    /// Gets the <see cref="CliApplication"/> instance.
+    /// Gets the input stream.
     /// </summary>
-    public CliApplication Application { get; }
+    public TextReader InputStream { get; }
 
     /// <summary>
-    /// Gets the parsed arguments.
+    /// Gets a dictionary of <see cref="IPropertyBinding"/> objects indexed by binding name.
     /// </summary>
-    public IReadOnlyList<ArgumentSyntax> ArgumentList { get; }
+    public Dictionary<string, IPropertyBinding> PropertyBindings { get; set; }
 
     /// <summary>
-    /// Gets the route arguments.
+    /// Gets the parse result.
     /// </summary>
-    public IReadOnlyList<ArgumentSyntax> RouteArguments { get; set; }
+    public ParseResult ParseResult { get; }
 
     /// <summary>
-    /// Gets the current route definition.
+    /// Gets a factory function that creates the initial object instance.
     /// </summary>
-    public RouteDefinition RouteDefinition { get; }
+    public Func<TModel>? Activator { get; }
 
     /// <summary>
-    /// Gets the collection of mapped parameters (options, switches, and arguments).
+    /// Gets a property value.
     /// </summary>
-    public ParameterCollection Parameters { get; }
-
-    /// <summary>
-    /// Gets a lookup of binding values paired with identifiers of the parameters they are
-    /// associated with.
-    /// </summary>
-    public BindingValuesLookup BindingValues { get; }
-
-    /// <summary>
-    /// Gets bindings provided by the application.
-    /// </summary>
-    public IReadOnlyDictionary<string, IBindingSource> ProvidedBindings { get; }
-
-    /// <summary>
-    /// Gets the value converters registered by the application or automatically
-    /// by the source generator.
-    /// </summary>
-    public IDictionary<Type, IValueConverter> ValueConverters { get; }
-
-    /// <summary>
-    /// Adds a <see cref="IValueConverter"/> instance if the target value type is not already
-    /// provided for.
-    /// </summary>
-    /// <param name="converter">The converter instance to add.</param>
-    public void TryAddConverter(IValueConverter converter) => ValueConverters.TryAdd(
-        converter.ValueType, converter);
-
-    /// <summary>
-    /// Attempts to invoke a call site that has internal model binding.
-    /// </summary>
-    /// <param name="cancellationToken">Token observed for cancellation.</param>
-    /// <returns>The integer result or <c>null</c> if the site was not invoked.</returns>
-    public async Task<int?> TryInvokeInternalCallSite(CancellationToken cancellationToken)
+    /// <param name="propertyExpression">The expression that identifies the model property being bound.</param>
+    /// <param name="valueConverter">A function that converts string arguments to the target value type.</param>
+    /// <typeparam name="TValue">Property type</typeparam>
+    /// <returns><typeparamref name="TValue"/> or <c>default</c>.</returns>
+    public TValue GetValue<TValue>(
+        Expression<Func<TModel, TValue>> propertyExpression,
+        ValueConverter<TValue>? valueConverter)
     {
-        if (TryGetCallSite<BindingContext>(out var bindingCallSite))
-            return await bindingCallSite(this, cancellationToken);
+        var binding = GetPropertyBinding(propertyExpression);
+        var bindingArgs = new PropertyBinder<TModel, TValue>(binding, this, valueConverter);
+        binding.TryBindValue(bindingArgs);
 
-        if (TryGetCallSite<EmptyModel>(out var emptyCallSite))
-            return await emptyCallSite(EmptyModel.Instance, cancellationToken);
+        if (bindingArgs.TryGetExplicitValue(out var value))
+            return value;
+        
+        if (TryGetSingleParseResultValue(binding, valueConverter, out var parsedValue))
+            return parsedValue;
 
-        return null;
+        return bindingArgs.TryGetDefaultValue(out var defaultValue) ? defaultValue : default!;
     }
 
     /// <summary>
-    /// Tries to get a call site for a particular model type.
+    /// Gets a collection property value.
     /// </summary>
-    /// <param name="callSite">When the method returns and a callsite is available for the given
-    /// model type, a reference to the call site.</param>
-    /// <typeparam name="TModel">Model type</typeparam>
-    /// <returns><c>true</c> if <paramref name="callSite"/> was assigned.</returns>
-    public bool TryGetCallSite<TModel>([NotNullWhen(true)] out AsyncCallSite<TModel>? callSite) where TModel : class
+    /// <param name="propertyExpression">The expression that identifies the model property being bound.</param>
+    /// <param name="elementConverter">A function that converts string arguments to the target element type.</param>
+    /// <param name="createCollection">A function that converts enumerable values to the strong collection type.</param>
+    /// <typeparam name="TElement">The collection or array's element type.</typeparam>
+    /// <typeparam name="TCollection">The collection type.</typeparam>
+    /// <returns>The collection value</returns>
+    public TCollection GetCollectionValue<TElement, TCollection>(
+        Expression<Func<TModel, TCollection>> propertyExpression,
+        ValueConverter<TElement>? elementConverter,
+        Func<IEnumerable<TElement>, TCollection> createCollection)
+        where TCollection : IEnumerable<TElement>
     {
-        callSite = CallSite?.GetType() == typeof(AsyncCallSite<TModel>)
-            ? (AsyncCallSite<TModel>)CallSite
-            : null;
+        var binding = GetPropertyBinding(propertyExpression);
+        var bindingArgs = new PropertyBinder<TModel, TCollection>(binding, this, null);
 
-        return callSite is not null;
+        binding.TryBindValue(bindingArgs);
+
+        if (bindingArgs.TryGetExplicitValue(out var value))
+            return value;
+
+        if (TryGetCollectionParseResultValue(binding, elementConverter, createCollection, out var collection))
+            return collection;
+
+        return bindingArgs.TryGetDefaultValue(out collection) ? collection : default!;
     }
 
     /// <summary>
-    /// Gets a single binding value.
+    /// Creates an instance of the model type.
     /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>Value of <typeparamref name="T"/>, or <c>default</c>.</returns>
-    public T GetValue<T>(string bindingName) => SelectSingleValue<T>(bindingName, BindingValues[bindingName]);
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>A enumerable of zero, one, or more values of <typeparamref name="T"/></returns>
-    public IEnumerable<T> GetValues<T>(string bindingName)
+    /// <returns>An instance of the model.</returns>
+    /// <exception cref="InvalidOperationException">An activator function was not configured.</exception>
+    public TModel ActivateModelInstance()
     {
-        return SelectCollectionValues<T>(bindingName, BindingValues[bindingName]);
+        return Activator?.Invoke() ?? throw Exceptions.ModelActivatorNotDefined(typeof(TModel));
     }
 
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>A <see cref="Array"/> of zero, one, or more values of <typeparamref name="T"/></returns>
-    public T[] GetArray<T>(string bindingName) => GetValues<T>(bindingName).ToArray();
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>A <see cref="HashSet{T}"/> of zero, one, or more values of <typeparamref name="T"/></returns>
-    public HashSet<T> GetHashSet<T>(string bindingName) => [..GetValues<T>(bindingName)];
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>A <see cref="SortedSet{T}"/> of zero, one, or more values of <typeparamref name="T"/></returns>
-    public HashSet<T> GetSortedSet<T>(string bindingName) => [..GetValues<T>(bindingName)];
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>A <see cref="List{T}"/> of zero, one, or more values of <typeparamref name="T"/></returns>
-    public List<T> GetList<T>(string bindingName) => [..GetValues<T>(bindingName)];
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>A <see cref="LinkedList{T}"/> of zero, one, or more values of <typeparamref name="T"/></returns>
-    public List<T> GetLinkedList<T>(string bindingName) => [..GetValues<T>(bindingName)];
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>A <see cref="Stack{T}"/> of zero, one, or more values of <typeparamref name="T"/></returns>
-    public Stack<T> GetStack<T>(string bindingName) => new(GetValues<T>(bindingName));
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>A <see cref="Queue{T}"/> of zero, one, or more values of <typeparamref name="T"/></returns>
-    public Queue<T> GetQueue<T>(string bindingName) => new(GetValues<T>(bindingName));
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>
-    /// A <see cref="System.Collections.Immutable.ImmutableArray{T}"/> of zero, one, or more values of
-    /// <typeparamref name="T"/>
-    /// </returns>
-    public ImmutableArray<T> GetImmutableArray<T>(string bindingName) => [..GetValues<T>(bindingName)];
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>
-    /// A <see cref="System.Collections.Immutable.ImmutableHashSet{T}"/> of zero, one, or more values of
-    /// <typeparamref name="T"/>
-    /// </returns>
-    public ImmutableHashSet<T> GetImmutableHashSet<T>(string bindingName) => [..GetValues<T>(bindingName)];
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>
-    /// A <see cref="System.Collections.Immutable.ImmutableSortedSet{T}"/> of zero, one, or more values of
-    /// <typeparamref name="T"/>
-    /// </returns>
-    public ImmutableHashSet<T> GetImmutableSortedSet<T>(string bindingName) => [..GetValues<T>(bindingName)];
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>
-    /// A <see cref="System.Collections.Immutable.ImmutableStack{T}"/> of zero, one, or more values of
-    /// <typeparamref name="T"/>
-    /// </returns>
-    public ImmutableStack<T> GetImmutableStack<T>(string bindingName) => [..GetValues<T>(bindingName)];
-
-    /// <summary>
-    /// Gets a collection of binding values.
-    /// </summary>
-    /// <param name="bindingName">The name of the binding.</param>
-    /// <typeparam name="T">Value type</typeparam>
-    /// <returns>
-    /// A <see cref="System.Collections.Immutable.ImmutableQueue{T}"/> of zero, one, or more values of
-    /// <typeparamref name="T"/>
-    /// </returns>
-    public ImmutableQueue<T> GetImmutableQueue<T>(string bindingName) => [..GetValues<T>(bindingName)];
-
-    internal static BindingContext Create(
-        CliApplication application,
-        IReadOnlyList<ArgumentSyntax> arguments,
-        RouteTarget routeTarget,
-        Delegate? callSite)
+    private bool TryGetSingleParseResultValue<TValue>(
+        IPropertyBinding<TModel, TValue> binding,
+        ValueConverter<TValue>? valueConverter,
+        out TValue value)
     {
-        var valueLookup = BindingValuesLookup.Create(application, routeTarget);
-        var bindings = GetProvidedValueBindings(application, routeTarget);
+        value = default!;
 
-        return new BindingContext(
-            application,
-            arguments,
-            routeTarget,
-            valueLookup,
-            bindings,
-            callSite);
+        if (ParseResult.GetValues(binding.BindingName) is not { Length: 1 } parseValues)
+            return false;
+
+        var converter = ResolveConverter(binding, valueConverter);
+
+        return TryConvertValue(binding, parseValues[0], converter, out value);
     }
 
-    private static Dictionary<string, IBindingSource> GetProvidedValueBindings(
-        CliApplication application, 
-        RouteTarget routeTarget)
+    private bool TryGetCollectionParseResultValue<TCollection, TElement>(
+        IPropertyBinding<TModel, TCollection> binding, 
+        ValueConverter<TElement>? elementConverter, 
+        Func<IEnumerable<TElement>, TCollection> createCollection, 
+        [NotNullWhen(true)] out TCollection? collection)
+        where TCollection : IEnumerable<TElement>
     {
-        var dictionary = new Dictionary<string, IBindingSource>();
+        collection = default!;
 
-        foreach (var type in routeTarget.Route.ModelType.GetTypeFamily())
+        if (ParseResult.GetValues(binding.BindingName) is not { Length: > 0 } parseValues)
+            return false;
+
+        var converter = ResolveConverter(binding, elementConverter);
+        var valueArray = new TElement[parseValues.Length];
+
+        for (var c = 0; c < valueArray.Length; c++)
         {
-            if (!application.ModelConfigurations.TryGetValue(type, out var configuration))
-                continue;
+            if (!TryConvertValue(binding, parseValues[c], converter, out var value))
+                return false;
 
-            foreach (var (key, value) in configuration.BindingSources)
-            {
-                dictionary.Add(key, value);
-            }
+            valueArray[c] = value;
         }
 
-        return dictionary;
+        collection = valueArray.GetType().IsAssignableTo(typeof(TCollection))
+            ? (TCollection)(object)valueArray
+            : createCollection(valueArray);
+        
+        return true;
     }
 
-    private AsyncCallSite<TModel> WrapCallSite<TModel>(AsyncCallSite<TModel> target) where TModel : class
+    private bool TryConvertValue<TValue>(
+        IPropertyBinding binding,
+        string value, 
+        ValueConverter<TValue> valueConverter, 
+        out TValue convertedValue)
     {
-        return async (model, token) =>
+        convertedValue = default!;
+
+        try
         {
-            ValidateCallSite(model);
-            return await target(model, token);
+            convertedValue = valueConverter(value);
+            return true;
+        }
+        catch (Exception exception)
+        {
+            _errors.Add(new ConversionError(binding, value, exception));
+            return false;
+        }
+    }
+
+    private IPropertyBinding<TModel, TValue> GetPropertyBinding<TValue>(Expression<Func<TModel, TValue>> propertyExpression)
+    {
+        var bindingName = propertyExpression.GetPropertyName();
+
+        return PropertyBindings.GetValueOrDefault(bindingName) switch
+        {
+            IPropertyBinding<TModel, TValue> typedBinding => typedBinding,
+            { } binding => throw Exceptions.InvalidBindingCast(typeof(TModel), typeof(TValue), binding),
+            _ => throw Exceptions.InvalidBindingName(typeof(TModel), typeof(TValue), bindingName)
         };
     }
 
-    private void ValidateCallSite<TModel>(TModel model) where TModel : class
+    private ValueConverter<TValue> ResolveConverter<TValue>(
+        IPropertyBinding propertyBinding,
+        ValueConverter<TValue>? providedConverter)
     {
-        foreach (var type in typeof(TModel).GetTypeFamily())
-        {
-            if (!Application.ModelConfigurations.TryGetValue(type, out var configuration))
-                continue;
-            
-            configuration.Validate(this, model);
-        }
+        if (_rootConfiguration.TryGetValueConverter<TValue>(out var converter))
+            return converter;
+
+        return providedConverter ?? throw Exceptions.ValueConverterNotDefined(propertyBinding);
     }
 }

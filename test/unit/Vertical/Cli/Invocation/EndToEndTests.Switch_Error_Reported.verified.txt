@@ -1,0 +1,1 @@
+﻿Switch --encrypt: invalid parameter 'yes' for switch

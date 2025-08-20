@@ -1,0 +1,3 @@
+﻿Command 'fs' requires a sub command, for example:
+   create
+   extract

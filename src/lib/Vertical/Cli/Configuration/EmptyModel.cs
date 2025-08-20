@@ -1,16 +1,14 @@
 namespace Vertical.Cli.Configuration;
 
 /// <summary>
-/// Defines an empty model type.
+/// Defines a model with no properties, useful for commands that don't require parameters.
 /// </summary>
 public sealed class EmptyModel
 {
-    /// <summary>
-    /// Defines a singleton instance of this type.
-    /// </summary>
-    public static readonly EmptyModel Instance = new();
-    
     private EmptyModel()
     {
+        
     }
+
+    internal static readonly EmptyModel Instance = new();
 }

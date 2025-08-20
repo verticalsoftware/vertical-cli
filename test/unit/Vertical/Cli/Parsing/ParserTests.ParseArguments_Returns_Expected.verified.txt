@@ -1,0 +1,82 @@
+﻿[
+  {
+    Kind: ArgumentValue,
+    Text: export,
+    ParsePosition: 0,
+    SyntaxKind: NonDecorated,
+    Symbol: (none),
+    Parameter: (none)
+  },
+  {
+    Kind: OptionSymbol,
+    Text: --table:Logs,
+    ParsePosition: 1,
+    SyntaxKind: PrefixedIdentifier,
+    Symbol: --table,
+    Parameter: Logs
+  },
+  {
+    Kind: OptionSymbol,
+    Text: --server,
+    ParsePosition: 2,
+    SyntaxKind: PrefixedIdentifier,
+    Symbol: --server,
+    Parameter: (none)
+  },
+  {
+    Kind: ArgumentValue,
+    Text: database.mysql.com,
+    ParsePosition: 3,
+    SyntaxKind: NonDecorated,
+    Symbol: (none),
+    Parameter: (none)
+  },
+  {
+    Kind: OptionSymbol,
+    Text: --database,
+    ParsePosition: 4,
+    SyntaxKind: PrefixedIdentifier,
+    Symbol: --database,
+    Parameter: (none)
+  },
+  {
+    Kind: ArgumentValue,
+    Text: security,
+    ParsePosition: 5,
+    SyntaxKind: NonDecorated,
+    Symbol: (none),
+    Parameter: (none)
+  },
+  {
+    Kind: Terminator,
+    Text: --,
+    ParsePosition: 6,
+    SyntaxKind: Terminator,
+    Symbol: (none),
+    Parameter: (none)
+  },
+  {
+    Kind: TerminatedValue,
+    Text: ./var/logs,
+    ParsePosition: 7,
+    SyntaxKind: NonDecorated,
+    Symbol: (none),
+    Parameter: (none)
+  },
+  {
+    Kind: TerminatedValue,
+    Text: -verbose-logging:true,
+    ParsePosition: 8,
+    SyntaxKind: PrefixedIdentifier,
+    Symbol: -verbose-logging,
+    Parameter: true
+  },
+  {
+    Kind: TerminatedValue,
+    Text: /failFast=true,
+    ParsePosition: 9,
+    SyntaxKind: PrefixedIdentifier,
+    Symbol: /failFast,
+    Parameter: true
+  }
+]

@@ -1,0 +1,15 @@
+[
+  --user-id,
+  root,
+  --password,
+  P@ssw0rd!,
+  --connect-timeout:30s,
+  --useSSL:true,
+  --pool,
+  --buffer-size:10mb,
+  --prop,
+  Transaction Mode=Isolated,
+  --log-verbose,
+  --server:postgres.com,
+  --database:core
+]
