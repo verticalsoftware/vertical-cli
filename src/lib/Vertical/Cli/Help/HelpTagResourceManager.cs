@@ -57,7 +57,7 @@ public class HelpTagResourceManager : IHelpResourceManager
     public virtual string SubCommandUsageArgumentsToken => "[arguments, options...]";
 
     /// <inheritdoc />
-    public string DirectiveSectionTitle => "Directives:";
+    public virtual string DirectiveSectionTitle => "Directives:";
 
     /// <summary>
     /// Gets the placeholder token that represents a sub command name.
@@ -124,11 +124,11 @@ public class HelpTagResourceManager : IHelpResourceManager
     }
 
     /// <summary>
-    /// Gets the syntax of an options's value.
+    /// Gets the syntax of an option's value.
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns>Formatted parameter name..</returns>
-    public string? GetOptionParameterSyntax(ISymbol symbol)
+    public virtual string? GetOptionParameterSyntax(ISymbol symbol)
     {
         if (symbol is not IPropertyBinding propertyBinding)
             return null;

@@ -1,11 +1,11 @@
 using Microsoft.CodeAnalysis;
 
-namespace Vertical.Cli.SourceGenerator;
+namespace Vertical.Cli.SourceGenerator.Utilities;
 
-public static class CodeStringBuilderExtensions
+public static class CodeFormatterExtensions
 {
-    public static void WriteModelImplementationPropertyDeclaration(
-        this CodeFormattedStringBuilder builder,
+    public static void WritePropertyDeclaration(
+        this CodeFormatter builder,
         IPropertySymbol property)
     {
         builder.Write(property.DeclaredAccessibility.ToString().ToLower()).Write(' ');
@@ -44,7 +44,7 @@ public static class CodeStringBuilderExtensions
         }
     }
     
-    public static CodeFormattedStringBuilder WriteGeneratedCodeAttribute(this CodeFormattedStringBuilder builder)
+    public static CodeFormatter WriteGeneratedCodeAttribute(this CodeFormatter builder)
     {
         return builder
             .WriteLine("[System.CodeDom.Compiler.GeneratedCode(\"Vertical.Cli.SourceGenerator.CommandLineBuilderExtensionsGenerator\", \"1.3.0\")]");

@@ -1,17 +1,24 @@
 using Microsoft.CodeAnalysis;
+using Vertical.Cli.SourceGenerator.ModelControllers;
+using Vertical.Cli.SourceGenerator.Utilities;
 
 namespace Vertical.Cli.SourceGenerator;
 
 public sealed class CodeGenerator
 {
-    public CodeGenerator(HashSet<ModelTypeInfo> modelEntries)
+    public CodeGenerator(HashSet<ITypeSymbol> typeSymbols)
     {
-        _modelEntries = modelEntries;
+        var expressionHelper = new BindingExpressionHelper("context");
+        
+        _controllers = typeSymbols
+            .Select(typeSymbol => ModelController.Create(typeSymbol, expressionHelper))
+            .Where(controller => controller is not null)
+            .Cast<IModelController>()
+            .ToArray();
     }
 
-    private readonly HashSet<ModelTypeInfo> _modelEntries;
-    private readonly CodeFormattedStringBuilder _builder = new();
-    private readonly BindingExpressionHelper _expressionHelper = new("context");
+    private readonly CodeFormatter _builder = new();
+    private readonly IModelController[] _controllers;
 
     public string Build()
     {
@@ -61,9 +68,9 @@ public sealed class CodeGenerator
             .WriteLine("ArgumentNullException.ThrowIfNull(arguments);")
             .WriteLine();
 
-        foreach (var entry in _modelEntries)
+        foreach (var controller in _controllers)
         {
-            _builder.WriteLine($"builder.ConfigureModel<{entry.TypeSymbol}>(model => model.UseBinder({entry.ImplementationTypeName}.Bind));");
+            _builder.WriteLine($"builder.ConfigureModel<{controller.TypeSymbol}>(model => model.UseBinder({controller.ImplementationTypeName}.Bind));");
         }
 
         _builder
@@ -74,136 +81,13 @@ public sealed class CodeGenerator
 
     private void WriteModelImplementations()
     {
-        foreach(var entry in _modelEntries)
+        foreach(var controller in _controllers)
         {
-            WriteModelImplementation(entry);
+            controller.WriteImplementation(_builder);
             _builder.EnqueueNewLine();
         }
     }
-
-    private void WriteModelImplementation(ModelTypeInfo entry)
-    {
-        var baseTypeDeclaration = entry.BaseImplementationTypeName != null
-            ? $" : {entry.BaseImplementationTypeName}"
-            : string.Empty;
-
-        var triviaHeading = $"// Binding implementation for model type {entry.TypeSymbol}";
-        
-        _builder
-            .Write("// ").Write('-', triviaHeading.Length - 3).WriteLine()
-            .WriteLine(triviaHeading)
-            .WriteLine($"// Source type: {entry.ImplementationType}")
-            .Write("// ").Write('-', triviaHeading.Length - 3).WriteLine()
-            .WriteLine($"private sealed class {entry.ImplementationTypeName}{baseTypeDeclaration}")
-            .WriteCodeBlockStart();
-
-        WriteModelImplementationProperties(entry);
-        WriteModelBinder(entry);
-
-        _builder.WriteCodeBlockEnd();
-    }
     
-    private void WriteModelBinder(ModelTypeInfo entry)
-    {
-        _builder
-            .WriteGeneratedCodeAttribute()
-            .WriteLine($"internal static {entry.TypeSymbol} Bind(Vertical.Cli.Binding.BindingContext<{entry.TypeSymbol}> context)")
-            .WriteCodeBlockStart();
-
-        WriteModelInstanceInitializer(entry);
-        WriteModelAssignableProperties(entry);
-
-        _builder.WriteLine("return model;");
-        _builder.WriteCodeBlockEnd();
-    }
-
-    private void WriteModelAssignableProperties(ModelTypeInfo entry)
-    {
-        foreach (var property in entry.AssignableProperties)
-        {
-            _builder.WriteLine($"model.{property.Name} = {_expressionHelper.GetBindingExpression(property)};");
-        }
-    }
-
-    private void WriteModelInstanceInitializer(ModelTypeInfo entry)
-    {
-        if (entry.RequiresActivation)
-        {
-            _builder.WriteLine("var model = context.ActivateModelInstance();");
-            return;
-        }
-
-        _builder.Write($"var model = new {entry.InitializerTypeName}");
-
-        var (hasParams, hasProps) = (
-            entry.InitializerParameters.Length > 0,
-            entry.InitializerProperties.Length > 0);
-
-        if (hasParams)
-        {
-            _builder.WriteLine('(').Indent();
-            
-            WriteMemberAssignmentList(
-                entry.InitializerParameters,
-                param => $"{param.Name}: {_expressionHelper.GetBindingExpression(param)}");
-
-            _builder.UnIndent().Write(')');
-        }
-
-        if (hasProps)
-        {
-            _builder
-                .WriteLine()
-                .WriteLine('{')
-                .Indent();
-            
-            WriteMemberAssignmentList(
-                entry.InitializerProperties,
-                prop => $"{prop.Name} = {_expressionHelper.GetBindingExpression(prop)}");
-            
-            _builder
-                .WriteLine()
-                .UnIndent()
-                .Write('}');
-        }
-
-        if (!(hasParams || hasProps))
-        {
-            _builder.Write("()");
-        }
-
-        _builder.WriteLine(';');
-    }
-
-    private void WriteMemberAssignmentList<T>(
-        IEnumerable<T> symbols,
-        Func<T, string> assignmentExpression)
-        where T : ISymbol
-    {
-        var next = false;
-
-        foreach (var symbol in symbols)
-        {
-            if (next)
-            {
-                _builder.WriteLine(',');
-            }
-            
-            _builder.Write(assignmentExpression(symbol));
-            next = true;
-        }
-    }
-
-    private void WriteModelImplementationProperties(ModelTypeInfo entry)
-    {
-        foreach (var property in entry.DeclarableProperties)
-        {
-            _builder.WriteModelImplementationPropertyDeclaration(property);
-        }
-
-        _builder.EnqueueNewLine(entry.DeclarableProperties.Length > 0);
-    }
-
     private void WriteHeader()
     {
         _builder

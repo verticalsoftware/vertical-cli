@@ -115,7 +115,7 @@ public sealed class BindingContext<TModel> where TModel : class
     /// </summary>
     /// <returns>An instance of the model.</returns>
     /// <exception cref="InvalidOperationException">An activator function was not configured.</exception>
-    public TModel ActivateModelInstance()
+    public TModel ActivateInstance()
     {
         return Activator?.Invoke() ?? throw Exceptions.ModelActivatorNotDefined(typeof(TModel));
     }

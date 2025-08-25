@@ -63,7 +63,7 @@ builder.ConfigureModel<IPendingTokens>(model => model.
     BindPendingTokenValues(x => x.PendingTokens));
 ```
 
-By default, the parser will generate an error for each pending token which can be disabled by configuration:
+By default, the parser will generate an error for each pending token, but this can be disabled by configuration:
 
 ```csharp
 buider.ConfigureOptions(options => options.IgnorePendingTokens = true);
@@ -90,7 +90,7 @@ builder.ConfigureModel<IOptions>(model => model
 
 ### Manually binding a property
 
-In rare cases, the application may need to manually provide a binding value for a property. This is accomplished by providing a custom binding implementation.
+In rare cases, the application may need to manually provide a binding value for a property. This is accomplished by defining a binding implementation.
 
 The following example binds a dictionary which is not supported by the framework out-of-box. The implementation splits string into key/value pairs using a multi-valued arity symbol.
 
@@ -146,9 +146,9 @@ The best way to see how a model can be bound manually is to refer to the demo ap
 |Class|Description|
 |---|---|
 |`ParseResult`|Contains a mapping of string token values (derived from arguments) to their matched symbols. Values are retrieved by providing the property name.|
-|`BindingContext<TModel>`|Sits above a `ParseResult` and is contextual to a specific model type. Strongly typed, converted values can be retrieved by providing the property expression. The model also has access to custom defined [value converters](link).|
+|`BindingContext<TModel>`|Sits overtop a `ParseResult` and is contextual to a specific model type. Strongly typed, converted values can be retrieved by providing the property expression.
 
-### Providing type converters
+### Providing value converters
 
 If a model defines a property whose type is not supported by an intrinsic converter, an application can provide the conversion function. The following to approaches can be used:
 
@@ -177,3 +177,7 @@ builder.AddValueConverter(str =>
         return new Coordinate(lat, long);
 });
 ```
+
+## Up next
+
+[Middleware](./middleware.md)

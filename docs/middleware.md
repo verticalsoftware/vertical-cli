@@ -1,6 +1,6 @@
 # Middleware
 
-The framework uses a middleware pipeline to allow the application to interact with the argument tokens and the result. The pipeline implements the chain of responsibility pattern, e.g. middleware passes control to the next middleware or short circuits. 
+The framework uses a middleware pipeline to allow the application to interact with the argument tokens and the result. The pipeline implements the chain of responsibility pattern, e.g. middleware passes control to the next middleware or short circuits. The pattern is implemented in the exact same way as the `aspnetcore` request pipeline.
 
 ### The invocation context
 
@@ -57,6 +57,7 @@ A middleware function can:
 - Signal cancellation
 - Generate errors
 - Set the application exit code
+- Write to the `IConsole` abstraction
 - Invoke the next middleware or short-circuit the pipeline
 
 ### The default pipeline

@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using Microsoft.CodeAnalysis;
 
-namespace Vertical.Cli.SourceGenerator;
+namespace Vertical.Cli.SourceGenerator.Utilities;
 
 public class BindingExpressionHelper(string contextParameter)
 {
@@ -39,6 +39,8 @@ public class BindingExpressionHelper(string contextParameter)
     };
 
     private const string ConverterQualifiedClassName = "Vertical.Cli.Conversion.Converters";
+
+    public string ContextParameter => contextParameter;
 
     public string GetBindingExpression(IPropertySymbol propertySymbol)
     {

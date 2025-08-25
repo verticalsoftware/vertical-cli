@@ -6,7 +6,7 @@ Fully featured command line argument parsing library.
 
 - Built for complex CLI applications
 - Converts string arguments to types
-- Supports command hierachies
+- Supports command hierarchies
 - Binds arguments to any `IParsable<T>` and their `Nullable<T>` compliments, enums, strings, collections, and more
 - Leverages a source generator for a reflection free, AOT-trimmable application
 - Integrates a fully customizable help system
@@ -23,8 +23,8 @@ Add the package to your application
 
 ## Documentation
 
-- [Conceptual overview](https://github.com/verticalsoftware/vertical-cli/blob/main/docs/home.md)
-- [Configuration](https://github.com/verticalsoftware/vertical-cli/blob/main/docs/symbols.md)
-- [Advanced concepts](https://github.com/verticalsoftware/vertical-cli/blob/main/docs/models.md)
-- [Middleware](https://github.com/verticalsoftware/vertical-cli/blob/main/docs/middleware.md)
+- [Conceptual overview](./docs/overview.md)
+- [Configuration](./docs/configuration.md)
+- [Advanced concepts](./docs/advanced.md)
+- [Middleware](./docs/middleware.md)
 

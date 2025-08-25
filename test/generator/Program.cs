@@ -20,4 +20,4 @@ var builder = new CommandLineBuilder(command)
         .AddOption(x => x.Property)
         .BindStandardInput(x => x.InputStream));
 
-return await builder.BuildAndRunAsync([]);        
+//return await builder.BuildAndRunAsync([]);        

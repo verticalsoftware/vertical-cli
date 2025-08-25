@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Vertical.Cli.SourceGenerator.Utilities;
 
 namespace Vertical.Cli.SourceGenerator;
 
@@ -22,17 +23,18 @@ public sealed class CommandLineBuilderIncrementalGenerator : IIncrementalGenerat
         
         context.RegisterSourceOutput(collected, (productionContext, source) =>
         {
-            var generationList = new HashSet<ModelTypeInfo>(source
+            var modelTypeSymbols = new HashSet<ITypeSymbol>(source
                     .Right
                     .Where(typeSymbol => typeSymbol is not null)
-                    .Select(typeSymbol => new ModelTypeInfo(typeSymbol!)),
-                ModelTypeInfo.Comparer);
+                    .Cast<ITypeSymbol>(),
+                SymbolEqualityComparer.Default);
 
-            if (generationList.Count == 0)
+            if (modelTypeSymbols.Count == 0)
                 return;
 
-            var code = new CodeGenerator(generationList).Build();
+            var code = new CodeGenerator(modelTypeSymbols).Build();
             
+            //productionContext.AddSource("CommandLineBuilderExtensions.g.cs", string.Empty);
             productionContext.AddSource("CommandLineBuilderExtensions.g.cs", code);
         });
     }

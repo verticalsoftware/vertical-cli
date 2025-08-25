@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Vertical.Cli.SourceGenerator;
+namespace Vertical.Cli.SourceGenerator.Utilities;
 
 public static class SyntaxNodeExtensions
 {

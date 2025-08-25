@@ -20,6 +20,7 @@ interface ILogOptions
     LogLevel LogLevel { get; }
 }
 
+[GeneratedBinding]
 interface IArchivingOptions : ILogOptions
 {
     bool Encrypt { get; }
@@ -30,11 +31,13 @@ interface IArchivingOptions : ILogOptions
 }
 ```
 
+The `[GeneratedBinding]` attribute queues the source generator to create property bindings. It only needs to be applied on final sub-types (e.g. types received by command handling functions). Alternatively, it can be applied to command handling function parameter.
+
 ### Creating commands
 
 Commands are created by instantiating a root command and any sub commands. Abstract commands use the `RootCommand` and `Command` classes, while invokable commands use the generic `RootCommand<TModel>` and `Command<TModel>` classes.
 
-Commands have a name, a help tag (discussed later), and a handler function if it is invokable. A handler function is delegate that accepts the model instance and a cancellation token and returns the appropriate integer exit code.
+Commands have a name, a help tag (discussed later), and a handling function if it is invokable. A handler function is delegate that accepts the model instance and a cancellation token and returns the appropriate integer exit code.
 
 ```csharp
 // Create commands
@@ -44,7 +47,7 @@ var rootCommand = new RootCommand(name: "archive");
 rootCommand.AddCommand(new Command<IArchivingOptions>(
     name: "create",
     handler: async (
-        [GeneratedBinding] IArchivingOptions options,
+        IArchivingOptions options,
         CancellationToken cancellationToken) => 
         {
             // TODO: Implement application functionality
@@ -57,7 +60,7 @@ rootCommand.AddCommand(new Command<IArchivingOptions>(
 rootCommand.AddCommand(new Command<IArchivingOptions>(
     name: "extract",
     handler: async (
-        [GeneratedBinding] IArchivingOptions options,
+        IArchivingOptions options,
         CancellationToken cancellationToken) => 
         {
             // TODO: Implement application functionality
@@ -109,3 +112,7 @@ Lastly, control is passed to the framework. If the application leverages the sou
 
 return await builder.BuildAndRunAsync(args);
 ```
+
+## Up next
+
+[Advanced configuration](./advanced.md)
