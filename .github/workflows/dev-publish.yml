@@ -1,4 +1,4 @@
-name: Dev release
+name: Publish pre-release version
 
 on:
   workflow_dispatch
