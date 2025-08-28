@@ -8,7 +8,12 @@ namespace Vertical.Cli.Directives;
 /// </summary>
 public sealed class DirectiveError : UsageError
 {
-    internal DirectiveError(Token token, string message)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DirectiveError"/> class.
+    /// </summary>
+    /// <param name="token">The directive token</param>
+    /// <param name="message">The message to report</param>
+    public DirectiveError(Token token, string message)
     {
         Token = token;
         Message = message;
@@ -29,4 +34,7 @@ public sealed class DirectiveError : UsageError
     {
         textWriter.WriteLine($"Invalid directive usage '{Token}': {Message}");
     }
+
+    /// <inheritdoc />
+    public override string ToString() => Message;
 }
