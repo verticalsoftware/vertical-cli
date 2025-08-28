@@ -1,4 +1,5 @@
 using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 
 namespace Vertical.Cli;
 
@@ -12,7 +13,7 @@ public sealed class Command : ContainerCommand, ISubCommand
     /// </summary>
     /// <param name="name">The unique name of the command within its set of siblings.</param>
     /// <param name="helpTag">An application defined help tag.</param>
-    public Command(string name, object? helpTag) : base(name, helpTag)
+    public Command(string name, CommandHelpTag? helpTag) : base(name, helpTag)
     {
     }
 
@@ -33,7 +34,7 @@ public sealed class Command<TModel> : InvokableCommand<TModel>, ISubCommand
     /// <param name="name">The unique name of the command within its set of siblings.</param>
     /// <param name="handler">A function that receives the option model and returns a result.</param>
     /// <param name="helpTag">An application defined help tag.</param>
-    public Command(string name, CommandHandler<TModel> handler, object? helpTag = null) 
+    public Command(string name, CommandHandler<TModel> handler, CommandHelpTag? helpTag = null) 
         : base(name, handler, helpTag)
     {
     }

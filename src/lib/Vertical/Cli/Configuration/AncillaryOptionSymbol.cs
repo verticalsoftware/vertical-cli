@@ -1,3 +1,5 @@
+using Vertical.Cli.Help;
+
 namespace Vertical.Cli.Configuration;
 
 /// <summary>
@@ -8,7 +10,7 @@ public sealed class AncillaryOptionSymbol : ISymbol
     internal AncillaryOptionSymbol(
         AncillaryOptionKind kind,
         string[] aliases,
-        object? helpTag)
+        SymbolHelpTag? helpTag)
     {
         Kind = kind;
         Aliases = aliases;
@@ -33,7 +35,7 @@ public sealed class AncillaryOptionSymbol : ISymbol
     public int Precedence => 0;
 
     /// <inheritdoc />
-    public object? HelpTag { get; }
+    public SymbolHelpTag? HelpTag { get; }
 
     /// <inheritdoc />
     public override string ToString() => Aliases.Length switch

@@ -1,3 +1,5 @@
+using Vertical.Cli.Help;
+
 namespace Vertical.Cli.Configuration;
 
 /// <summary>
@@ -5,7 +7,7 @@ namespace Vertical.Cli.Configuration;
 /// </summary>
 public abstract class ContainerCommand : ICommand
 {
-    internal ContainerCommand(string name, object? helpTag)
+    internal ContainerCommand(string name, CommandHelpTag? helpTag)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         
@@ -29,7 +31,7 @@ public abstract class ContainerCommand : ICommand
         : Name;
 
     /// <inheritdoc />
-    public object? HelpTag { get; }
+    public CommandHelpTag? HelpTag { get; }
 
     /// <summary>
     /// Adds a sub command.

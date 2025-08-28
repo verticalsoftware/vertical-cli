@@ -12,9 +12,9 @@ public sealed class CommandLineOptions : IParserOptions
 {
     private SymbolConvention _defaultSymbolConvention = SymbolConvention.GnuOption;
     private string[] _helpOptionAliases = ["--help", "-?"];
-    private object _helpOptionHelpTag = "Display help for the application or command";
+    private SymbolHelpTag _helpOptionHelpTag = "Display help for the application or command";
     private string[] _versionOptionAliases = ["--version"];
-    private object _versionOptionHelpTag = "Display the current version of the application";
+    private SymbolHelpTag _versionOptionHelpTag = "Display the current version of the application";
     private Func<IConsole, IHelpProvider> _helpProviderFactory = DefaultHelpProvider.CreateDefault;
     
     /// <summary>
@@ -69,7 +69,7 @@ public sealed class CommandLineOptions : IParserOptions
     /// <summary>
     /// Gets the help tag for the version option.
     /// </summary>
-    public object HelpOptionHelpTag
+    public SymbolHelpTag HelpOptionHelpTag
     {
         get => _helpOptionHelpTag;
         set => _helpOptionHelpTag = value ?? throw new ArgumentNullException(nameof(value));
@@ -89,7 +89,7 @@ public sealed class CommandLineOptions : IParserOptions
     /// <summary>
     /// Gets the help tag for the version option.
     /// </summary>
-    public object VersionOptionHelpTag
+    public SymbolHelpTag VersionOptionHelpTag
     {
         get => _versionOptionHelpTag;
         set => _versionOptionHelpTag = value ?? throw new ArgumentNullException(nameof(value));

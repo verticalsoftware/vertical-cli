@@ -1,3 +1,5 @@
+using Vertical.Cli.Help;
+
 namespace Vertical.Cli.Configuration;
 
 /// <summary>
@@ -23,5 +25,5 @@ public interface ICommand
     /// <summary>
     /// Gets the application defined help tag.
     /// </summary>
-    object? HelpTag { get; }
+    CommandHelpTag? HelpTag { get; }
 }

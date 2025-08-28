@@ -8,5 +8,13 @@ namespace Vertical.Cli.Help;
 /// <param name="FinalRemarks">Optional content written at the end of the help topic.</param>
 public record CommandHelpTag(
     string Description,
-    RemarksSection? IntroductoryRemarks,
-    RemarksSection? FinalRemarks);
+    RemarksSection? IntroductoryRemarks = null,
+    RemarksSection? FinalRemarks = null)
+{
+    /// <summary>
+    /// Provides implicit conversion from string.
+    /// </summary>
+    /// <param name="description">Command description</param>
+    /// <returns><see cref="CommandHelpTag"/></returns>
+    public static implicit operator CommandHelpTag(string description) => new(description);
+}

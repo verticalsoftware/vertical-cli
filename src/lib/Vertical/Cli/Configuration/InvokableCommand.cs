@@ -1,3 +1,4 @@
+using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
 
 namespace Vertical.Cli.Configuration;
@@ -11,7 +12,7 @@ public abstract class InvokableCommand<TModel> : ContainerCommand, IInvocationTa
     /// <inheritdoc />
     protected InvokableCommand(string name, 
         CommandHandler<TModel> handler,
-        object? helpTag) : base(name, helpTag)
+        CommandHelpTag? helpTag) : base(name, helpTag)
     {
         _handler = handler;
     }

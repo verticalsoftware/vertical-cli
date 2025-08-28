@@ -1,4 +1,5 @@
 using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 
 namespace Vertical.Cli.Binding;
 
@@ -18,7 +19,7 @@ public sealed class SymbolBinding<TModel, TValue> : IPropertyBinding<TModel, TVa
         int precedence,
         string[] aliases,
         Arity arity,
-        object? helpTag,
+        SymbolHelpTag? helpTag,
         Action<PropertyBinder<TModel, TValue>>? setBindingOptions)
     {
         BindingName = bindingName;
@@ -40,7 +41,7 @@ public sealed class SymbolBinding<TModel, TValue> : IPropertyBinding<TModel, TVa
     public int Precedence { get; }
 
     /// <inheritdoc />
-    public object? HelpTag { get; }
+    public SymbolHelpTag? HelpTag { get; }
 
     /// <inheritdoc />
     public Type ModelType { get; }

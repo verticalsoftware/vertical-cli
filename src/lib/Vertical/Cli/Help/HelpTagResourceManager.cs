@@ -17,8 +17,7 @@ public class HelpTagResourceManager : IHelpResourceManager
     /// <returns><see cref="string"/> if there is a description resource available</returns>
     public virtual string? GetCommandDescription(ICommand command)
     {
-        return (command.HelpTag as CommandHelpTag)?.Description
-               ?? command.HelpTag as string;
+        return command.HelpTag?.Description;
     }
 
     /// <summary>
@@ -188,10 +187,6 @@ public class HelpTagResourceManager : IHelpResourceManager
     /// <returns><see cref="string"/> or <c>null</c></returns>
     public virtual string? GetSymbolDescription(ISymbol symbol)
     {
-        return symbol.HelpTag switch
-        {
-            SymbolHelpTag helpTag => helpTag.Description,
-            _ => symbol.HelpTag as string
-        };
+        return symbol.HelpTag?.Description;
     }
 }

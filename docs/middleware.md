@@ -138,3 +138,7 @@ builder.ConfigureMiddleware(middleware =>
         }
     ))
 ```
+
+### Up next
+
+[Adding help](./help.md)

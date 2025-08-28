@@ -1,3 +1,5 @@
+using Vertical.Cli.Help;
+
 namespace Vertical.Cli.Configuration;
 
 /// <summary>
@@ -28,5 +30,5 @@ public interface ISymbol
     /// <summary>
     /// Gets an application defined help tag.
     /// </summary>
-    object? HelpTag { get; }
+    SymbolHelpTag? HelpTag { get; }
 }

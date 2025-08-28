@@ -1,6 +1,7 @@
 using Shouldly;
 using Vertical.Cli.Binding;
 using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
 
 namespace Vertical.Cli.Parsing;
@@ -31,7 +32,7 @@ public class ParseResultTests
         public Type ValueType => typeof(int);
 
         /// <inheritdoc />
-        public object? HelpTag => null;
+        public SymbolHelpTag? HelpTag => null;
     }
 
     [Fact]

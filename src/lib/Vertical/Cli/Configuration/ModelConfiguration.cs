@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Vertical.Cli.Binding;
+using Vertical.Cli.Help;
 using Vertical.Cli.Internal;
 using Vertical.Cli.Invocation;
 using Vertical.Cli.Parsing;
@@ -88,7 +89,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         int precedence,
         string? name = null,
         BasicArity? arity = null,
-        object? helpTag = null,
+        SymbolHelpTag? helpTag = null,
         Action<ValidationContext<TModel, TValue>>? configureValidation = null,
         Action<PropertyBinder<TModel, TValue>>? setBindingOptions = null)
     {
@@ -140,7 +141,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         int precedence,
         string? name = null,
         CollectionArity? arity = null,
-        object? helpTag = null,
+        SymbolHelpTag? helpTag = null,
         Action<ValidationContext<TModel, TCollection>>? configureValidation = null,
         Action<PropertyBinder<TModel, TCollection>>? setBindingOptions = null)
     {
@@ -187,7 +188,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         Expression<Func<TModel, TValue>> propertyExpression,
         string[]? aliases = null,
         BasicArity? arity = null,
-        object? helpTag = null,
+        SymbolHelpTag? helpTag = null,
         Action<ValidationContext<TModel, TValue>>? configureValidation = null,
         Action<PropertyBinder<TModel, TValue>>? setBindingOptions = null)
     {
@@ -231,7 +232,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         Expression<Func<TModel, TCollection>> propertyExpression,
         string[]? aliases = null,
         CollectionArity? arity = null,
-        object? helpTag = null,
+        SymbolHelpTag? helpTag = null,
         Action<ValidationContext<TModel, TCollection>>? configureValidation = null,
         Action<PropertyBinder<TModel, TCollection>>? setBindingOptions = null)
     {
@@ -272,7 +273,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
     public ModelConfiguration<TModel> AddSwitch(
         Expression<Func<TModel, bool>> propertyExpression,
         string[]? aliases = null,
-        object? helpTag = null,
+        SymbolHelpTag? helpTag = null,
         bool defaultValue = false,
         Action<ValidationContext<TModel, bool>>? configureValidation = null)
     {

@@ -231,7 +231,7 @@ public sealed class MiddlewareConfiguration
     /// <returns></returns>
     public MiddlewareConfiguration AddAncillaryOption(string[] aliases,
         Func<InvocationContext, ICommand, Task<int>> handleOption,
-        object? helpTag)
+        SymbolHelpTag? helpTag)
     {
         return AddAncillaryOption(
             Guid.NewGuid(),
@@ -340,7 +340,7 @@ public sealed class MiddlewareConfiguration
         Guid registrationId,
         AncillaryOptionKind kind,
         string[] aliases,
-        object? helpTag,
+        SymbolHelpTag? helpTag,
         Func<InvocationContext, ICommand, Task<int>> handleOption)
     {
         return Add(

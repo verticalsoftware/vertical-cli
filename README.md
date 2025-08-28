@@ -27,4 +27,4 @@ Add the package to your application
 - [Configuration](./docs/configuration.md)
 - [Advanced concepts](./docs/advanced.md)
 - [Middleware](./docs/middleware.md)
-
+- [Adding help](./docs/help.md)

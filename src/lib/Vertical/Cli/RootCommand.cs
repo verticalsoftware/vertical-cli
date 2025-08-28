@@ -1,4 +1,5 @@
 using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 
 namespace Vertical.Cli;
 
@@ -8,7 +9,7 @@ namespace Vertical.Cli;
 public sealed class RootCommand : ContainerCommand, IRootCommand
 {
     /// <inheritdoc />
-    public RootCommand(string name, object? helpTag = null) : base(name, helpTag)
+    public RootCommand(string name, CommandHelpTag? helpTag = null) : base(name, helpTag)
     {
     }
 }
@@ -25,7 +26,7 @@ public sealed class RootCommand<TModel> : InvokableCommand<TModel>, IRootCommand
     /// <param name="name">The unique name of the command within its set of siblings.</param>
     /// <param name="handler">A function that receives the option model and returns a result.</param>
     /// <param name="helpTag">A help tag to associate with the command.</param>
-    public RootCommand(string name, CommandHandler<TModel> handler, object? helpTag = null) 
+    public RootCommand(string name, CommandHandler<TModel> handler, CommandHelpTag? helpTag = null) 
         : base(name, handler, helpTag)
     {
     }
