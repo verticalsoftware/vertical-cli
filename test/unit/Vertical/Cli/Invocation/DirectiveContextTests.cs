@@ -42,27 +42,6 @@ public class DirectiveContextTests
         context.TokenList.First?.Value.Text.ShouldBe("[not-test]");
     }
 
-    [Fact]
-    public async Task AddDirective_With_Context_Provides_Expected_Context()
-    {
-        var values = new List<string>();
-
-        var context = await CreateAndInvokeContext(
-            middleware => middleware.AddDirectiveHandler(
-                values,
-                args =>
-                {
-                    args.State.Add("value");
-                    args.DequeueToken();
-
-                    return Task.CompletedTask;
-                }),
-            ["[add-to-list]"]);
-        
-        values.ShouldBe(["value"]);
-        context.TokenList.ShouldBeEmpty();
-    }
-
     private async Task<InvocationContext> CreateAndInvokeContext(
         Action<MiddlewareConfiguration> configure,  
         string[] arguments)

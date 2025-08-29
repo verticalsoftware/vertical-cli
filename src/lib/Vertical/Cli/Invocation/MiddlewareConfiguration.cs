@@ -1,11 +1,9 @@
-using System.Reflection.Metadata;
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Directives;
 using Vertical.Cli.Help;
 using Vertical.Cli.Internal;
 using Vertical.Cli.Parsing;
 using Vertical.Cli.ResponseFiles;
-using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Invocation;
 
@@ -121,7 +119,6 @@ public sealed class MiddlewareConfiguration
     {
         return AddDirectiveHandler(
             Guid.NewGuid(),
-            state: 0,
             handler,
             helpTag);
     }
@@ -141,26 +138,6 @@ public sealed class MiddlewareConfiguration
             await ResponseFileParser.ParseResponseFileTokensAsync(context, File.OpenRead);
             await next(context);
         }
-    }
-
-    /// <summary>
-    /// Adds a function that evaluates directive tokens.
-    /// </summary>
-    /// <param name="state">The state to provide to the handler.</param>
-    /// <param name="handler">The function that evaluates the token and takes action.</param>
-    /// <param name="helpTag">The help tag to associate with the directive.</param>
-    /// <typeparam name="TState">State type</typeparam>
-    /// <returns>A reference to this instance</returns>
-    public MiddlewareConfiguration AddDirectiveHandler<TState>(
-        TState state,
-        Func<DirectiveContext<TState>, Task> handler,
-        DirectiveHelpTag? helpTag = null)
-    {
-        return AddDirectiveHandler(
-            Guid.NewGuid(),
-            state,
-            handler,
-            helpTag);
     }
 
     /// <summary>
@@ -373,10 +350,9 @@ public sealed class MiddlewareConfiguration
         }
     }
 
-    private MiddlewareConfiguration AddDirectiveHandler<TState>(
+    private MiddlewareConfiguration AddDirectiveHandler(
         Guid registrationId,
-        TState state,
-        Func<DirectiveContext<TState>, Task> directiveHandler,
+        Func<DirectiveContext, Task> directiveHandler,
         DirectiveHelpTag? helpTag)
     {
         return Add(registrationId, (handler, id) => handler ?? 
@@ -386,7 +362,7 @@ public sealed class MiddlewareConfiguration
         {
             for (var node = context.TokenList.First; node?.Value is { Kind: TokenKind.Directive };)
             {
-                var directiveArgs = new DirectiveContext<TState>(node.Value, state, context);
+                var directiveArgs = new DirectiveContext(node.Value, context);
                 await directiveHandler(directiveArgs);
 
                 if (context.IsExitCodeSet)

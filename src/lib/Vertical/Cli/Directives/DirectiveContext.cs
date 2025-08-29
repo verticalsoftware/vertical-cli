@@ -54,24 +54,3 @@ public class DirectiveContext
     /// <inheritdoc />
     public override string ToString() => $"{Token}, dequeue={Dequeue}";
 }
-
-/// <summary>
-/// Represents a context that can be used to handle a directive.
-/// </summary>
-/// <typeparam name="TState">The state object type.</typeparam>
-public sealed class DirectiveContext<TState> : DirectiveContext
-{
-    /// <inheritdoc />
-    internal DirectiveContext(
-        Token token, 
-        TState state,
-        InvocationContext context) : base(token, context)
-    {
-        State = state;
-    }
-
-    /// <summary>
-    /// Gets the application defined context object.
-    /// </summary>
-    public TState State { get; }
-}
