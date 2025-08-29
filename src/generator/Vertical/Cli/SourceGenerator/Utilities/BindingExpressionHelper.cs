@@ -153,6 +153,9 @@ public class BindingExpressionHelper(string contextParameter)
             case { BaseType.SpecialType: SpecialType.System_Enum }:
                 return $"{ConverterQualifiedClassName}.Enum<{type}>()";
             
+            case { IsReferenceType: true, NullableAnnotation: NullableAnnotation.Annotated } when type.IsParsable():
+                return $"{ConverterQualifiedClassName}.NullAnnotatedParsable<{type}>()";
+            
             case not null when type.IsParsable():
                 return $"{ConverterQualifiedClassName}.Parsable<{type}>()";
             

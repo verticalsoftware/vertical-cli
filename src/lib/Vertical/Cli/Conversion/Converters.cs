@@ -62,6 +62,11 @@ public static class Converters
     /// Gets the default <see cref="IParsable{T}"/> converter.
     /// </summary>
     public static ValueConverter<T> Parsable<T>() where T : IParsable<T> => ParsableConverter<T>.Value;
+    
+    /// <summary>
+    /// Gets the default <see cref="IParsable{T}"/> converter.
+    /// </summary>
+    public static ValueConverter<T?> NullAnnotatedParsable<T>() where T : IParsable<T> => ParsableConverter<T>.Value;
 
     /// <summary>
     /// Gets the default <see cref="Nullable{T}"/> converter.

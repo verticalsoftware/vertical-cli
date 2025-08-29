@@ -29,12 +29,8 @@ public sealed class CommandLineBuilderIncrementalGenerator : IIncrementalGenerat
                     .Cast<ITypeSymbol>(),
                 SymbolEqualityComparer.Default);
 
-            if (modelTypeSymbols.Count == 0)
-                return;
-
             var code = new CodeGenerator(modelTypeSymbols).Build();
             
-            //productionContext.AddSource("CommandLineBuilderExtensions.g.cs", string.Empty);
             productionContext.AddSource("CommandLineBuilderExtensions.g.cs", code);
         });
     }

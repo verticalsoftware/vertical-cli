@@ -8,7 +8,8 @@ namespace Vertical.Cli.Conversion;
 /// </summary>
 public sealed class ConversionError : UsageError
 {
-    internal ConversionError(IPropertyBinding binding,
+    internal ConversionError(
+        IPropertyBinding binding,
         string attemptedValue,
         Exception? exception)
     {
