@@ -65,6 +65,13 @@ public interface IHelpResourceManager
     string GetOptionAliasList(ISymbol symbol);
 
     /// <summary>
+    /// Formats a list of alias names for an ancillary option usage.
+    /// </summary>
+    /// <param name="symbol">The option or switch symbol.</param>
+    /// <returns><see cref="string"/></returns>
+    string GetAncillaryOptionAliasList(ISymbol symbol);
+
+    /// <summary>
     /// Gets the syntax of an argument's value.
     /// </summary>
     /// <param name="symbol"></param>

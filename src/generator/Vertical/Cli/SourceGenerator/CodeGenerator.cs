@@ -55,7 +55,7 @@ public sealed class CodeGenerator
             .WriteLine("/// <returns>A task that when complete, provides the integer exit code</returns>")
             .WriteLine("/// </summary>")
             .WriteGeneratedCodeAttribute()
-            .WriteLine("public static async System.Threading.Tasks.Task<int> BuildAndRunAsync(")
+            .WriteLine("internal static async System.Threading.Tasks.Task<int> BuildAndRunAsync(")
             .Indent()
             .WriteLine("this Vertical.Cli.CommandLineBuilder builder,")
             .WriteLine("string[] arguments,")

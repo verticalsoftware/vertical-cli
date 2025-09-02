@@ -107,6 +107,12 @@ public class HelpTagResourceManager : IHelpResourceManager
         return symbol.Aliases.Length == 1 ? symbol.Aliases[0] : string.Join(", ", symbol.Aliases);
     }
 
+    /// <inheritdoc />
+    public string GetAncillaryOptionAliasList(ISymbol symbol)
+    {
+        return symbol.Aliases.Length == 1 ? symbol.Aliases[0] : $"[{GetOptionAliasList(symbol)}]";
+    }
+
     /// <summary>
     /// Gets the syntax of an argument's value.
     /// </summary>
@@ -129,14 +135,13 @@ public class HelpTagResourceManager : IHelpResourceManager
     /// <returns>Formatted parameter name..</returns>
     public virtual string? GetOptionParameterSyntax(ISymbol symbol)
     {
-        if (symbol is not IPropertyBinding propertyBinding)
-            return null;
-
-        if (symbol.HelpTag is SymbolHelpTag { ParameterSyntax.Length: > 0 } helpTag)
-            return helpTag.ParameterSyntax;
-
-        var inferredName = propertyBinding.BindingName.ToUpperSnakeCase();
-        return $"<{inferredName}>";
+        return symbol switch
+        {
+            { Behavior: SymbolBehavior.Switch } => null,
+            { HelpTag.ParameterSyntax.Length: > 0 } => symbol.HelpTag.ParameterSyntax,
+            IPropertyBinding propertyBinding => $"<{propertyBinding.BindingName.ToUpperSnakeCase()}>",
+            _ => null
+        };
     }
 
     /// <summary>
@@ -149,7 +154,9 @@ public class HelpTagResourceManager : IHelpResourceManager
     /// </returns>
     public virtual IEnumerable<IGrouping<string, ISubCommand>> GetCommandGroupings(IReadOnlyList<ISubCommand> commands)
     {
-        return commands.GroupBy(_ => "Commands:");
+        return commands
+            .OrderBy(command => command.Name)
+            .GroupBy(_ => "Commands:");
     }
 
     /// <summary>

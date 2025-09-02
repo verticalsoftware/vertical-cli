@@ -20,6 +20,7 @@ public sealed partial class CommandLineBuilder
         _middlewareConfiguration = new MiddlewareConfiguration(Options);
         
         RootCommand = rootCommand ?? throw new ArgumentNullException(nameof(rootCommand));
+        ConfigureModel<EmptyModel>(model => model.UseBinder(_ => EmptyModel.Instance));
     }
     
     private readonly Lazy<Dictionary<Type, Delegate>> _lazyValueConverters = new(() => []);

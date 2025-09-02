@@ -16,7 +16,7 @@ internal static class StaticMiddleware
     {
         var target = context.GetTargetCommand(dequeue: true);
 
-        if (target.Command is not IInvocationTarget invocationTarget)
+        if (!target.Command.IsInvocationTarget)
         {
             var command = target.Command;
             
@@ -30,7 +30,7 @@ internal static class StaticMiddleware
             return;
         }
 
-        var requestBuilder = invocationTarget.CreateRequestBuilder(
+        var requestBuilder = target.Command.CreateRequestBuilder(
             context.Configuration,
             ModelConfiguration.CreateFactory(context.Parser));
 

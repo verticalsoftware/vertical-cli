@@ -154,7 +154,7 @@ public class BindingExpressionHelper(string contextParameter)
                 return $"{ConverterQualifiedClassName}.Enum<{type}>()";
             
             case { IsReferenceType: true, NullableAnnotation: NullableAnnotation.Annotated } when type.IsParsable():
-                return $"{ConverterQualifiedClassName}.NullAnnotatedParsable<{type}>()";
+                return $"{ConverterQualifiedClassName}.NullAnnotatedParsable<{type.WithNullableAnnotation(NullableAnnotation.NotAnnotated)}>()";
             
             case not null when type.IsParsable():
                 return $"{ConverterQualifiedClassName}.Parsable<{type}>()";

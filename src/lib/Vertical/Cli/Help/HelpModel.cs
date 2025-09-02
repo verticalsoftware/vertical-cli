@@ -45,7 +45,7 @@ public sealed class HelpModel
     {
         var builder = command switch
         {
-            IInvocationTarget invocationTarget => invocationTarget.CreateRequestBuilder(
+            { IsInvocationTarget: true } => command.CreateRequestBuilder(
                 _context.Configuration,
                 ModelConfiguration.CreateFactory(_context.Parser)),
             
@@ -53,15 +53,16 @@ public sealed class HelpModel
         };
 
         var symbols = builder.Symbols;
+        var coreSymbols = symbols.Where(symbol => symbol is not AncillaryOptionSymbol);
         
         return new SymbolCollection(
-            symbols
+            ArgumentSymbols: coreSymbols
                 .Where(symbol => symbol.Behavior == SymbolBehavior.Argument)
                 .ToArray(),
-            symbols
+            OptionSymbols: coreSymbols
                 .Where(symbol => symbol.Behavior is SymbolBehavior.Option or SymbolBehavior.Switch)
                 .ToArray(),
-            symbols
+            AncillarySymbols: symbols
                 .OfType<AncillaryOptionSymbol>()
                 .ToArray(),
             builder.DirectiveHelpTags);

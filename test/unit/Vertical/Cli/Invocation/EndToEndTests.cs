@@ -98,7 +98,7 @@ public partial class EndToEndTests
 
     private static CommandLineApplication BuildApplication(IConsole console)
     {
-        var rootCommand = new RootCommand("fs", "Create or extract archive files");
+        var rootCommand = new RootCommand("fs", helpTag: "Create or extract archive files");
         
         rootCommand.AddCommand(new Command<ArchiveOptions>(
             "create",

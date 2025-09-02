@@ -6,10 +6,15 @@ namespace Vertical.Cli;
 /// <summary>
 /// Represents a sub command.
 /// </summary>
-public sealed class RootCommand : ContainerCommand, IRootCommand
+public sealed class RootCommand : ContainerCommand<EmptyModel>, IRootCommand
 {
     /// <inheritdoc />
-    public RootCommand(string name, CommandHelpTag? helpTag = null) : base(name, helpTag)
+    public RootCommand(
+        string name,
+        CommandHandler? handler = null,
+        CommandHelpTag? helpTag = null) 
+        : base(
+            name, handler != null ? (_, cancellationToken) => handler(cancellationToken) : null, helpTag)
     {
     }
 }
@@ -18,7 +23,7 @@ public sealed class RootCommand : ContainerCommand, IRootCommand
 /// Represents an invokable root command.
 /// </summary>
 /// <typeparam name="TModel">Model type</typeparam>
-public sealed class RootCommand<TModel> : InvokableCommand<TModel>, IRootCommand where TModel : class
+public sealed class RootCommand<TModel> : ContainerCommand<TModel>, IRootCommand where TModel : class
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RootCommand{T}"/> class.

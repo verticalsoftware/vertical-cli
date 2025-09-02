@@ -103,7 +103,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
     private void WriteSubCommandList(HelpModel helpModel)
     {
-        if (helpModel.Subject.Commands is not { Count: > 1 } commands)
+        if (helpModel.Subject.Commands is not { Count: > 0 } commands)
             return;
 
         WriteList(
@@ -187,7 +187,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
 
     private void WriteInvocationUsage(HelpModel helpModel, ICommand command)
     {
-        if (command is not IInvocationTarget)
+        if (!command.IsInvocationTarget)
             return;
         
         var symbols = helpModel.GetSymbols(command);
@@ -226,9 +226,9 @@ public sealed class DefaultHelpProvider : IHelpProvider
     private void WriteOptionUsages(HelpModel helpModel, ICommand command)
     {
         var symbols = command is IRootCommand
-            ? helpModel.Symbols.InterceptingSymbols
+            ? helpModel.Symbols.AncillarySymbols
             : helpModel.Symbols
-                .InterceptingSymbols
+                .AncillarySymbols
                 .Where(symbol => symbol.Kind == AncillaryOptionKind.Help)
                 .ToArray();
 
@@ -239,7 +239,7 @@ public sealed class DefaultHelpProvider : IHelpProvider
         {
             LayoutEngine.WriteUsageClause(command.Path, new UsageToken(
                 HelpElementKind.NamedOptionUsageClauseToken,
-                ResourceManager.GetOptionAliasList(symbol)));
+                ResourceManager.GetAncillaryOptionAliasList(symbol)));
         }
     }
 }

@@ -1,19 +1,26 @@
 using Vertical.Cli.Help;
+using Vertical.Cli.Internal;
+using Vertical.Cli.Invocation;
 
 namespace Vertical.Cli.Configuration;
 
 /// <summary>
 /// Abstract type for parent commands.
 /// </summary>
-public abstract class ContainerCommand : ICommand
+public abstract class ContainerCommand<TModel> : ICommand where TModel : class
 {
-    internal ContainerCommand(string name, CommandHelpTag? helpTag)
+    internal ContainerCommand(string name,
+        CommandHandler<TModel>? handler,
+        CommandHelpTag? helpTag)
     {
+        _handler = handler;
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         
         Name = name;
         HelpTag = helpTag;
     }
+
+    private readonly CommandHandler<TModel>? _handler;
 
     private readonly List<ISubCommand> _subCommands = [];
 
@@ -32,6 +39,31 @@ public abstract class ContainerCommand : ICommand
 
     /// <inheritdoc />
     public CommandHelpTag? HelpTag { get; }
+
+    /// <inheritdoc />
+    public bool IsInvocationTarget => _handler != null;
+
+    /// <inheritdoc />
+    public HandlerContextBuilder CreateRequestBuilder(
+        IRootConfiguration configuration,
+        IModelConfigurationFactory modelConfigurationFactory)
+    {
+        if (_handler == null)
+        {
+            throw Exceptions.InvalidCommandInvocationPath(this);
+        }
+
+        var requestBuilder = new HandlerContextBuilder<TModel>(
+            this,
+            _handler);
+
+        return configuration.ConfigureRequestBuilder(
+            requestBuilder,
+            typeof(TModel),
+            modelConfigurationFactory);
+    }
+    
+    
 
     /// <summary>
     /// Adds a sub command.
@@ -54,9 +86,9 @@ public abstract class ContainerCommand : ICommand
     /// Adds a sub command.
     /// </summary>
     /// <param name="command">The command that will become a child of this instance.</param>
-    /// <typeparam name="TModel">The command's options model type</typeparam>
+    /// <typeparam name="TChildModel">The command's options model type</typeparam>
     /// <exception cref="ArgumentNullException"><paramref name="command"></paramref> is null</exception>
-    public void AddCommand<TModel>(Command<TModel> command) where TModel : class
+    public void AddCommand<TChildModel>(Command<TChildModel> command) where TChildModel : class
     {
         if (_subCommands.Any(child => child.Name.Equals(command.Name)))
         {

@@ -1,4 +1,5 @@
 using Vertical.Cli.Help;
+using Vertical.Cli.Invocation;
 
 namespace Vertical.Cli.Configuration;
 
@@ -26,4 +27,19 @@ public interface ICommand
     /// Gets the application defined help tag.
     /// </summary>
     CommandHelpTag? HelpTag { get; }
+    
+    /// <summary>
+    /// Gets whether the command is an invocation target.
+    /// </summary>
+    bool IsInvocationTarget { get; }
+
+    /// <summary>
+    /// Creates a handler request builder.
+    /// </summary>
+    /// <param name="configuration">The root configuration.</param>
+    /// <param name="modelConfigurationFactory">The service that creates model configurations.</param>
+    /// <returns><see cref="HandlerContextBuilder"/></returns>
+    HandlerContextBuilder CreateRequestBuilder(
+        IRootConfiguration configuration,
+        IModelConfigurationFactory modelConfigurationFactory);
 }
