@@ -87,24 +87,32 @@ public partial class ParseResult
 
         for (var node = state.TokenList.First; node?.Value is { } token;)
         {
-            var consumeNode = TryParseOptionToken(state, optionSymbols, node, token);
-            
-            node = consumeNode
-                ? state.TokenList.Dequeue(node)
-                : node.Next;
+            var dequeueCount = TryParseOptionToken(state, optionSymbols, node, token);
+
+            for (var c = 0; c < dequeueCount; c++)
+            {
+                node = state.TokenList.Dequeue(node!);
+            }
+
+            if (dequeueCount > 0)
+                continue;
+
+            node = node!.Next;
         }
     }
 
-    private static bool TryParseOptionToken(
+    private static int TryParseOptionToken(
         ParseState state,
         Dictionary<string, ISymbolBinding> optionSymbols,
         LinkedListNode<Token> node,
         Token token)
     {
-        return token.Kind == TokenKind.OptionSymbol && ParseSemanticOptionToken(state, optionSymbols, node, token);
+        return token.Kind == TokenKind.OptionSymbol
+            ? ParseSemanticOptionToken(state, optionSymbols, node, token)
+            : 0;
     }
 
-    private static bool ParseSemanticOptionToken(
+    private static int ParseSemanticOptionToken(
         ParseState state,
         Dictionary<string, ISymbolBinding> optionSymbols,
         LinkedListNode<Token> node,
@@ -113,10 +121,10 @@ public partial class ParseResult
         return state
             .Parser
             .CreateSemanticTokens(token)
-            .All(semanticToken => ParseOptionToken(state, optionSymbols, node, semanticToken));
+            .Max(semanticToken => ParseOptionToken(state, optionSymbols, node, semanticToken));
     }
 
-    private static bool ParseOptionToken(
+    private static int ParseOptionToken(
         ParseState state,
         Dictionary<string, ISymbolBinding> optionSymbols,
         LinkedListNode<Token> node,
@@ -127,7 +135,7 @@ public partial class ParseResult
         if (!optionSymbols.TryGetValue(symbol, out var option))
         {
             state.Errors.Add(new InvalidOptionSymbolError(semanticToken.ConstituentToken));
-            return false;
+            return 0;
         }
 
         return option.Behavior == SymbolBehavior.Switch
@@ -135,7 +143,7 @@ public partial class ParseResult
             : ParseParameterizedOptionToken(state, option, node, semanticToken);
     }
 
-    private static bool ParseSwitchToken(
+    private static int ParseSwitchToken(
         ParseState state, 
         ISymbolBinding symbolBinding, 
         SemanticToken semanticToken)
@@ -144,19 +152,19 @@ public partial class ParseResult
         {
             case { HasBooleanParameter: true }:
                 state.AddParameterValue(symbolBinding, semanticToken.Token);
-                return true;
+                return 1;
             
             case { Token.Syntax.HasParameter: true }:
                 state.Errors.Add(new InvalidSwitchParameterError(symbolBinding, semanticToken.ConstituentToken));
-                return false;
+                return 0;
             
             default:
                 state.AddStringValue(symbolBinding, bool.TrueString);
-                return true;
+                return 1;
         }
     }
 
-    private static bool ParseParameterizedOptionToken(
+    private static int ParseParameterizedOptionToken(
         ParseState state,
         ISymbolBinding symbolBinding,
         LinkedListNode<Token> node,
@@ -165,24 +173,24 @@ public partial class ParseResult
         if (semanticToken.Token.Syntax.HasParameter)
         {
             state.AddParameterValue(symbolBinding, semanticToken.Token);
-            return true;
+            return 1;
         }
 
         if (node.Next?.Value is { Kind: TokenKind.ArgumentValue })
         {
             state.AddArgumentValue(symbolBinding, node.Next.Value);
-            return true;
+            return 2;
         }
         
         if (state.TerminatedTokenQueue.TryDequeue(out var terminatedTokenNode))
         {
             state.AddArgumentValue(symbolBinding, terminatedTokenNode.Value);
             state.TokenList.Remove(terminatedTokenNode);
-            return true;
+            return 1;
         }
 
         state.Errors.Add(new MissingParameterError(symbolBinding));
-        return false;
+        return 0;
     }
 
     private static Dictionary<string, ISymbolBinding> BuildOptionSymbols(ISymbolBinding[] bindings)

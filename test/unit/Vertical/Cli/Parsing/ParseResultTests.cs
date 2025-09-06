@@ -76,6 +76,47 @@ public class ParseResultTests
     }
 
     [Fact]
+    public void ParseResult_Removes_Pending_Tokens_For_Option()
+    {
+        var parseResult = GetParseResult(["--host", "vertical.com"], [Bindings[1]]);
+        parseResult.GetValues("Host").ShouldBe(["vertical.com"]);
+        parseResult.PendingTokens.ShouldBeEmpty();
+    }
+    
+    [Fact]
+    public void ParseResult_Leaves_Pending_Tokens_For_Option()
+    {
+        var parseResult = GetParseResult(["--host", "vertical.com", "/var/temp"], [Bindings[1], Bindings[3]]);
+        parseResult.GetValues("Host").ShouldBe(["vertical.com"]);
+        parseResult.GetValues("Path").ShouldBe(["/var/temp"]);
+        parseResult.PendingTokens.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void ParseResult_Leaves_Pending_Tokens_For_Switch()
+    {
+        var parseResult = GetParseResult(["--log-verbose", "/var/temp"], [Bindings[0], Bindings[3]]);
+        parseResult.GetValues("LogVerbose").Single().ShouldBe("True");
+        parseResult.GetValues("Path").Single().ShouldBe("/var/temp");
+    }
+
+    [Fact]
+    public void PraseResult_Identifies_Posix_Group()
+    {
+        var parseResult = GetParseResult(["-abc:value"],
+        [
+            new MyBinding(SymbolBehavior.Switch, "A", Arity.One, ["-a"]),
+            new MyBinding(SymbolBehavior.Switch, "B", Arity.One, ["-b"]),
+            new MyBinding(SymbolBehavior.Option, "C", Arity.ZeroOrOne, ["-c"])
+        ]);
+        
+        parseResult.GetValues("A").Single().ShouldBe("True");
+        parseResult.GetValues("B").Single().ShouldBe("True");
+        parseResult.GetValues("C").Single().ShouldBe("value");
+        parseResult.PendingTokens.ShouldBeEmpty();
+    }
+
+    [Fact]
     public void ParseResult_Sets_No_Arity_Error_For_Switch()
     {
         var result = GetParseResult([], [Bindings[0]]);
