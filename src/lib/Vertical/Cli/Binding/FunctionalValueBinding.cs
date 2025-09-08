@@ -5,12 +5,12 @@ namespace Vertical.Cli.Binding;
 /// </summary>
 /// <typeparam name="TValue">Value type</typeparam>
 /// <typeparam name="TModel">Model type</typeparam>
-public sealed class FunctionalValueBinding<TModel, TValue> : IPropertyBinding<TModel, TValue> 
+public sealed class FunctionalValueBinding<TModel, TValue> : IPropertyBinding<TValue> 
     where TModel : class
 {
     internal FunctionalValueBinding(Type modelType, 
         string bindingName, 
-        Action<PropertyBinder<TModel, TValue>> configureBinding)
+        Action<PropertyBinder<TValue>> configureBinding)
     {
         _configureBinding = configureBinding;
         
@@ -18,10 +18,10 @@ public sealed class FunctionalValueBinding<TModel, TValue> : IPropertyBinding<TM
         BindingName = bindingName;
     }
 
-    private readonly Action<PropertyBinder<TModel, TValue>> _configureBinding;
+    private readonly Action<PropertyBinder<TValue>> _configureBinding;
 
     /// <inheritdoc />
-    public bool TryBindValue(PropertyBinder<TModel, TValue> binder)
+    public bool TryBindValue(PropertyBinder<TValue> binder)
     {
         _configureBinding(binder);
         return binder.IsValueSet;

@@ -7,12 +7,11 @@ namespace Vertical.Cli.Binding;
 /// Represents data used to realize a model's property value.
 /// </summary>
 /// <typeparam name="TValue">Value type</typeparam>
-/// <typeparam name="TModel">Model type</typeparam>
-public sealed class PropertyBinder<TModel, TValue> where TModel : class
+public sealed class PropertyBinder<TValue> 
 {
     internal PropertyBinder(
-        IPropertyBinding<TModel, TValue> propertyBinding,
-        BindingContext<TModel> bindingContext,
+        IPropertyBinding<TValue> propertyBinding,
+        IBindingContext bindingContext,
         ValueConverter<TValue>? valueConverter)
     {
         PropertyBinding = propertyBinding;
@@ -31,12 +30,12 @@ public sealed class PropertyBinder<TModel, TValue> where TModel : class
     /// <summary>
     /// Gets the property binding.
     /// </summary>
-    public IPropertyBinding<TModel, TValue> PropertyBinding { get; }
+    public IPropertyBinding PropertyBinding { get; }
 
     /// <summary>
     /// Gets the binding context.
     /// </summary>
-    public BindingContext<TModel> BindingContext { get; }
+    public IBindingContext BindingContext { get; }
 
     /// <summary>
     /// Gets whether a result has been set.

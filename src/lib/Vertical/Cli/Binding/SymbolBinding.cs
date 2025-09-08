@@ -9,7 +9,7 @@ namespace Vertical.Cli.Binding;
 /// </summary>
 /// <typeparam name="TValue">Value type</typeparam>
 /// <typeparam name="TModel">Model type</typeparam>
-public sealed class SymbolBinding<TModel, TValue> : IPropertyBinding<TModel, TValue>, ISymbolBinding
+public sealed class SymbolBinding<TModel, TValue> : IPropertyBinding<TValue>, ISymbolBinding
     where TModel : class
 {
     internal SymbolBinding(
@@ -20,7 +20,7 @@ public sealed class SymbolBinding<TModel, TValue> : IPropertyBinding<TModel, TVa
         string[] aliases,
         Arity arity,
         SymbolHelpTag? helpTag,
-        Action<PropertyBinder<TModel, TValue>>? setBindingOptions)
+        Action<PropertyBinder<TValue>>? setBindingOptions)
     {
         BindingName = bindingName;
         Precedence = precedence;
@@ -62,7 +62,7 @@ public sealed class SymbolBinding<TModel, TValue> : IPropertyBinding<TModel, TVa
     /// <summary>
     /// Gets an action that binds the symbol value.
     /// </summary>
-    public Action<PropertyBinder<TModel, TValue>>? BindingOptionsAction { get; }
+    public Action<PropertyBinder<TValue>>? BindingOptionsAction { get; }
 
     /// <summary>
     /// Gets the aliases the symbol is known by.
@@ -75,7 +75,7 @@ public sealed class SymbolBinding<TModel, TValue> : IPropertyBinding<TModel, TVa
     public bool HasBindingOptions => BindingOptionsAction != null;
 
     /// <inheritdoc />
-    public bool TryBindValue(PropertyBinder<TModel, TValue> binder)
+    public bool TryBindValue(PropertyBinder<TValue> binder)
     {
         BindingOptionsAction?.Invoke(binder);
         return BindingOptionsAction != null;

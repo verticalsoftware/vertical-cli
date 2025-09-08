@@ -91,7 +91,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         BasicArity? arity = null,
         SymbolHelpTag? helpTag = null,
         Action<ValidationContext<TModel, TValue>>? configureValidation = null,
-        Action<PropertyBinder<TModel, TValue>>? setBindingOptions = null)
+        Action<PropertyBinder<TValue>>? setBindingOptions = null)
     {
         ArgumentNullException.ThrowIfNull(propertyExpression);
         if (name != null && TokenSyntax.Parse(name) is not { Kind: SyntaxKind.NonDecorated })
@@ -143,7 +143,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         CollectionArity? arity = null,
         SymbolHelpTag? helpTag = null,
         Action<ValidationContext<TModel, TCollection>>? configureValidation = null,
-        Action<PropertyBinder<TModel, TCollection>>? setBindingOptions = null)
+        Action<PropertyBinder<TCollection>>? setBindingOptions = null)
     {
         ArgumentNullException.ThrowIfNull(propertyExpression);
         if (name != null && TokenSyntax.Parse(name) is not { Kind: SyntaxKind.NonDecorated })
@@ -190,7 +190,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         BasicArity? arity = null,
         SymbolHelpTag? helpTag = null,
         Action<ValidationContext<TModel, TValue>>? configureValidation = null,
-        Action<PropertyBinder<TModel, TValue>>? setBindingOptions = null)
+        Action<PropertyBinder<TValue>>? setBindingOptions = null)
     {
         ArgumentNullException.ThrowIfNull(propertyExpression);
         ValidateAliases(aliases);
@@ -234,7 +234,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
         CollectionArity? arity = null,
         SymbolHelpTag? helpTag = null,
         Action<ValidationContext<TModel, TCollection>>? configureValidation = null,
-        Action<PropertyBinder<TModel, TCollection>>? setBindingOptions = null)
+        Action<PropertyBinder<TCollection>>? setBindingOptions = null)
     {
         ArgumentNullException.ThrowIfNull(propertyExpression);
         ValidateAliases(aliases);
@@ -309,7 +309,7 @@ public sealed class ModelConfiguration<TModel> : ModelConfiguration where TModel
     /// <returns>A reference to this instance</returns>
     public ModelConfiguration<TModel> BindParseResultValue<TValue>(
         Expression<Func<TModel, TValue>> propertyExpression,
-        Action<PropertyBinder<TModel, TValue>> mapResult)
+        Action<PropertyBinder<TValue>> mapResult)
     {
         ArgumentNullException.ThrowIfNull(propertyExpression);
         ArgumentNullException.ThrowIfNull(mapResult);

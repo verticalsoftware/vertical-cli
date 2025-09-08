@@ -4,7 +4,6 @@ using Vertical.Cli.Configuration;
 using Vertical.Cli.Conversion;
 using Vertical.Cli.Internal;
 using Vertical.Cli.Invocation;
-using Vertical.Cli.IO;
 using Vertical.Cli.Parsing;
 
 namespace Vertical.Cli.Binding;
@@ -13,7 +12,7 @@ namespace Vertical.Cli.Binding;
 /// Represents a context used to provide values for model activation.
 /// </summary>
 /// <typeparam name="TModel">Model type</typeparam>
-public sealed class BindingContext<TModel> where TModel : class
+public sealed class BindingContext<TModel> : IBindingContext where TModel : class
 {
     internal BindingContext(
         IRootConfiguration rootConfiguration,
@@ -69,7 +68,7 @@ public sealed class BindingContext<TModel> where TModel : class
         ValueConverter<TValue>? valueConverter)
     {
         var binding = GetPropertyBinding(propertyExpression);
-        var bindingArgs = new PropertyBinder<TModel, TValue>(binding, this, valueConverter);
+        var bindingArgs = new PropertyBinder<TValue>(binding, this, valueConverter);
         binding.TryBindValue(bindingArgs);
 
         if (bindingArgs.TryGetExplicitValue(out var value))
@@ -97,7 +96,7 @@ public sealed class BindingContext<TModel> where TModel : class
         where TCollection : IEnumerable<TElement>
     {
         var binding = GetPropertyBinding(propertyExpression);
-        var bindingArgs = new PropertyBinder<TModel, TCollection>(binding, this, null);
+        var bindingArgs = new PropertyBinder<TCollection>(binding, this, null);
 
         binding.TryBindValue(bindingArgs);
 
@@ -121,7 +120,7 @@ public sealed class BindingContext<TModel> where TModel : class
     }
 
     private bool TryGetSingleParseResultValue<TValue>(
-        IPropertyBinding<TModel, TValue> binding,
+        IPropertyBinding<TValue> binding,
         ValueConverter<TValue>? valueConverter,
         out TValue value)
     {
@@ -136,7 +135,7 @@ public sealed class BindingContext<TModel> where TModel : class
     }
 
     private bool TryGetCollectionParseResultValue<TCollection, TElement>(
-        IPropertyBinding<TModel, TCollection> binding, 
+        IPropertyBinding<TCollection> binding, 
         ValueConverter<TElement>? elementConverter, 
         Func<IEnumerable<TElement>, TCollection> createCollection, 
         [NotNullWhen(true)] out TCollection? collection)
@@ -185,13 +184,13 @@ public sealed class BindingContext<TModel> where TModel : class
         }
     }
 
-    private IPropertyBinding<TModel, TValue> GetPropertyBinding<TValue>(Expression<Func<TModel, TValue>> propertyExpression)
+    private IPropertyBinding<TValue> GetPropertyBinding<TValue>(Expression<Func<TModel, TValue>> propertyExpression)
     {
         var bindingName = propertyExpression.GetPropertyName();
 
         return PropertyBindings.GetValueOrDefault(bindingName) switch
         {
-            IPropertyBinding<TModel, TValue> typedBinding => typedBinding,
+            IPropertyBinding<TValue> typedBinding => typedBinding,
             { } binding => throw Exceptions.InvalidBindingCast(typeof(TModel), typeof(TValue), binding),
             _ => throw Exceptions.InvalidBindingName(typeof(TModel), typeof(TValue), bindingName)
         };

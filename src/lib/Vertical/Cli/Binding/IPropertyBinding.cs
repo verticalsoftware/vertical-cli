@@ -29,12 +29,12 @@ public interface IPropertyBinding
 /// <summary>
 /// Represents the interface of an object that binds a property value in an option model.
 /// </summary>
-public interface IPropertyBinding<TModel, TValue> : IPropertyBinding where TModel : class
+public interface IPropertyBinding<TValue> : IPropertyBinding
 {
     /// <summary>
     /// Tries to bind a value using the given arguments.
     /// </summary>
     /// <param name="binder">The object that contains binding data.</param>
     /// <returns><c>true</c> if a value was set.</returns>
-    bool TryBindValue(PropertyBinder<TModel, TValue> binder);
+    bool TryBindValue(PropertyBinder<TValue> binder);
 }
