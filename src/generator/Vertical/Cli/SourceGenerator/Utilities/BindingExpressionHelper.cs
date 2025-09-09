@@ -119,10 +119,22 @@ public class BindingExpressionHelper(string contextParameter)
     {
         var elementConversionExpression = GetConversionExpression(valueType);
         var formattedExpression = string.Format(collectionConversionTemplate, valueType);
+        var isNullableCollection = collectionType is
+        {
+            IsReferenceType: true,
+            NullableAnnotation: NullableAnnotation.Annotated
+        };
+        var contextMethod = isNullableCollection
+            ? "GetCollectionValueOrDefault"
+            : "GetCollectionValue";
+        var resolvedCollectionType = isNullableCollection
+            ? collectionType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
+            : collectionType;
+        var bindingNameAnnotation = isNullableCollection ? "!" : null;
 
         return elementConversionExpression != "null"
-            ? $"{contextParameter}.GetCollectionValue(x => x.{bindingName}, {elementConversionExpression}, {formattedExpression})"
-            : $"{contextParameter}.GetCollectionValue<{valueType}, {collectionType}>(x => x.{bindingName}, null, {formattedExpression})";
+            ? $"{contextParameter}.{contextMethod}<{valueType}, {resolvedCollectionType}>(x => x.{bindingName}{bindingNameAnnotation}, {elementConversionExpression}, {formattedExpression})"
+            : $"{contextParameter}.{contextMethod}<{valueType}, {resolvedCollectionType}>(x => x.{bindingName}{bindingNameAnnotation}, null, {formattedExpression})";
     }
 
     private string GetConversionExpression(ITypeSymbol valueType)

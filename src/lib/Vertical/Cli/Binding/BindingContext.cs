@@ -106,7 +106,40 @@ public sealed class BindingContext<TModel> : IBindingContext where TModel : clas
         if (TryGetCollectionParseResultValue(binding, elementConverter, createCollection, out var collection))
             return collection;
 
-        return bindingArgs.TryGetDefaultValue(out collection) ? collection : default!;
+        return bindingArgs.TryGetDefaultValue(out collection) 
+            ? collection 
+            : createCollection([]);
+    }
+    
+    /// <summary>
+    /// Gets a collection property value.
+    /// </summary>
+    /// <param name="propertyExpression">The expression that identifies the model property being bound.</param>
+    /// <param name="elementConverter">A function that converts string arguments to the target element type.</param>
+    /// <param name="createCollection">A function that converts enumerable values to the strong collection type.</param>
+    /// <typeparam name="TElement">The collection or array's element type.</typeparam>
+    /// <typeparam name="TCollection">The collection type.</typeparam>
+    /// <returns>The collection value</returns>
+    public TCollection? GetCollectionValueOrDefault<TElement, TCollection>(
+        Expression<Func<TModel, TCollection>> propertyExpression,
+        ValueConverter<TElement>? elementConverter,
+        Func<IEnumerable<TElement>, TCollection> createCollection)
+        where TCollection : IEnumerable<TElement>
+    {
+        var binding = GetPropertyBinding(propertyExpression);
+        var bindingArgs = new PropertyBinder<TCollection>(binding, this, null);
+
+        binding.TryBindValue(bindingArgs);
+
+        if (bindingArgs.TryGetExplicitValue(out var value))
+            return value;
+
+        if (TryGetCollectionParseResultValue(binding, elementConverter, createCollection, out var collection))
+            return collection;
+
+        return bindingArgs.TryGetDefaultValue(out collection)
+            ? collection
+            : default;
     }
 
     /// <summary>
