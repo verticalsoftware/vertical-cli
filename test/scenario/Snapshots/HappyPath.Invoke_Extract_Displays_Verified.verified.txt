@@ -1,0 +1,8 @@
+﻿{
+  "ComputeSha": true,
+  "InputFiles": ".archive.gz",
+  "Overwrite": true,
+  "Timeout": "00:00:15",
+  "CompressionType": "GZip",
+  "EncryptionType": "RSA"
+}

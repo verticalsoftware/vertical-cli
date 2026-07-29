@@ -1,0 +1,28 @@
+﻿Description:
+  Creates an archive set from one or more input files.
+
+Usage:
+  archive create <path [...]> [options]
+  archive create --help | -?
+
+Arguments:
+* <path [...]>    One or more input files to include in the archive.
+
+Options:
+  -c, --compression <type>        Compression type to use, one of gzip or brotli.
+  -e, --encrypt <aes|rsa>         Encryption type to use to protect the files. If AES is used, the <KEY> references a
+                                  symmetric key. If RSA is used, <KEY> references the recipient's public key.
+  --timeout <timeout>             The maximum timespan for the operation to run, specific in hh:mm:ss.
+  --compute-sha                   Compute and display the SHA-1 hashes for each output file.
+  --overwrite                     Overwrite any existing output files with the same name.
+* --secret <key>                  The symmetric key or the recipient's public key used to encrypt the archive.
+* --out <output-file>             Path and name of the compressed output file. For archives that are split into
+                                  multiple files, the given path will be used as the name of the first file. Subsequent
+                                  files will have a sequential numbering scheme applied to their names.
+  --include-metadata              Include source file metadata in the archive.
+  --split-size <size[bkmg]>       The maximum allowable size of each split output file.
+  --property <key=value [...]>    An addition metadata  key/value pair to include in the archive.
+
+Available directives:
+  [log-level=[level]]    Configures verbosity of output logging. <level> = trace|debug|information|warning
+

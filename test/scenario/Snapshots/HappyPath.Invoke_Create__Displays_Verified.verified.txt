@@ -1,0 +1,21 @@
+﻿{
+  "ComputeSha": true,
+  "IncludeMetadata": true,
+  "InputFiles": [
+    "image1.png",
+    "image2.png"
+  ],
+  "OutputFile": "archive.gz",
+  "OutputFileSplitSize": {
+    "Value": 10,
+    "Units": "m"
+  },
+  "Overwrite": true,
+  "Properties": {
+    "tags": "images",
+    "encoding": ".png"
+  },
+  "Timeout": "00:00:15",
+  "CompressionType": "GZip",
+  "EncryptionType": "RSA"
+}

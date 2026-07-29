@@ -1,0 +1,6 @@
+﻿Option --secret: argument required.
+Argument path: value required.
+Option --out: argument required.
+
+To get help with this command, run:
+  archive create --help, -?

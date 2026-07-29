@@ -1,0 +1,4 @@
+﻿Option --secret: argument required.
+
+To get help with this command, run:
+  archive extract --help, -?

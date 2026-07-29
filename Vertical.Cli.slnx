@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/examples/" />
+  <Folder Name="/examples/basic/">
+    <Project Path="examples/basic/BasicDemo.csproj" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/generator/">
+    <Project Path="src/generator/Vertical.Cli.SourceGenerator.csproj" />
+  </Folder>
+  <Folder Name="/src/lib/">
+    <Project Path="src/lib/Vertical.Cli.csproj" />
+  </Folder>
+  <Folder Name="/test/" />
+  <Folder Name="/test/scenario/">
+    <Project Path="test/scenario/Vertical.Cli.ScenarioTests.csproj" />
+  </Folder>
+</Solution>

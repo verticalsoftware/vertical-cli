@@ -1,0 +1,363 @@
+﻿using System.Linq.Expressions;
+using Vertical.Cli.Binding;
+using Vertical.Cli.Diagnostics;
+using Vertical.Cli.Help;
+using Vertical.Cli.Parsing;
+using Vertical.Cli.Utilities;
+using Vertical.Cli.Validation;
+
+namespace Vertical.Cli.Configuration;
+
+
+/// <summary>
+/// Used to fluently configure a model type.
+/// </summary>
+/// <typeparam name="TModel">The model class that represents an application's arguments.</typeparam>
+public sealed class ModelBuilder<TModel> where TModel : class
+{
+    private readonly ModelConfiguration _configuration;
+
+    internal ModelBuilder(ModelConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
+    /// <summary>
+    /// Associates a model property with a position argument input.
+    /// </summary>
+    /// <param name="expression">Expression that identifies the model's property.</param>
+    /// <param name="ordinalPosition">
+    /// The expected position of the argument in relation to other position arguments.
+    /// </param>
+    /// <param name="required">A flag indicating whether a value for the argument is required.</param>
+    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="validate">A delegate that performs data validation checks.</param>
+    /// <param name="helpTopic">The help topic associated with the argument.</param>
+    /// <typeparam name="TValue">The value type</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapArgument<TValue>(
+        Expression<Func<TModel, TValue>> expression,
+        int ordinalPosition,
+        bool required = false,
+        Func<TValue>? defaultProvider = null,
+        Action<ValidationEventInfo<TModel, TValue>>? validate = null,
+        SymbolHelpTopic? helpTopic = null)
+    {
+        _configuration.AddBindingSource(new CliSymbol<TModel, TValue>(
+            expression,
+            SymbolKind.PositionArgument,
+            expression.BindingName,
+            ordinalPosition,
+            aliases: [],
+            arity: required ? Arity.One : Arity.ZeroOrOne,
+            defaultProvider,
+            helpTopic,
+            ValidationHelpers.TryCreateValidationAction(validate),
+            self => new ScalarPropertyBinder<TModel, TValue>(self)));
+        
+        return this;
+    } 
+    
+    /// <summary>
+    /// Associates a model property with position argument input that can be specified more than once.
+    /// </summary>
+    /// <param name="expression">Expression that identifies the model's property.</param>
+    /// <param name="ordinalPosition">
+    /// The expected position of the argument in relation to other position arguments.
+    /// </param>
+    /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
+    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="validate">A delegate that performs data validation checks.</param>
+    /// <param name="helpTopic">The help topic associated with the argument.</param>
+    /// <typeparam name="TElement">The value type</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapVariadicArgument<TElement>(
+        Expression<Func<TModel, TElement[]>> expression,
+        int ordinalPosition,
+        Arity? arity = null,
+        Func<TElement[]>? defaultProvider = null,
+        Action<ValidationEventInfo<TModel, TElement, TElement[]>>? validate = null,
+        SymbolHelpTopic? helpTopic = null)
+    {
+        _configuration.AddBindingSource(new CliSymbol<TModel, TElement[]>(
+            expression,
+            SymbolKind.PositionArgument,
+            expression.BindingName,
+            ordinalPosition,
+            aliases: [],
+            arity: arity ?? Arity.ZeroOrMore,
+            defaultProvider,
+            helpTopic,
+            ValidationHelpers.TryCreateValidationAction(validate),
+            self => new CollectionPropertyBinder<TModel, TElement, TElement[]>(self)));
+        
+        return this;
+    }
+
+    /// <summary>
+    /// Associates a model property with position argument input that can be specified more than once.
+    /// </summary>
+    /// <param name="expression">Expression that identifies the model's property.</param>
+    /// <param name="ordinalPosition">
+    /// The expected position of the argument in relation to other position arguments.
+    /// </param>
+    /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
+    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="validate">A delegate that performs data validation checks.</param>
+    /// <param name="helpTopic">The help topic associated with the argument.</param>
+    /// <typeparam name="TElement">The value type</typeparam>
+    /// <typeparam name="TCollection">The property's collection type.</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapVariadicArgument<TElement, TCollection>(
+        Expression<Func<TModel, TCollection>> expression,
+        int ordinalPosition,
+        Arity? arity = null,
+        Func<TCollection>? defaultProvider = null,
+        Action<ValidationEventInfo<TModel, TCollection>>? validate = null,
+        SymbolHelpTopic? helpTopic = null)
+        where TCollection : IEnumerable<TElement>
+    {
+        _configuration.AddBindingSource(new CliSymbol<TModel, TCollection>(
+            expression,
+            SymbolKind.PositionArgument,
+            expression.BindingName,
+            ordinalPosition,
+            aliases: [],
+            arity: arity ?? Arity.ZeroOrMore,
+            defaultProvider,
+            helpTopic,
+            ValidationHelpers.TryCreateValidationAction(validate),
+            self => new CollectionPropertyBinder<TModel, TElement, TCollection>(self)));
+        
+        return this;
+    }
+
+    /// <summary>
+    /// Associates a model property with a named option input.
+    /// </summary>
+    /// <param name="expression">Expression that identifies the model's property.</param>
+    /// <param name="aliases">
+    /// One or more GNU option identifiers. When left <c>null</c> an alias is generated using the
+    /// property name.
+    /// </param>
+    /// <param name="required">A flag indicating whether a value for the argument is required.</param>
+    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="validate">A delegate that performs data validation checks.</param>
+    /// <param name="helpTopic">The help topic associated with the argument.</param>
+    /// <typeparam name="TValue">The value type</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapOption<TValue>(
+        Expression<Func<TModel, TValue>> expression,
+        string[]? aliases = null,
+        bool required = false,
+        Func<TValue>? defaultProvider = null,
+        Action<ValidationEventInfo<TModel, TValue>>? validate = null,
+        SymbolHelpTopic? helpTopic = null)
+    {
+        var bindingName = expression.BindingName;
+        
+        _configuration.AddBindingSource(new CliSymbol<TModel, TValue>(
+            expression,
+            SymbolKind.Option,
+            bindingName,
+            0,
+            ValidateAliasesOrGetDefault(bindingName, aliases),
+            required ? Arity.One : Arity.ZeroOrOne,
+            defaultProvider,
+            helpTopic,
+            ValidationHelpers.TryCreateValidationAction(validate),
+            self => new ScalarPropertyBinder<TModel, TValue>(self)));
+
+        return this;
+    }
+    
+    /// <summary>
+    /// Associates a model property with named option inputs that can be specified more than once.
+    /// </summary>
+    /// <param name="expression">Expression that identifies the model's property.</param>
+    /// <param name="aliases">
+    /// One or more GNU option identifiers. When left <c>null</c> an alias is generated using the
+    /// property name.
+    /// </param>
+    /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
+    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="validate">A delegate that performs data validation checks.</param>
+    /// <param name="helpTopic">The help topic associated with the argument.</param>
+    /// <typeparam name="TElement">The value type</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapVariadicOption<TElement>(
+        Expression<Func<TModel, TElement[]>> expression,
+        string[]? aliases = null,
+        Arity? arity = null,
+        Func<TElement[]>? defaultProvider = null,
+        Action<ValidationEventInfo<TModel, TElement[]>>? validate = null,
+        SymbolHelpTopic? helpTopic = null)
+    {
+        var bindingName = expression.BindingName;
+        
+        _configuration.AddBindingSource(new CliSymbol<TModel, TElement[]>(
+            expression,
+            SymbolKind.Option,
+            bindingName,
+            0,
+            ValidateAliasesOrGetDefault(bindingName, aliases),
+            arity ?? Arity.ZeroOrMore,
+            defaultProvider,
+            helpTopic,
+            ValidationHelpers.TryCreateValidationAction(validate),
+            self => new CollectionPropertyBinder<TModel, TElement, TElement[]>(self)));
+
+        return this;
+    }
+    
+    /// <summary>
+    /// Associates a model property with named option inputs that can be specified more than once.
+    /// </summary>
+    /// <param name="expression">Expression that identifies the model's property.</param>
+    /// <param name="aliases">
+    /// One or more GNU option identifiers. When left <c>null</c> an alias is generated using the
+    /// property name.
+    /// </param>
+    /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
+    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="validate">A delegate that performs data validation checks.</param>
+    /// <param name="helpTopic">The help topic associated with the argument.</param>
+    /// <typeparam name="TElement">The value type</typeparam>
+    /// <typeparam name="TCollection">The property's collection type.</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapVariadicOption<TElement, TCollection>(
+        Expression<Func<TModel, TCollection>> expression,
+        string[]? aliases = null,
+        Arity? arity = null,
+        Func<TCollection>? defaultProvider = null,
+        Action<ValidationEventInfo<TModel, TCollection>>? validate = null,
+        SymbolHelpTopic? helpTopic = null)
+        where TCollection : IEnumerable<TElement>
+    {
+        var bindingName = expression.BindingName;
+        
+        _configuration.AddBindingSource(new CliSymbol<TModel, TCollection>(
+            expression,
+            SymbolKind.Option,
+            bindingName,
+            0,
+            ValidateAliasesOrGetDefault(bindingName, aliases),
+            arity ?? Arity.ZeroOrMore,
+            defaultProvider,
+            helpTopic,
+            ValidationHelpers.TryCreateValidationAction(validate),
+            self => new CollectionPropertyBinder<TModel, TElement, TCollection>(self)));
+
+        return this;
+    }
+    
+    /// <summary>
+    /// Associates a boolean model property to a switch input.
+    /// </summary>
+    /// <param name="expression">Expression that identifies the model's property.</param>
+    /// <param name="aliases">
+    /// One or more GNU option identifiers. When left <c>null</c> an alias is generated using the
+    /// property name.
+    /// </param>
+    /// <param name="validate">A delegate that performs data validation checks.</param>
+    /// <param name="helpTopic">The help topic associated with the argument.</param>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapSwitch(
+        Expression<Func<TModel, bool>> expression,
+        string[]? aliases = null,
+        Action<ValidationEventInfo<TModel, bool>>? validate = null,
+        SymbolHelpTopic? helpTopic = null)
+    {
+        var bindingName = expression.BindingName;
+        
+        _configuration.AddBindingSource(new CliSymbol<TModel, bool>(
+            expression,
+            SymbolKind.Switch,
+            bindingName,
+            0,
+            ValidateAliasesOrGetDefault(bindingName, aliases),
+            Arity.ZeroOrOne,
+            () => false,
+            helpTopic,
+            ValidationHelpers.TryCreateValidationAction(validate),
+            self => new ScalarPropertyBinder<TModel, bool>(self)));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets a preconfigured private value for a model's property.
+    /// </summary>
+    /// <param name="expression">Expression that identifies the model's property.</param>
+    /// <param name="value">The static value to map into new model instances.</param>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapStaticValue<TValue>(Expression<Func<TModel, TValue>> expression, TValue value)
+    {
+        return MapBindingInfoValue(expression, _ => value);
+    }
+
+    /// <summary>
+    /// Sets a preconfigured private binding value for a model's property.
+    /// </summary>
+    /// <param name="expression">Expression that identifies the model's property.</param>
+    /// <param name="valueProvider">A delegate that provides the value to bind.</param>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapBindingInfoValue<TValue>(
+        Expression<Func<TModel, TValue>> expression,
+        Func<PropertyBindingInfo, TValue> valueProvider)
+    {
+        ArgumentNullException.ThrowIfNull(expression);
+        ArgumentNullException.ThrowIfNull(valueProvider);
+        
+        var bindingSource = new PrivateBindingSource<TValue>(
+            expression.BindingName,
+            valueProvider);
+        
+        _configuration.AddBindingSource(bindingSource);
+        return this;
+    }
+
+    /// <summary>
+    /// Sets a <see cref="TextReader"/> property of model to the console abstraction's
+    /// input text reader.
+    /// </summary>
+    /// <param name="expression">Expression that identifies a model's <see cref="TextReader"/> property.</param>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapInputStream(Expression<Func<TModel, TextReader>> expression)
+    {
+        return MapBindingInfoValue(expression, info => info.ConsoleInput);
+    }
+
+    /// <summary>
+    /// Establishes the action that creates instances of the model type.
+    /// </summary>
+    /// <param name="binder">
+    /// An action that uses the parse result to build new instances of the model type.
+    /// </param>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> SetBinder(ModelBinder<TModel> binder)
+    {
+        _configuration.SetBinder(binder);
+        return this;
+    }
+
+    private static string[] ValidateAliasesOrGetDefault(string bindingName, string[]? aliases)
+    {
+        return aliases is not { Length: > 0 }
+            ? [ArgumentSyntax.CreateGnuAlias(bindingName)]
+            : ValidateAliases(aliases);
+    }
+
+    private static string[] ValidateAliases(string[] aliases)
+    {
+        if (aliases.Where(alias => ArgumentSyntax.GetSyntaxKind(alias) != SyntaxKind.Option).ToArray()
+            is { Length: > 0 } invalid)
+        {
+            throw Exceptions.InvalidOptionOrSwitchAliases(invalid);
+        }
+
+        return aliases;
+    }
+}

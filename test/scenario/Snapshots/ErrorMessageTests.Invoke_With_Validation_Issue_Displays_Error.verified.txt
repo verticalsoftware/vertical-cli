@@ -1,0 +1,4 @@
+﻿Option --timeout: value must be less than 00:05:00.
+
+To get help with this command, run:
+  archive extract --help, -?

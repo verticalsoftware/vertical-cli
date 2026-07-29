@@ -1,0 +1,21 @@
+﻿Description:
+  Creates and extracts compressed, encrypted archive files.
+
+Usage:
+  archive <command>
+  archive --help | -?
+
+Commands:
+  create       Creates an archive set from one or more input files.
+  extract      Extracts an archive file or set.
+
+Available directives:
+  [log-level=[level]]    Configures verbosity of output logging. <level> = trace|debug|information|warning
+
+Overview
+  This utility can create compressed archives that are encrypted. Features include:
+    - Archives a single file or multiple files.
+    - The output artifacts can be split split into fixed size chunk files, 
+      allowing easier uploading to cloud or remote storage.
+    - Artifacts can be encrypted using symmetric (AES) or asymmetric keys (RSA).
+

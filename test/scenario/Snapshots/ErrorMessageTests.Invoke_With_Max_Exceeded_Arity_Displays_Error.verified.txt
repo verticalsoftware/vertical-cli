@@ -1,0 +1,4 @@
+﻿Option --out: single argument expected.
+
+To get help with this command, run:
+  archive extract --help, -?
