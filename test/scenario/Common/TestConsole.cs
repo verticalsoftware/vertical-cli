@@ -8,7 +8,7 @@ public class TestConsole : IConsole
     private readonly StringWriter _writer = new(new StringBuilder());
 
     /// <inheritdoc />
-    public TextReader In => throw new NotSupportedException();
+    public TextReader In => null!;
 
     /// <inheritdoc />
     public TextWriter Out => _writer;
