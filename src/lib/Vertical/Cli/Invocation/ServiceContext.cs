@@ -11,7 +11,7 @@ internal sealed class ServiceContext
     /// <summary>
     /// Gets a method that creates or provides a service provider.
     /// </summary>
-    public required Func<IServiceProvider>? ServiceProviderFactory { get; init; }
+    public required Func<InvocationContext, IServiceProvider>? ServiceProviderFactory { get; init; }
     
     /// <summary>
     /// Gets whether to dispose of the provider.

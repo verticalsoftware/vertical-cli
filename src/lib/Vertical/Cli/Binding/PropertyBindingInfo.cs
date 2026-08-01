@@ -1,6 +1,7 @@
 ﻿using Vertical.Cli.Configuration;
 using Vertical.Cli.Conversion;
 using Vertical.Cli.Parsing;
+using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Binding;
 
@@ -26,7 +27,7 @@ public sealed class PropertyBindingInfo
     /// <summary>
     /// Gets application data.
     /// </summary>
-    public required PropertyBag ApplicationData { get; init; }
+    public required OptionsManager OptionsManager { get; init; }
     
     /// <summary>
     /// Gets the console abstraction input text reader.

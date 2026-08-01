@@ -9,6 +9,13 @@ public enum CompressionAlgorithm
     Brotli
 }
 
+public enum LogSeverity
+{
+    Debug,
+    Normal,
+    Minimal
+}
+
 [GeneratedBinding]
 public interface IOptions
 {
@@ -20,12 +27,7 @@ public interface IOptions
     TimeSpan? Timeout { get; }
 }
 
-// public record Options(
-//     CompressionAlgorithm CompressionType,
-//     FileInfo[] SourceFiles,
-//     FileInfo OutputFile, 
-//     bool PrintSha,
-//     int SplitSizeKb,
-//     TimeSpan? Timeout) : IOptions
-// {
-// }
+public sealed class AppOptions
+{
+    public LogSeverity LogSeverity { get; set; }
+}

@@ -49,5 +49,5 @@ public interface IHelpProvider
     /// </summary>
     /// <param name="subject">The symbol or directive instance.</param>
     /// <returns><see cref="string"/></returns>
-    string GetParameterValueSyntax(IHelpSubject subject);
+    string GetParameterName(IHelpSubject subject);
 }

@@ -40,25 +40,26 @@ public class DefaultHelpProvider : IHelpProvider
     {
         return subject switch
         {
-            CliSymbol { SymbolKind: SymbolKind.PositionArgument } argument  => 
+            CliSymbol { Kind: SymbolKind.PositionArgument } argument  => 
                 argument.HelpTopic?.ParameterSyntax ?? argument.BindingName.ToKebabCase(),
-            CliSymbol { SymbolKind: SymbolKind.Option or SymbolKind.Switch } named => 
+            CliSymbol { Kind: SymbolKind.Option or SymbolKind.Switch } named => 
                 string.Join(", ", named.Aliases),
-            DirectiveSymbol directive => directive.Symbol,
+            IDirectiveSymbol directive => directive.Identifier,
             _ => throw new NotSupportedException()
         };
     }
 
     /// <inheritdoc />
-    public string GetParameterValueSyntax(IHelpSubject subject)
+    public string GetParameterName(IHelpSubject subject)
     {
         return subject switch
         {
-            CliSymbol { SymbolKind: SymbolKind.PositionArgument } symbol => GetListIdentifier(symbol),
-            CliSymbol { SymbolKind: SymbolKind.Option } option => option.HelpTopic?.ParameterSyntax ??
+            CliSymbol { Kind: SymbolKind.PositionArgument } symbol => GetListIdentifier(symbol),
+            CliSymbol { Kind: SymbolKind.Option } option => option.HelpTopic?.ParameterSyntax ??
                                                                   option.BindingName.ToKebabCase(),
-            CliSymbol { SymbolKind: SymbolKind.Switch } => string.Empty,
-            DirectiveSymbol directive => directive.HelpTopic?.ParameterSyntax ?? "value", 
+            CliSymbol { Kind: SymbolKind.Switch } => string.Empty,
+            IDirectiveSymbol { HelpTopic: SymbolHelpTopic topic } => topic.ParameterSyntax ?? "value",
+            IDirectiveSymbol => "value",
             _ => throw new NotSupportedException()
         };
     }

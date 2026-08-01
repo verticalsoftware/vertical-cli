@@ -1,10 +1,13 @@
 ﻿using Vertical.Cli.Configuration;
 using Vertical.Cli.Conversion;
+using Vertical.Cli.Diagnostics;
 using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
 using Vertical.Cli.IO;
 using Vertical.Cli.Middleware;
 using Vertical.Cli.Middleware.Components;
+using Vertical.Cli.Parsing;
+using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli;
 
@@ -19,29 +22,6 @@ public class CommandLineApplication
     {
         ArgumentNullException.ThrowIfNull(rootCommand);
         _configuration = new RootConfiguration(rootCommand);
-    }
-
-    /// <summary>
-    /// Adds directive handling for the given symbol.
-    /// </summary>
-    /// <param name="symbol">The symbol the directive is identified as.</param>
-    /// <param name="arity">The parameter arity.</param>
-    /// <param name="asyncHandler">A method that handles the directive logic.</param>
-    /// <param name="helpTopic">An optional help topic to associate with the directive.</param>
-    /// <returns>A reference to this instance.</returns>
-    public CommandLineApplication HandleDirective(
-        string symbol,
-        Func<DirectiveEventInfo, Task> asyncHandler,
-        DirectiveParameterArity arity = DirectiveParameterArity.NotSupported,
-        SymbolHelpTopic? helpTopic = null)
-    {
-        _configuration.DirectiveSymbols.Add(new DirectiveSymbol(
-            symbol, 
-            arity, 
-            asyncHandler, 
-            helpTopic));
-        
-        return this;
     }
 
     /// <summary>
@@ -67,13 +47,13 @@ public class CommandLineApplication
         configure(_configuration.MiddlewareBuilder);
         return this;
     }
-    
+
     /// <summary>
-    /// Registers an action that configures a model type.
+    /// Registers an action that configures the parser for a model type.
     /// </summary>
     /// <param name="configure">An action that manipulates the provided <see cref="ModelBuilder{TModel}"/>.</param>
     /// <typeparam name="TModel">Model type being configured.</typeparam>
-    public CommandLineApplication ConfigureModel<TModel>(Action<ModelBuilder<TModel>> configure) 
+    public CommandLineApplication ConfigureParser<TModel>(Action<ModelBuilder<TModel>> configure) 
         where TModel : class
     {
         _configuration.AddModelBuilder(configure);
@@ -109,6 +89,54 @@ public class CommandLineApplication
     }
 
     /// <summary>
+    /// Registers an asynchronous directive handler.
+    /// </summary>
+    /// <param name="identifier">The identifier for the directive.</param>
+    /// <param name="handler">An asynchronous handler that is invoked when a token is matched.</param>
+    /// <param name="helpTopic">Optional help topic to associate with the directive.</param>
+    /// <returns>A reference to this instance.</returns>
+    public CommandLineApplication AddDirective(
+        string identifier,
+        Func<DirectiveEventInfo, Task> handler,
+        SymbolHelpTopic? helpTopic = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(identifier);
+        ArgumentNullException.ThrowIfNull(handler);
+        
+        var directive = new DirectiveSymbol(identifier, ParameterArity.Zero, handler, helpTopic);
+        _configuration.AddDirectiveSymbol(directive);
+        return this;
+    }
+
+    /// <summary>
+    /// Registers an asynchronous directive handler.
+    /// </summary>
+    /// <param name="identifier">The identifier for the directive.</param>
+    /// <param name="handler">An asynchronous handler that is invoked when a token is matched.</param>
+    /// <param name="defaultProvider">A function that returns a default value.</param>
+    /// <param name="helpTopic">Optional help topic to associate with the directive.</param>
+    /// <returns>A reference to this instance.</returns>
+    public CommandLineApplication AddParameterizedDirective<TValue>(
+        string identifier,
+        Func<DirectiveEventInfo<TValue>, Task> handler,
+        Func<TValue>? defaultProvider = null,
+        SymbolHelpTopic? helpTopic = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(identifier);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var directive = new ParameterizedDirectiveSymbol<TValue>(
+            identifier,
+            defaultProvider != null ? ParameterArity.ZeroOrOne : ParameterArity.One,
+            handler, 
+            defaultProvider, 
+            helpTopic);
+            
+        _configuration.AddDirectiveSymbol(directive);
+        return this;
+    }
+
+    /// <summary>
     /// Informs the framework of the application's service provider. When set, command handlers
     /// can be resolved using dependency injection.
     /// </summary>
@@ -119,7 +147,7 @@ public class CommandLineApplication
     /// When set <c>true</c>, the framework will manage the lifecycle of the service provider.
     /// </param>
     /// <returns></returns>
-    public CommandLineApplication UseServices(Func<IServiceProvider> serviceProviderFactory, bool dispose = true)
+    public CommandLineApplication UseServices(Func<InvocationContext, IServiceProvider> serviceProviderFactory, bool dispose = true)
     {
         _configuration.ServiceContext = new ServiceContext
         {
@@ -149,6 +177,19 @@ public class CommandLineApplication
     public CommandLineApplication UseOutputFormatter(OutputFormatter outputFormatter)
     {
         _configuration.OutputFormatter = outputFormatter ?? throw new ArgumentNullException(nameof(outputFormatter));
+        return this;
+    }
+    
+    /// <summary>
+    /// Configures an options object.
+    /// </summary>
+    /// <param name="configure">An action that manipulates the object.</param>
+    /// <typeparam name="TOptions">Creatable options type</typeparam>
+    /// <returns>A reference to this instance.</returns>
+    public CommandLineApplication ConfigureOptions<TOptions>(Action<TOptions> configure) where TOptions : class, new()
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+        _configuration.OptionsManager.Configure(configure);
         return this;
     }
 

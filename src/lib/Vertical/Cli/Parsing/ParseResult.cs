@@ -122,7 +122,7 @@ public partial class ParseResult
 
         switch (token, symbol)
         {
-            case { symbol.SymbolKind: SymbolKind.Switch }:
+            case { symbol.Kind: SymbolKind.Switch }:
                 state.AddValue(symbol, bool.TrueString);
                 break;
                 

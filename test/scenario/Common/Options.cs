@@ -25,7 +25,7 @@ public interface ISharedOptions
 
 public interface ICreateOptions
 {
-    FileInfo[] InputFiles { get; }
+    List<FileInfo> InputFiles { get; }
     FileInfo OutputFile { get; }
     FileSize OutputFileSplitSize { get; }
     bool IncludeMetadata { get; }

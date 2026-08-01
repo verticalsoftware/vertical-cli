@@ -2,6 +2,7 @@
 using Vertical.Cli.Help;
 using Vertical.Cli.IO;
 using Vertical.Cli.Middleware;
+using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Configuration;
 
@@ -13,7 +14,7 @@ public interface IRootConfigurationView : IConversionProvider
 
      MiddlewareDelegate GetMiddlewarePipeline();
     
-    PropertyBag ApplicationData { get; }
+    OptionsManager OptionsManager { get; }
     
     IConsole Console { get; }
     
@@ -23,5 +24,5 @@ public interface IRootConfigurationView : IConversionProvider
 
     Stream GetAnnotationStream(string resource);
 
-    IReadOnlyList<DirectiveSymbol> GetDirectives();
+    IReadOnlyList<IDirectiveSymbol> GetDirectives();
 }

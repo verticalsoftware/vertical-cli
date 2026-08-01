@@ -94,4 +94,14 @@ internal static class Exceptions
              """,
             nameof(aliases));
     }
+    
+    public static ArgumentException InvalidUnboundSymbolAliases(string[] aliases)
+    {
+        var csv = string.Join(", ", aliases);
+
+        return new ArgumentException(
+            $"""
+            
+             """, nameof(aliases));
+    }
 }

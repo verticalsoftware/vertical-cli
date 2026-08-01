@@ -18,7 +18,7 @@ public static class HelpSystem
             HelpOptionRemarks = helpOptions.OptionRemarks,
             HelpProvider = helpOptions.HelpProvider,
             OutputWriter = new OutputWriter(bufferedConsole, configuration.OutputFormatter),
-            Directives = configuration.GetDirectives(),
+            DirectiveSymbols = configuration.GetDirectives()
         };
 
         helpOptions.ArticleWriter.WriteContent(articleInfo);

@@ -5,37 +5,35 @@ namespace Vertical.Cli.Invocation;
 internal static class HandlerServiceContext
 {
     public static HandlerServiceContext<TModel> Create<TModel>(
-        ServiceContext serviceContext,
+        InvocationContext context,
         Func<TModel, CancellationToken, Task<int>> handler)
         where TModel : class
     {
-        ArgumentNullException.ThrowIfNull(serviceContext);
+        ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(handler);
 
-        return new HandlerServiceContext<TModel>(
-            serviceContext,
-            _ => new DelegatedHandler<TModel>(handler));
+        return new HandlerServiceContext<TModel>(context, _ => new DelegatedHandler<TModel>(handler));
     }
 
     public static HandlerServiceContext<TModel> Create<TModel>(
-        ServiceContext serviceContext,
+        InvocationContext context,
         Func<IServiceProvider?, IHandler<TModel>> handlerResolver)
         where TModel : class
     {
-        ArgumentNullException.ThrowIfNull(serviceContext);
+        ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(handlerResolver);
 
-        return new HandlerServiceContext<TModel>(serviceContext, handlerResolver);
+        return new HandlerServiceContext<TModel>(context, handlerResolver);
     }
 
-    public static HandlerServiceContext<TModel> Create<TModel, THandler>(ServiceContext serviceContext)
+    public static HandlerServiceContext<TModel> Create<TModel, THandler>(InvocationContext context)
         where TModel : class
         where THandler : class, IHandler<TModel>
     {
-        ArgumentNullException.ThrowIfNull(serviceContext);
+        ArgumentNullException.ThrowIfNull(context);
 
         return new HandlerServiceContext<TModel>(
-            serviceContext,
+            context,
             serviceProvider =>
             {
                 if (serviceProvider is null)
@@ -51,23 +49,26 @@ internal static class HandlerServiceContext
 
 internal sealed class HandlerServiceContext<TModel> : IAsyncDisposable where TModel : class
 {
-    private readonly ServiceContext _serviceContext;
+    private readonly InvocationContext _context;
     private readonly Func<IServiceProvider?, IHandler<TModel>> _handlerFactory;
     private readonly Lazy<IServiceProvider?> _lazyServiceProvider;
 
     public HandlerServiceContext(
-        ServiceContext serviceContext,
+        InvocationContext context,
         Func<IServiceProvider?, IHandler<TModel>> handlerFactory)
     {
-        _serviceContext = serviceContext;
+        _context = context;
         _handlerFactory = handlerFactory;
-        _lazyServiceProvider = new Lazy<IServiceProvider?>(() => serviceContext.ServiceProviderFactory?.Invoke());
+        _lazyServiceProvider = new Lazy<IServiceProvider?>(() => context
+            .ServiceContext
+            .ServiceProviderFactory?
+            .Invoke(context));
     }
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        switch (provider: _lazyServiceProvider, context: _serviceContext)
+        switch (provider: _lazyServiceProvider, context: _context.ServiceContext)
         {
             case { provider.IsValueCreated: false }:
             case { provider.Value: null }:                

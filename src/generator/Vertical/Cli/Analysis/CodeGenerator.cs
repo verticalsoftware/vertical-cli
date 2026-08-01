@@ -81,6 +81,19 @@ public class CodeGenerator
         writer.WriteLine("/// <param name=\"app\">The application instance to add configuration to.</param>");
         writer.WriteLine($"public static void Configure(this {NamingConvention.CommandLineApplicationClassFqName} app)");
         writer.WriteBlock(IndentedCodeWriter.CurlyBraces, (ref inner) => WriteConfigureMethodBody(typeModels, ref inner));
+        writer.WriteLine();
+        writer.WriteLine("/// <summary>");
+        writer.WriteLine("/// Calls the <c>Configure</c> and <c>RunAsync</c> methods.");
+        writer.WriteLine("/// </summary>");
+        writer.WriteLine("/// <param name=\"app\">The application instance to add configuration to.</param>");
+        writer.WriteLine("/// <param name=\"args\">Arguments provided by the application's entry point..</param>");
+        writer.WriteLine("/// <returns>A task that wraps the integer result code.</returns>");
+        writer.WriteLine($"public static async global::System.Threading.Tasks.Task<int> ConfigureAndRunAsync(this {NamingConvention.CommandLineApplicationClassFqName} app, string[] args)");
+        writer.WriteBlock(IndentedCodeWriter.CurlyBraces, (ref inner) =>
+        {
+            inner.WriteLine("app.Configure();");
+            inner.WriteLine("return await app.RunAsync(args);");
+        });
     }
 
     private static void WriteConfigureMethodBody(TypeModel[] typeModels, ref IndentedCodeWriter writer)
@@ -93,7 +106,7 @@ public class CodeGenerator
     {
         foreach (var typeModel in typeModels)
         {
-            writer.WriteLine($"app.ConfigureModel<{typeModel.TypeSymbol.GlobalName}>(builder => builder.SetBinder({typeModel.GeneratedTypeName}.Bind));");
+            writer.WriteLine($"app.ConfigureParser<{typeModel.TypeSymbol.GlobalName}>(builder => builder.SetBinder({typeModel.GeneratedTypeName}.Bind));");
         }
     }
 

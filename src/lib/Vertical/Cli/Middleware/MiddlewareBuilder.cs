@@ -11,10 +11,10 @@ public sealed class MiddlewareBuilder
 
     private static List<MiddlewareDelegate> DefaultComponents =>
     [
+        HandleDirectiveSymbolHooksMiddleware.InvokeAsync,
         HelpSystemMiddleware.InvokeAsync,
         DisplayHelpOptionSuggestionMiddleware.InvokeAsync,
         DisplayInputErrorsMiddleware.InvokeAsync,
-        HandleDirectivesMiddleware.InvokeAsync,
         InjectResponseFileArgumentsMiddleware.InvokeAsync,
         HandleConsoleCancellationMiddleware.InvokeAsync
     ];
@@ -46,15 +46,15 @@ public sealed class MiddlewareBuilder
     }
 
     /// <summary>
+    /// Adds middleware that filters directive hooks.
+    /// </summary>
+    public MiddlewareBuilder HandleDirectives => AddLast(HandleDirectiveSymbolHooksMiddleware.InvokeAsync);
+
+    /// <summary>
     /// Adds middleware that displays help articles when the help option is invoked on a command.
     /// </summary>
     public MiddlewareBuilder DisplayHelpArticles => AddLast(HelpSystemMiddleware.InvokeAsync);
-
-    /// <summary>
-    /// Adds middleware that handles directive tokens.
-    /// </summary>
-    public MiddlewareBuilder EnableDirectives => AddLast(HandleDirectivesMiddleware.InvokeAsync);
-
+    
     /// <summary>
     /// Adds middleware that listens for SIGTERM and SIGINT and invokes the internal
     /// cancellation source.

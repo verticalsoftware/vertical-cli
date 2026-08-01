@@ -9,8 +9,8 @@ Commands:
   create       Creates an archive set from one or more input files.
   extract      Extracts an archive file or set.
 
-Available directives:
-  [log-level=[level]]    Configures verbosity of output logging. <level> = trace|debug|information|warning
+Directives:
+  [log-level=<level>]      Configures verbosity of output logging. <level> = trace|debug|information|warning
 
 Overview
   This utility can create compressed archives that are encrypted. Features include:

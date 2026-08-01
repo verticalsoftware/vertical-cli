@@ -1,5 +1,6 @@
 ﻿using Vertical.Cli.Configuration;
 using Vertical.Cli.IO;
+using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Help;
 
@@ -8,7 +9,7 @@ namespace Vertical.Cli.Help;
 /// </summary>
 public class HelpArticleWriter
 {
-    private const int IndentSpaces = 2;
+    private const int IndentSpaces = FormattingConstants.IndentSpaces;
     
     /// <summary>
     /// Writes help content to console output.
@@ -53,32 +54,11 @@ public class HelpArticleWriter
         
         writer.WriteLine("Arguments:", DisplayElement.Heading);
 
-        var items = symbols
-            .Select(symbol => new
-            {
-                symbol,
-                identifier = FormatArityEnclosure(provider.GetListIdentifier(symbol), symbol.Arity)
-            });
-
-        writer.WriteTable(
-            items,
-            item => item.identifier.Length + 2,
-            item =>
-            {
-                if (item.symbol.Arity.Minimum > 0)
-                    writer.Write("* ", DisplayElement.Important);
-                else
-                    writer.WriteWhiteSpace(3);
-                writer.Write(item.identifier, DisplayElement.ListIdentifier);
-            },
-            item => provider.GetRemarks(item.symbol),
-            DisplayElement.Remarks,
-            lineBounds,
-            IndentSpaces);
-
+        var elements = symbols.Select(symbol => ArgumentSymbolElement.Create(provider, symbol));
+        writer.WriteTable(elements, lineBounds);
         writer.WriteLine();
     }
-    
+
     private static void WriteOptionsSection(HelpEventInfo eventInfo)
     {
         var symbols = eventInfo.NamedSymbols;
@@ -90,85 +70,24 @@ public class HelpArticleWriter
         
         writer.WriteLine("Options:", DisplayElement.Heading);
 
-        var items = symbols
-            .Select(symbol => new
-            {
-                required = symbol.Arity.Minimum > 0,
-                identifier = provider.GetListIdentifier(symbol),
-                parameter = FormatArityEnclosure(
-                    provider.GetParameterValueSyntax(symbol), 
-                    GetOptionParameterArity(symbol)),
-                remarks = provider.GetRemarks(symbol)
-            });
-
-        writer.WriteTable(
-            items,
-            item => item.identifier.Length
-                    + item.parameter.Length
-                    + 3,
-            item =>
-            {
-                if (item.required)
-                    writer.Write("* ", DisplayElement.Important);
-                else
-                    writer.WriteWhiteSpace(2);
-                
-                writer.Write(item.identifier, DisplayElement.ListIdentifier);
-                writer.WriteWhiteSpace();
-                
-                if (item.parameter.Length > 0)
-                {
-                    writer.Write(item.parameter, DisplayElement.ParameterSyntax);
-                }
-            },
-            item => item.remarks,
-            DisplayElement.Remarks,
-            lineBounds,
-            IndentSpaces);
-        
+        var elements = symbols.Select(symbol => OptionSymbolElement.Create(provider, symbol));
+        writer.WriteTable(elements, lineBounds);
         writer.WriteLine();
     }
-    
+
     private static void WriteDirectivesSection(HelpEventInfo eventInfo)
     {
-        var directives = eventInfo.Directives;
-        if (directives.Count == 0) return;
+        var symbols = eventInfo.DirectiveSymbols;
+        if (symbols.Count == 0)
+            return;
         
         var writer = eventInfo.OutputWriter;
         var provider = eventInfo.HelpProvider;
-        var lineBounds = new LineBounds(0, eventInfo.DisplayWidth);
+        var lineBounds = new LineBounds(IndentSpaces, eventInfo.DisplayWidth);
         
-        writer.WriteLine("Available directives:", DisplayElement.Heading);
-
-        var tableItems = directives
-            .Select(directive => new
-            {
-                identifier = provider.GetListIdentifier(directive),
-                parameter = GetDirectiveParameterSyntax(provider, directive),
-                remarks = provider.GetRemarks(directive)
-            });
-
-        writer.WriteTable(
-            tableItems,
-            item => item.identifier.Length + item.parameter.Length + 5,
-            item =>
-            {
-                writer.WriteWhiteSpace(2);
-                writer.Write('[', DisplayElement.ListIdentifier);
-                writer.Write(item.identifier, DisplayElement.ListIdentifier);
-                if (item.parameter.Length > 0)
-                {
-                    writer.Write('=', DisplayElement.ParameterSyntax);
-                    writer.Write(item.parameter, DisplayElement.ParameterSyntax);
-                }
-                writer.Write(']');
-                if (item.parameter.Length == 0) writer.WriteWhiteSpace();
-            },
-            item => item.remarks,
-            DisplayElement.Remarks,                
-            lineBounds,
-            IndentSpaces);
-        
+        writer.WriteLine("Directives:", DisplayElement.Heading);
+        var elements = symbols.Select(symbol => DirectiveSymbolElement.Create(provider, symbol));
+        writer.WriteTable(elements, lineBounds);
         writer.WriteLine();
     }
 
@@ -217,8 +136,8 @@ public class HelpArticleWriter
         {
             case 1:
                 writer.WriteWhiteSpace();
-                var argumentSyntax = provider.GetListIdentifier(arguments[0]);
-                writer.Write(FormatArityEnclosure(argumentSyntax, arguments[0].Arity), DisplayElement.ParameterSyntax);
+                var argumentElement = ArgumentSymbolElement.Create(provider, arguments[0]);
+                argumentElement.RenderParameterSyntax(writer);
                 break;
             
             case > 1:
@@ -264,35 +183,5 @@ public class HelpArticleWriter
             LineBounds.RightJustified(IndentSpaces, eventInfo.DisplayWidth),
             DisplayElement.Remarks);
         writer.WriteLine();
-    }
-
-    private static Arity GetOptionParameterArity(CliSymbol symbol) => symbol.Arity.Maximum is null or > 1
-        ? Arity.OneOrMore
-        : Arity.One;
-
-    private static string FormatArityEnclosure(string? parameterSyntax, Arity arity)
-    {
-        if (parameterSyntax is not { Length: > 0 }) return string.Empty;
-        
-        return arity switch
-        {
-            { Minimum: 0, Maximum: 1 } => $"[{parameterSyntax}]",
-            { Minimum: 0, Maximum: null } => $"[{parameterSyntax} ...]",
-            { Minimum: 1, Maximum: 1 } => $"<{parameterSyntax}>",
-            { Minimum: 1, Maximum: null } => $"<{parameterSyntax} [...]>",
-            _ => $"<{parameterSyntax} ...>"
-        };
-    }
-
-    private static string GetDirectiveParameterSyntax(IHelpProvider helpProvider, DirectiveSymbol directive)
-    {
-        var parameterSyntax = helpProvider.GetParameterValueSyntax(directive);
-        
-        return directive.Arity switch
-        {
-            DirectiveParameterArity.NotSupported => string.Empty,
-            DirectiveParameterArity.Optional => FormatArityEnclosure(parameterSyntax, Arity.ZeroOrOne),
-            _ => FormatArityEnclosure(parameterSyntax, Arity.One)
-        };
     }
 }

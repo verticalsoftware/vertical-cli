@@ -1,30 +1,19 @@
 ﻿using Vertical.Cli.Configuration;
-using Vertical.Cli.Conversion;
-using Vertical.Cli.Diagnostics;
 using Vertical.Cli.Parsing;
+using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Invocation;
 
-/// <summary>
-/// Provides information about a parsed directive.
-/// </summary>
-public sealed class DirectiveEventInfo
+public class DirectiveEventInfo
 {
-    internal DirectiveEventInfo(InvocationContext context, DirectiveSymbol symbol,  ArgumentToken token)
+    internal DirectiveEventInfo(
+        InvocationContext context,
+        ArgumentToken token,
+        IDirectiveSymbol symbol)
     {
         Context = context;
-        Symbol = symbol;
         Token = token;
-    }
-
-    /// <summary>
-    /// Adds an error ot the context.
-    /// </summary>
-    /// <param name="error"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public void AddError(CommandLineError error)
-    {
-        Context.AddError(error ?? throw new ArgumentNullException(nameof(error)));
+        Symbol = symbol;
     }
 
     /// <summary>
@@ -33,21 +22,36 @@ public sealed class DirectiveEventInfo
     public InvocationContext Context { get; }
 
     /// <summary>
-    /// Gets the symbol declaration.
-    /// </summary>
-    public DirectiveSymbol Symbol { get; }
-
-    /// <summary>
-    /// Gets the directive token that was matched.
+    /// Gets the matched argument token.
     /// </summary>
     public ArgumentToken Token { get; }
 
     /// <summary>
-    /// Gets or sets whether to remove the token from the context after the event
-    /// handler returns (defaults to <c>true</c>).
+    /// Gets the symbol reference.
     /// </summary>
-    public bool RemoveToken { get; set; } = true;
+    public IDirectiveSymbol Symbol { get; }
+}
 
+public sealed class DirectiveEventInfo<TValue> : DirectiveEventInfo
+{
     /// <inheritdoc />
-    public override string ToString() => Token.ToString();
+    internal DirectiveEventInfo(
+        InvocationContext context,
+        ArgumentToken token,
+        ParameterizedDirectiveSymbol<TValue> symbol,
+        TValue value) 
+        : base(context, token, symbol)
+    {
+        Value = value;
+    }
+
+    /// <summary>
+    /// Gets the parameter value.
+    /// </summary>
+    public TValue Value { get; }
+
+    /// <summary>
+    /// Gets the application's property bag.
+    /// </summary>
+    public OptionsManager ApplicationOptions => Context.ApplicationOptions;
 }

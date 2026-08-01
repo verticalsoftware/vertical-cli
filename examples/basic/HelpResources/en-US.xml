@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<help>
+    <topic type="command" id="app">
+        Provides various compression and encryption based file utilities.
+    </topic>
+    
+    <topic type="command" id="app compress">
+        Compresses one or more source files into a proprietary archive file using either the gzip or brotli algorithms.
+    </topic>
+    
+    <topic type="symbol" id="BasicDemo.IOptions.SourceFiles" parameter-name="path">
+        One or more source files to add to the compression archive.
+    </topic>
+    
+    <topic type="symbol" id="BasicDemo.IOptions.OutputFile" parameter-name="path">
+        Path used when creating the output file.
+    </topic>
+    
+    <topic type="symbol" id="BasicDemo.IOptions.PrintSha">
+        Compute and display the sha-256 of the output file.
+    </topic>
+    
+    <topic type="symbol" id="BasicDemo.IOptions.CompressionType" parameter-name="gzip|brotli">
+        The compression algorithm to use, can be either gzip or brotli.
+    </topic>
+    
+    <topic type="symbol" id="BasicDemo.IOptions.SplitSizeKb" parameter-name="kb">
+        Split size, in kb, to optimize the output file.
+    </topic>
+    
+    <topic type="symbol" id="BasicDemo.IOptions.Timeout" parameter-name="hh:mm:ss">
+        Maximum time to allow for the operation.
+    </topic>
+    
+    <topic type="directive" id="log-level" parameter-name="severity">
+        Verbosity of output logging (trace, debug, or info).
+    </topic>
+</help>

@@ -45,17 +45,17 @@ public abstract class CommandLineError
     {
         return symbol switch
         {
-            CliSymbol { SymbolKind: SymbolKind.PositionArgument, HelpTopic.ParameterSyntax: { } parameterSyntax }
+            CliSymbol { Kind: SymbolKind.PositionArgument, HelpTopic.ParameterSyntax: { } parameterSyntax }
                 => $"Argument {parameterSyntax}",
             
-            CliSymbol { SymbolKind: SymbolKind.PositionArgument } argumentSymbol 
+            CliSymbol { Kind: SymbolKind.PositionArgument } argumentSymbol 
                 => $"Argument {argumentSymbol.BindingName.ToKebabCase(toUpperCase: true)}",
             
-            CliSymbol { SymbolKind: SymbolKind.Option } optionSymbol => $"Option {FormatAliases(optionSymbol.Aliases)}",
+            CliSymbol { Kind: SymbolKind.Option } optionSymbol => $"Option {FormatAliases(optionSymbol.Aliases)}",
             
-            CliSymbol { SymbolKind: SymbolKind.Switch } switchSymbol => $"Switch {FormatAliases(switchSymbol.Aliases)}",
+            CliSymbol { Kind: SymbolKind.Switch } switchSymbol => $"Switch {FormatAliases(switchSymbol.Aliases)}",
             
-            DirectiveSymbol directiveSymbol => $"Directive [{directiveSymbol.Symbol}]",
+            IDirectiveSymbol directive => $"Directive [{directive.Identifier}]",
             
             _ => throw new NotSupportedException()
         };

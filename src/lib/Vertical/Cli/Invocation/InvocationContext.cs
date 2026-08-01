@@ -2,6 +2,7 @@
 using Vertical.Cli.Diagnostics;
 using Vertical.Cli.IO;
 using Vertical.Cli.Parsing;
+using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Invocation;
 
@@ -32,6 +33,11 @@ public sealed class InvocationContext : IDisposable
     /// Gets the output writer.
     /// </summary>
     public OutputWriter OutputWriter { get; set; }
+
+    /// <summary>
+    /// Gets the options manager.
+    /// </summary>
+    public OptionsManager ApplicationOptions => _configuration.OptionsManager;
 
     /// <summary>
     /// Releases all resources used by this component.

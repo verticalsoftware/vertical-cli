@@ -56,6 +56,7 @@ public sealed class OutputWriter
     /// <param name="element">The display element or <c>null</c> to use the current style.</param>
     public void Write(ReadOnlySpan<char> span, DisplayElement? element = null)
     {
+        if (span.Length == 0) return;
         TrySetDisplayElement(element);
         _writer.Write(span);
         IsNewLine = false;
@@ -68,6 +69,7 @@ public sealed class OutputWriter
     /// <param name="element">The display element or <c>null</c> to use the current style.</param>
     public void Write(string str, DisplayElement? element = null)
     {
+        if (str.Length == 0) return;
         TrySetDisplayElement(element);
         _writer.Write(str);
         IsNewLine = false;

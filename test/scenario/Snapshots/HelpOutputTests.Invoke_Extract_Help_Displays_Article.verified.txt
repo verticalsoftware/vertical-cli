@@ -19,6 +19,6 @@ Options:
   --out <path>                Directory into which the extracted file(s) should be written (defaults to the current
                               working directory).
 
-Available directives:
-  [log-level=[level]]    Configures verbosity of output logging. <level> = trace|debug|information|warning
+Directives:
+  [log-level=<level>]      Configures verbosity of output logging. <level> = trace|debug|information|warning
 

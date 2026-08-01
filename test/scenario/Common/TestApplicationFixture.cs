@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Testing.Platform.Logging;
 using Vertical.Cli.Configuration;
 using Vertical.Cli.IO;
 using Vertical.Cli.Validation;
@@ -27,7 +28,7 @@ public sealed class TestApplicationFixture
 
         var app = new CommandLineApplication(rootCommand);
         
-        app.ConfigureModel<ISharedOptions>(builder => builder
+        app.ConfigureParser<ISharedOptions>(builder => builder
             .MapOption(x => x.CompressionType,
                 ["-c", "--compression"],
                 defaultProvider: () => CompressionType.GZip,
@@ -47,8 +48,8 @@ public sealed class TestApplicationFixture
                 helpTopic: HelpResources.SecretOption)
         );
 
-        app.ConfigureModel<ICreateOptions>(builder => builder
-            .MapVariadicArgument(x => x.InputFiles,
+        app.ConfigureParser<ICreateOptions>(builder => builder
+            .MapMultiValuedArgument(x => x.InputFiles,
                 ordinalPosition: 0,
                 arity: Arity.OneOrMore,
                 helpTopic: HelpResources.InputFilesArgument)
@@ -61,13 +62,13 @@ public sealed class TestApplicationFixture
                 ["--split-size"],
                 defaultProvider: () => new FileSize(250, "m"),
                 helpTopic: HelpResources.OutputFileSplitSizeOption)
-            .MapVariadicOption<KeyValuePair<string, string>, Dictionary<string, string>>(
+            .MapMultiValuedOption<KeyValuePair<string, string>, Dictionary<string, string>>(
                 x => x.Properties,
                 ["--property"],
                 arity: Arity.ZeroOrMore,
                 helpTopic: HelpResources.PropertiesOption));
 
-        app.ConfigureModel<IExtractOptions>(builder => builder
+        app.ConfigureParser<IExtractOptions>(builder => builder
             .MapArgument(
                 x => x.InputFile,
                 ordinalPosition: 0,
@@ -80,16 +81,21 @@ public sealed class TestApplicationFixture
                 helpTopic: HelpResources.ExtractOutputPathOption)
         );
 
-        app.HandleDirective(
-            symbol: "log-level",
+        // app.HandleUnboundSymbolWithParameter<LogLevel>(
+        //     UnboundSymbolKind.Directive,
+        //     ["log-level"],
+        //     _ => Task.CompletedTask,
+        //     helpTopic: HelpResources.LogLevelDirective);
+
+        app.AddParameterizedDirective<LogLevel>(
+            "log-level",
             _ => Task.CompletedTask,
-            DirectiveParameterArity.Optional,
             helpTopic: HelpResources.LogLevelDirective);
 
         app.AddArgumentConverter(KeyValuePairConverter.Convert);
         app.AddCollectionConverter((IEnumerable<KeyValuePair<string, string>> values) =>
             new Dictionary<string, string>(values));
-        app.UseServices(services.BuildServiceProvider);
+        app.UseServices(_ => services.BuildServiceProvider());
         app.UseConsole(console);
 
         Application = app;

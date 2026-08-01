@@ -10,14 +10,14 @@ namespace Vertical.Cli.Configuration;
 public abstract class CliSymbol : IBindingSource, ICliSymbol
 {
     protected CliSymbol(
-        SymbolKind symbolKind,
+        SymbolKind kind,
         PropertyInfo propertyInfo,
         int ordinalPosition,
         string[] aliases,
         Arity arity,
         SymbolHelpTopic? helpTopic)
     {
-        SymbolKind = symbolKind;
+        Kind = kind;
         PropertyInfo = propertyInfo;
         OrdinalPosition = ordinalPosition;
         Aliases = aliases;
@@ -28,7 +28,7 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol
     /// <summary>
     /// Gets the symbol kind.
     /// </summary>
-    public SymbolKind SymbolKind { get; }
+    public SymbolKind Kind { get; }
 
     /// <summary>
     /// Gets the binding property info.
@@ -88,7 +88,7 @@ public sealed class CliSymbol<TModel, TValue> : CliSymbol where TModel : class
 
     internal CliSymbol(
         Expression<Func<TModel, TValue>> expression,
-        SymbolKind symbolKind,
+        SymbolKind kind,
         string bindingName,
         int ordinalPosition,
         string[] aliases,
@@ -97,7 +97,7 @@ public sealed class CliSymbol<TModel, TValue> : CliSymbol where TModel : class
         SymbolHelpTopic? helpTopic,
         Action<CliSymbol, ValidationContext>? validate,
         Func<CliSymbol<TModel, TValue>, PropertyBinder> binderFactory)
-        : base(symbolKind, expression.PropertyInfo, ordinalPosition, aliases, arity, helpTopic)
+        : base(kind, expression.PropertyInfo, ordinalPosition, aliases, arity, helpTopic)
     {
         DefaultProvider = defaultProvider;
 

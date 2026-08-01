@@ -10,5 +10,10 @@ public interface ICliSymbol : IHelpSubject
     /// <summary>
     /// Gets the symbol kind.
     /// </summary>
-    SymbolKind SymbolKind { get; }
+    SymbolKind Kind { get; }
+    
+    /// <summary>
+    /// Gets the symbol or parameter arity.
+    /// </summary>
+    Arity Arity { get; }
 }

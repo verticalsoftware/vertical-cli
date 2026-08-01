@@ -8,7 +8,7 @@ namespace Vertical.Cli.Diagnostics;
 public sealed class SymbolArityError : CommandLineError
 {
     /// <inheritdoc />
-    internal SymbolArityError(CliSymbol symbol, string[] argumentsReceived) 
+    internal SymbolArityError(ICliSymbol symbol, string[] argumentsReceived) 
         : base(FormatMessage(symbol, argumentsReceived.Length))
     {
         ArgumentsReceived = argumentsReceived;
@@ -19,11 +19,11 @@ public sealed class SymbolArityError : CommandLineError
     /// </summary>
     public string[] ArgumentsReceived { get; }
 
-    private static string FormatMessage(CliSymbol symbol, int argumentCount)
+    private static string FormatMessage(ICliSymbol symbol, int argumentCount)
     {
         var identifier = GetSymbolIdentifier(symbol);
         var (min, max) = symbol.Arity;
-        var parameterType = symbol.SymbolKind == SymbolKind.PositionArgument
+        var parameterType = symbol.Kind == SymbolKind.PositionArgument
             ? "value"
             : "argument";
 

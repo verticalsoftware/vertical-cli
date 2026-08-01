@@ -71,7 +71,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TElement">The value type</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapVariadicArgument<TElement>(
+    public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
         Expression<Func<TModel, TElement[]>> expression,
         int ordinalPosition,
         Arity? arity = null,
@@ -108,7 +108,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <typeparam name="TElement">The value type</typeparam>
     /// <typeparam name="TCollection">The property's collection type.</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapVariadicArgument<TElement, TCollection>(
+    public ModelBuilder<TModel> MapMultiValuedArgument<TElement, TCollection>(
         Expression<Func<TModel, TCollection>> expression,
         int ordinalPosition,
         Arity? arity = null,
@@ -185,7 +185,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TElement">The value type</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapVariadicOption<TElement>(
+    public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
         Expression<Func<TModel, TElement[]>> expression,
         string[]? aliases = null,
         Arity? arity = null,
@@ -225,7 +225,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <typeparam name="TElement">The value type</typeparam>
     /// <typeparam name="TCollection">The property's collection type.</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapVariadicOption<TElement, TCollection>(
+    public ModelBuilder<TModel> MapMultiValuedOption<TElement, TCollection>(
         Expression<Func<TModel, TCollection>> expression,
         string[]? aliases = null,
         Arity? arity = null,

@@ -11,13 +11,14 @@ public sealed class HelpEventInfo
     internal HelpEventInfo(IEnumerable<CliSymbol> symbols)
     {
         Symbols = symbols.ToArray();
+        
         PositionalSymbols = Symbols
-            .Where(symbol => symbol.SymbolKind == SymbolKind.PositionArgument)
+            .Where(symbol => symbol.Kind == SymbolKind.PositionArgument)
             .OrderBy(symbol => symbol.OrdinalPosition)
             .ToArray();
         
         NamedSymbols = Symbols
-            .Where(symbol => symbol.SymbolKind is SymbolKind.Option or SymbolKind.Switch)
+            .Where(symbol => symbol.Kind is SymbolKind.Option or SymbolKind.Switch)
             .ToArray();
     }
 
@@ -25,11 +26,6 @@ public sealed class HelpEventInfo
     /// Gets the display width of the output writer.
     /// </summary>
     public int DisplayWidth => OutputWriter.DisplayWidth;
-
-    /// <summary>
-    /// Gets the directive symbols.
-    /// </summary>
-    public required IReadOnlyList<DirectiveSymbol> Directives { get; init; }
 
     /// <summary>
     /// Gets the command that is the subject of the article.
@@ -50,6 +46,11 @@ public sealed class HelpEventInfo
     /// Gets the argument symbols.
     /// </summary>
     public IReadOnlyList<CliSymbol> PositionalSymbols { get; }
+    
+    /// <summary>
+    /// Gets the directive symbols.
+    /// </summary>
+    public required IReadOnlyCollection<IDirectiveSymbol> DirectiveSymbols { get; init; }
     
     /// <summary>
     /// Gets the aliases used to trigger the help system.

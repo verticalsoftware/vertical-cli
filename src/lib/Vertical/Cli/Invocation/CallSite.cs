@@ -29,10 +29,11 @@ internal static class CallSite
         var bindingInfo = new PropertyBindingInfo
         {
             ConversionProvider = root,
-            ApplicationData = root.ApplicationData,
+            OptionsManager = root.OptionsManager,
             ParseResult = parseResult,
             ConsoleInput = root.Console.In
         };
+        
         var bindingResults = bindingSources
             .Select(source => source.CreatePropertyBinder().CreateBindingResult(bindingInfo))
             .ToDictionary(result => result.BindingName);

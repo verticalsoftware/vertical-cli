@@ -1,22 +1,22 @@
 ﻿namespace Vertical.Cli.Configuration;
 
 /// <summary>
-/// Defines the arity of a directive parameter.
+/// Defines the arity of a parameter.
 /// </summary>
-public enum DirectiveParameterArity
+public enum ParameterArity
 {
     /// <summary>
-    /// Indicates parameter values are not supported.
+    /// Indicates a parameter value is not supported.
     /// </summary>
-    NotSupported,
+    Zero,
     
     /// <summary>
     /// Indicates a parameter value is optional.
     /// </summary>
-    Optional,
+    ZeroOrOne,
     
     /// <summary>
     /// Indicates a parameter value is required.
     /// </summary>
-    Required
+    One
 }

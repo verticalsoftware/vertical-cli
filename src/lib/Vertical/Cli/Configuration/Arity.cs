@@ -46,6 +46,13 @@ public readonly struct Arity
         : $"({Minimum}-{Maximum})";
 
     /// <summary>
+    /// Creates a new instance with a specific minimum and maximum count.
+    /// </summary>
+    /// <param name="count">The number of occurrence to require.</param>
+    /// <returns><see cref="Arity"/></returns>
+    public static Arity Require(int count) => new(count, count);
+
+    /// <summary>
     /// Creates a new instance that allows no more than one argument.
     /// </summary>
     public static Arity ZeroOrOne => new(0, 1);

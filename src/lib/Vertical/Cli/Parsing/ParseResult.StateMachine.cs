@@ -10,12 +10,12 @@ public partial class ParseResult
     private sealed class StateMachine(IReadOnlyCollection<CliSymbol> symbols, ITokenList tokenList)
     {
         private readonly Dictionary<string, CliSymbol> _namedSymbols = symbols
-            .Where(symbol => symbol.SymbolKind is SymbolKind.Option or SymbolKind.Switch)
+            .Where(symbol => symbol.Kind is SymbolKind.Option or SymbolKind.Switch)
             .SelectMany(symbol => symbol.Aliases.Select(alias => (alias, symbol)))
             .ToDictionary(t => t.alias, t => t.symbol);
 
         private readonly List<PositionalSymbolState> _positionalSymbolStates = symbols
-            .Where(symbol => symbol.SymbolKind == SymbolKind.PositionArgument)
+            .Where(symbol => symbol.Kind == SymbolKind.PositionArgument)
             .OrderByDescending(symbol => symbol.OrdinalPosition)
             .Select(symbol => new PositionalSymbolState(symbol, 0))
             .ToList();

@@ -10,6 +10,7 @@ namespace Vertical.Cli.Configuration;
 internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigurationView
 {
     private readonly List<(Type ModelType, Action<ModelConfiguration> Action)> _modelBuilders = [];
+    private readonly List<IDirectiveSymbol> _directiveSymbols = [];
     private readonly Dictionary<Type, Delegate> _argumentConverters = [];
     private readonly Dictionary<(Type, Type), Delegate> _collectionConverters = [];
     
@@ -17,14 +18,14 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
 
     public MiddlewareBuilder MiddlewareBuilder { get; } = MiddlewareBuilder.CreateDefault();
 
-    public List<DirectiveSymbol> DirectiveSymbols { get; } = [];
-
     public void AddModelBuilder<TModel>(Action<ModelBuilder<TModel>> configure) where TModel : class
     {
         _modelBuilders.Add((
             typeof(TModel),
             configuration => configure(new ModelBuilder<TModel>(configuration))));
     }
+
+    public void AddDirectiveSymbol(IDirectiveSymbol symbol) => _directiveSymbols.Add(symbol);
 
     /// <inheritdoc />
     public ModelConfiguration GetModelConfiguration(Type modelType)
@@ -50,7 +51,7 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
     public MiddlewareDelegate GetMiddlewarePipeline() => MiddlewareBuilder.BuildPipeline();
 
     /// <inheritdoc />
-    public PropertyBag ApplicationData { get; } = new();
+    public OptionsManager OptionsManager { get; } = new();
 
     /// <inheritdoc />
     public IConsole Console { get; set; } = new SystemConsole();
@@ -65,7 +66,7 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
     public Stream GetAnnotationStream(string resource) => AnnotationStreamProvider(resource);
 
     /// <inheritdoc />
-    public IReadOnlyList<DirectiveSymbol> GetDirectives() => DirectiveSymbols;
+    public IReadOnlyList<IDirectiveSymbol> GetDirectives() => _directiveSymbols;
 
     public Func<string, Stream> AnnotationStreamProvider { get; set; } = File.OpenRead;
 

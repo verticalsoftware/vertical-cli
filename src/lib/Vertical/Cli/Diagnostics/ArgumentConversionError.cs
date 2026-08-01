@@ -8,7 +8,7 @@ namespace Vertical.Cli.Diagnostics;
 public class ArgumentConversionError : CommandLineError
 {
     internal ArgumentConversionError(
-        CliSymbol symbol,
+        ICliSymbol symbol,
         Type expectedType,
         string receivedArgument,
         Exception? exception = null)
@@ -23,7 +23,7 @@ public class ArgumentConversionError : CommandLineError
     /// <summary>
     /// Gets the affected symbol.
     /// </summary>
-    public CliSymbol Symbol { get; }
+    public ICliSymbol Symbol { get; }
 
     /// <summary>
     /// Gets the type the argument should be convertible to.
@@ -40,7 +40,7 @@ public class ArgumentConversionError : CommandLineError
     /// </summary>
     public Exception? Exception { get; }
 
-    private static string FormatMessage(CliSymbol symbol, Type expectedType, string receivedArgument)
+    private static string FormatMessage(ICliSymbol symbol, Type expectedType, string receivedArgument)
     {
         var identifier = GetSymbolIdentifier(symbol);
 

@@ -129,7 +129,7 @@ public abstract class Command : IHelpSubject
         _callSiteInfo = new CallSiteInfo(
             (context, tokenList) => CallSite.Create(
                 context,
-                () => HandlerServiceContext.Create(context.ServiceContext, handler), tokenList),
+                () => HandlerServiceContext.Create(context, handler), tokenList),
             typeof(TModel));
     }
 
@@ -146,7 +146,7 @@ public abstract class Command : IHelpSubject
         _callSiteInfo = new CallSiteInfo(
             (context, tokenList) => CallSite.Create(
                 context,
-                () => HandlerServiceContext.Create(context.ServiceContext, serviceResolver), tokenList),
+                () => HandlerServiceContext.Create(context, serviceResolver), tokenList),
             typeof(TModel));
     }
 
@@ -164,7 +164,7 @@ public abstract class Command : IHelpSubject
         _callSiteInfo = new CallSiteInfo(
             (context, tokenList) => CallSite.Create(
                 context,
-                () => HandlerServiceContext.Create<TModel, THandler>(context.ServiceContext), tokenList),
+                () => HandlerServiceContext.Create<TModel, THandler>(context), tokenList),
             typeof(TModel));
     }
 }
