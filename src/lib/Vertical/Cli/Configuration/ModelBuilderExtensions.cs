@@ -36,7 +36,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IEnumerable<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -72,7 +71,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ICollection<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -108,7 +106,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IReadOnlyCollection<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -144,7 +141,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IList<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -180,7 +176,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IReadOnlyList<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -216,7 +211,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, List<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -252,7 +246,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, LinkedList<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -288,7 +281,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ISet<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -324,7 +316,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IReadOnlySet<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -360,7 +351,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, HashSet<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -396,7 +386,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, SortedSet<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -432,7 +421,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableArray<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -468,7 +456,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableList<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -504,7 +491,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableHashSet<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -540,7 +526,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableSortedSet<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -576,7 +561,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableStack<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -612,7 +596,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableQueue<TElement>>(
                 expression,
                 SymbolKind.PositionArgument,
-                expression.BindingName,
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
@@ -651,7 +634,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IEnumerable<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -690,7 +672,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ICollection<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -729,7 +710,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IReadOnlyCollection<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -768,7 +748,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IList<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -807,7 +786,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IReadOnlyList<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -846,7 +824,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, List<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -885,7 +862,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, LinkedList<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -924,7 +900,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ISet<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -963,7 +938,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IReadOnlySet<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -1002,7 +976,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, HashSet<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -1041,7 +1014,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, SortedSet<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -1080,7 +1052,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableArray<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -1119,7 +1090,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableList<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -1158,7 +1128,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableHashSet<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -1197,7 +1166,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableSortedSet<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -1236,7 +1204,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableStack<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,
@@ -1275,7 +1242,6 @@ public static class ModelBuilderExtensions
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableQueue<TElement>>(
                 expression,
                 SymbolKind.Option,
-                bindingName,
                 0,
                 ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
                 arity ?? Arity.ZeroOrMore,

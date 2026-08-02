@@ -89,7 +89,6 @@ public sealed class CliSymbol<TModel, TValue> : CliSymbol where TModel : class
     internal CliSymbol(
         Expression<Func<TModel, TValue>> expression,
         SymbolKind kind,
-        string bindingName,
         int ordinalPosition,
         string[] aliases,
         Arity arity,

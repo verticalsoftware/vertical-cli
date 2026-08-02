@@ -46,7 +46,6 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Configuration.AddBindingSource(new CliSymbol<TModel, TValue>(
             expression,
             SymbolKind.PositionArgument,
-            expression.BindingName,
             ordinalPosition,
             aliases: [],
             arity: required ? Arity.One : Arity.ZeroOrOne,
@@ -82,7 +81,6 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Configuration.AddBindingSource(new CliSymbol<TModel, TElement[]>(
             expression,
             SymbolKind.PositionArgument,
-            expression.BindingName,
             ordinalPosition,
             aliases: [],
             arity: arity ?? Arity.ZeroOrMore,
@@ -120,7 +118,6 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Configuration.AddBindingSource(new CliSymbol<TModel, TCollection>(
             expression,
             SymbolKind.PositionArgument,
-            expression.BindingName,
             ordinalPosition,
             aliases: [],
             arity: arity ?? Arity.ZeroOrMore,
@@ -159,7 +156,6 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Configuration.AddBindingSource(new CliSymbol<TModel, TValue>(
             expression,
             SymbolKind.Option,
-            bindingName,
             0,
             ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
             required ? Arity.One : Arity.ZeroOrOne,
@@ -198,7 +194,6 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Configuration.AddBindingSource(new CliSymbol<TModel, TElement[]>(
             expression,
             SymbolKind.Option,
-            bindingName,
             0,
             ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
             arity ?? Arity.ZeroOrMore,
@@ -239,7 +234,6 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Configuration.AddBindingSource(new CliSymbol<TModel, TCollection>(
             expression,
             SymbolKind.Option,
-            bindingName,
             0,
             ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
             arity ?? Arity.ZeroOrMore,
@@ -273,7 +267,6 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Configuration.AddBindingSource(new CliSymbol<TModel, bool>(
             expression,
             SymbolKind.Switch,
-            bindingName,
             0,
             ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
             Arity.ZeroOrOne,
