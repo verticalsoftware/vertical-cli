@@ -2,7 +2,7 @@
 
 ## Overview
 
-Commands can be thought of as functions of the application. At a minimum, an application must define one command, but it may also a command hierarchy. Consider the following .NET CLI command:
+Commands can be thought of as functions of the application. At a minimum, an application must define one command, but it can also create a command hierarchy. Consider the following .NET CLI command:
 
 ```shell
 > dotnet nuget push [arguments]

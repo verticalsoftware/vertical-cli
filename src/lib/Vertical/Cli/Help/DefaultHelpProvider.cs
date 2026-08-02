@@ -12,27 +12,9 @@ public class DefaultHelpProvider : IHelpProvider
     public virtual string? GetRemarks(IHelpSubject subject) => subject.HelpTopic?.Remarks;
 
     /// <inheritdoc />
-    public int GetCommandSectionsCount(Command command)
+    public IEnumerable<CommandExtendedRemarks> GetExtendedRemarks(Command command)
     {
-        return command.HelpTopic?.SectionContent?.Length ?? 0;
-    }
-
-    /// <inheritdoc />
-    public string GetCommandSectionHeading(Command command, int sectionId)
-    {
-        return command.HelpTopic?.SectionContent is { } sectionContent
-               && sectionId < sectionContent.Length
-            ? sectionContent[sectionId].Heading
-            : throw new InvalidOperationException($"Command '{command.Path}' does not have section {sectionId}.");
-    }
-
-    /// <inheritdoc />
-    public string GetCommandSectionRemarks(Command command, int sectionId)
-    {
-        return command.HelpTopic?.SectionContent is { } sectionContent
-               && sectionId < sectionContent.Length
-            ? sectionContent[sectionId].Remarks
-            : throw new InvalidOperationException($"Command '{command.Path}' does not have section {sectionId}.");
+        return command.HelpTopic?.ExtendedRemarks ?? [];
     }
 
     /// <inheritdoc />

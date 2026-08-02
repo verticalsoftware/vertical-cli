@@ -9,7 +9,7 @@ In addition to being able to bind a single value to a scalar type model property
 - Interfaces `IEnumerable<T>`, `ICollection<T>`, `IReadOnlyCollection<T>`, `IList<T>`, `IReadOnlyList<T>`, `ISet<T>`, and `IReadOnlySet<T>`
 
 Using multi-valued arguments requires the following implementation:
-- Introduce the array or collection type property to the model
+- Introduce an array or collection type property to the model
 - Configure the parser with the `MapMultiValuedArgument` or `MapMultiValuedOption` methods of the `ModelBuilder<TModel>` type.
 
 The following example prints the colors specified by the user. It binds to a string array in the options model.

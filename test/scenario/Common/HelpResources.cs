@@ -4,20 +4,7 @@ namespace Vertical.Cli.ScenarioTests.Common;
 
 public static class HelpResources
 {
-    public static readonly CommandHelpTopic Root = new CommandHelpTopic(
-        "Creates and extracts compressed, encrypted archive files.",
-        sectionContent:
-        [
-            new HelpContentSection(
-                "Overview",
-                """
-                This utility can create compressed archives that are encrypted. Features include:
-                  - Archives a single file or multiple files.
-                  - The output artifacts can be split split into fixed size chunk files, 
-                    allowing easier uploading to cloud or remote storage.
-                  - Artifacts can be encrypted using symmetric (AES) or asymmetric keys (RSA).
-                """)
-        ]);
+    public static readonly CommandHelpTopic Root = "Creates and extracts compressed, encrypted archive files.";
 
     public static readonly CommandHelpTopic CreateCommand = "Creates an archive set from one or more input files.";
 

@@ -1,35 +1,59 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <help>
-    <topic type="command" id="app">
-        Provides various compression and encryption based file utilities.
+    <topic type="command" id="arcv">
+        <remarks>Create or extract compressed archives, optionally using symmetric or public key encryption.</remarks>
     </topic>
     
-    <topic type="command" id="app compress">
-        Compresses one or more source files into a proprietary archive file using either the gzip or brotli algorithms.
+    <topic type="command" id="arcv create">
+        <remarks>Create a compressed archive optionally using encryption.</remarks>
+        <sections>
+            <section title="Output splitting">
+                Files can be split according to a size threshold. If specified, artifacts will be written to the output directory using a sequential numbering schema concatenated with the file extension. The split size can be specified using the --split option.
+            </section>
+            <section title="Encryption">
+                Archive output can be optionally protected using symmetric or public key encryption. Symmetric encryption is processed using the AES algorithm while asymmetric encryption uses RSA key pairs.
+            </section>
+        </sections>
     </topic>
     
-    <topic type="symbol" id="BasicDemo.IOptions.SourceFiles" parameter-name="path">
-        One or more source files to add to the compression archive.
+    <topic type="symbol" id="BasicDemo.IEncryptionOptions.EncryptionType" parameter-name="type">
+        Encryption type to use when writing or accessing an archive. Supported types are 'symmetric' or 'asymmetric' using the AES or RSA encryption algorithms, respectively. 
     </topic>
     
-    <topic type="symbol" id="BasicDemo.IOptions.OutputFile" parameter-name="path">
-        Path used when creating the output file.
+    <topic type="symbol" id="BasicDemo.IEncryptionOptions.Secret" parameter-name="key">
+        For symmetric encryption, this is the AES cipher key used to create or read the archive. For RSA, this is the reader's public key when writing and private keys when reading.  
     </topic>
     
-    <topic type="symbol" id="BasicDemo.IOptions.PrintSha">
-        Compute and display the sha-256 of the output file.
+    <topic type="symbol" id="BasicDemo.ICompressionOptions.CompressionType" parameter-name="gzip|brotli">
+        Compression type used to read/write archives, either GZip or Brotli algorithms (defaults to GZip).
     </topic>
     
-    <topic type="symbol" id="BasicDemo.IOptions.CompressionType" parameter-name="gzip|brotli">
-        The compression algorithm to use, can be either gzip or brotli.
+    <topic type="symbol" id="BasicDemo.ICreateCommandOptions.ScanDirectories" parameter-name="path">
+        One or more directories where archive source files are matched. When omitted, the current working directory is searched.
     </topic>
     
-    <topic type="symbol" id="BasicDemo.IOptions.SplitSizeKb" parameter-name="kb">
-        Split size, in kb, to optimize the output file.
+    <topic type="symbol" id="BasicDemo.ICreateCommandOptions.OutputDirectory" parameter-name="path">
+        Directory the output artifacts are written to. When omitted, output is written to the current working directory.
     </topic>
     
-    <topic type="symbol" id="BasicDemo.IOptions.Timeout" parameter-name="hh:mm:ss">
-        Maximum time to allow for the operation.
+    <topic type="symbol" id="BasicDemo.ICreateCommandOptions.Patterns" parameter-name="glob">
+        One or more patterns of file names to include in the archive (supports recursive glob patterns).
+    </topic>
+    
+    <topic type="symbol" id="BasicDemo.ICreateCommandOptions.SplitSize" parameter-name="size-spec">
+        Maximum size of any output file expressed in the  format &lt;size&lt;b|k|m|g&gt;&gt; (defaults to 250k).
+    </topic>
+    
+    <topic type="symbol" id="BasicDemo.ICreateCommandOptions.NoManifest">
+        Exclude writing a manifest. v
+    </topic>
+    
+    <topic type="symbol" id="BasicDemo.IOverwriteOptions.Overwrite">
+        Overwrite any existing files with the same name.
+    </topic>
+    
+    <topic type="symbol" id="BasicDemo.ICreateCommandOptions.Metadata" parameter-name="key:value">
+        One or more metadata keys to include in the manifest file.
     </topic>
     
     <topic type="directive" id="log-level" parameter-name="severity">

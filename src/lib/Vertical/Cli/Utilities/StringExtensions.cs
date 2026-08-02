@@ -4,6 +4,8 @@ namespace Vertical.Cli.Utilities;
 
 internal static class StringExtensions
 {
+    public static string? NonWhiteSpaceOrNull(this string? str) => string.IsNullOrWhiteSpace(str) ? null : str;
+    
     extension(string str)
     {
         public string ToKebabCase(string? prefix = null, bool toUpperCase = false, char separator = '-')

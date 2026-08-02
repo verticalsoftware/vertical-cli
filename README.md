@@ -65,7 +65,7 @@ For a setup walkthrough example, we'll build an application that performs the si
 
 ### Defining models
 
-Command handlers are provided instances of applicationd defined model types that have property values set by the client's arguments. The library's source generator will convert and bind string arguments to the following types automatically:
+Command handlers are provided instances of applicationd defined model types that have property values derived from the client's arguments. The library's source generator will convert and bind string arguments to the following types automatically:
 
 - Any type that implements `IParsable<T>`, and any nullable value type that has an `IParsable<T>` type argument (this covers most `System` primitive types suchs as booleans, integers, floats, decimals, and the temporal structs.)
 - Strings
@@ -166,7 +166,7 @@ app.ConfigureParser<ICompressOptions>(builder => builder
 The minimal example concludes by invoking the configuration of the source generator and running the application. The `Configure()` method is provided by the source generated code and is implemented as an extension method. When called, the generated code will add the following to the configuration:
 - Conversion delegates that transform `string` arguments into types expected by the model's properties.
 - A file scoped implementation of the model interface type.
-- A binding function that creates instances of the model type using the parse results configured by the application.
+- A binding function that creates an instance of the model type using the parse results configured by the application.
 
 ```csharp
 // Add generated configuration.
@@ -185,4 +185,7 @@ return await app.RunAsync(args);
 - [Defining and structuring commands](docs/coommands.md)
 - [Using multi valued & variadic symbols](docs/multi-valued-symbols.md)
 - [Validating user input](docs/validation.md)
+- [Application data & services](docs/services.md)
 - [Implement directives for ancillary application control](docs/directives.md)
+- [Tapping into framework flow with middleware](docs/middleware.md)
+- [Implementing advanced model binding](docs/binding.md)

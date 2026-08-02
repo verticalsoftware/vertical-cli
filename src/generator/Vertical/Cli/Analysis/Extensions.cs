@@ -4,6 +4,15 @@ namespace Vertical.Cli.Analysis;
 
 public static class Extensions
 {
+    private static readonly SymbolDisplayFormat FullyQualifiedNullableFormat =
+        new(
+            globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
+            typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+            genericsOptions:
+            SymbolDisplayGenericsOptions.IncludeTypeParameters,
+            miscellaneousOptions:
+            SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+    
     extension(ITypeSymbol typeSymbol)
     {
         public bool IsRecordOrInterface => typeSymbol.IsRecord || typeSymbol.TypeKind == TypeKind.Interface;
@@ -12,7 +21,7 @@ public static class Extensions
             ? $"{typeSymbol.ContainingNamespace.ToDisplayString()}.{typeSymbol.MetadataName}"
             : typeSymbol.MetadataName;
         
-        public string GlobalName => typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        public string GlobalName => typeSymbol.ToDisplayString(FullyQualifiedNullableFormat);
 
         public bool IsParsableType => typeSymbol
             .AllInterfaces

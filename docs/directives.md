@@ -23,7 +23,9 @@ var app = new CommandLineApplication(rootCommand);
 
 app.AddParameterizedDirective(
     "log-level",
-    info => 
+    // The attribute will ensure the string argument can be converted
+    // to the LogLevel enum
+    ([GeneratedConversion] info) => 
     {
         info.ApplicationOptions.Configure<AppOptions>(options => 
             options.LogLevel = info.Value);

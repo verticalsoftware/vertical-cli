@@ -1,5 +1,4 @@
-﻿using Vertical.Cli.Conversion;
-using Vertical.Cli.Help;
+﻿using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
 using Vertical.Cli.IO;
 using Vertical.Cli.Middleware;
@@ -72,12 +71,12 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
 
     public ServiceContext ServiceContext { get; set; } = ServiceContext.Default;
 
-    public void AddArgumentConverter<TValue>(ArgumentConverter<TValue> converter)
+    public void AddArgumentConverter<TValue>(Converter<string, TValue> converter)
     {
         _argumentConverters.Add(typeof(TValue), converter ?? throw new ArgumentNullException(nameof(converter)));
     }
 
-    public void AddCollectionConverter<TElement, TCollection>(CollectionConverter<TElement, TCollection> converter)
+    public void AddCollectionConverter<TElement, TCollection>(Converter<IEnumerable<TElement>, TCollection> converter)
         where TCollection : IEnumerable<TElement>
     {
         _collectionConverters[(typeof(TElement), typeof(TCollection))] = converter ?? 
@@ -85,18 +84,18 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
     }
 
     /// <inheritdoc />
-    public ArgumentConverter<TValue> GetArgumentConverter<TValue>()
+    public Converter<string,TValue> GetArgumentConverter<TValue>()
     {
-        return _argumentConverters.GetValueOrDefault(typeof(TValue)) as ArgumentConverter<TValue>
+        return _argumentConverters.GetValueOrDefault(typeof(TValue)) as Converter<string, TValue>
                ?? throw new InvalidOperationException($"Argument converter for type {typeof(TValue)} not configured.");
     }
 
     /// <inheritdoc />
-    public CollectionConverter<TElement, TCollection> GetCollectionConverter<TElement, TCollection>()
+    public Converter<IEnumerable<TElement>, TCollection> GetCollectionConverter<TElement, TCollection>()
         where TCollection : IEnumerable<TElement>
     {
         return _collectionConverters.GetValueOrDefault((typeof(TElement), typeof(TCollection)))
-                   as CollectionConverter<TElement, TCollection>
+                   as Converter<IEnumerable<TElement>, TCollection>
                ?? throw new InvalidOperationException($"Collection converter {typeof(TCollection)} not configured.");
     }
 }

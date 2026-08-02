@@ -1,7 +1,7 @@
 ﻿namespace Vertical.Cli.Conversion;
 
 /// <summary>
-/// Manages a collection of <see cref="Vertical.Cli.Conversion.ArgumentConverter{T}"/> services.
+/// Manages a collection of value converter services.
 /// </summary>
 public interface IConversionProvider
 {
@@ -9,8 +9,8 @@ public interface IConversionProvider
     /// Gets an argument converter for the given value type.
     /// </summary>
     /// <typeparam name="TValue">Target value type conversion is requested for.</typeparam>
-    /// <returns><see cref="ArgumentConverter{TValue}"/></returns>
-    ArgumentConverter<TValue> GetArgumentConverter<TValue>();
+    /// <returns><see cref="Converter{string, TValue}"/></returns>
+    Converter<string, TValue> GetArgumentConverter<TValue>();
 
     /// <summary>
     /// Gets a converter for the given element and collection type. 
@@ -18,6 +18,6 @@ public interface IConversionProvider
     /// <typeparam name="TElement">Element type</typeparam>
     /// <typeparam name="TCollection">Collection type</typeparam>
     /// <returns></returns>
-    CollectionConverter<TElement, TCollection> GetCollectionConverter<TElement, TCollection>()
+    Converter<IEnumerable<TElement>, TCollection> GetCollectionConverter<TElement, TCollection>()
         where TCollection : IEnumerable<TElement>;
 }

@@ -30,6 +30,7 @@ internal sealed class BufferedConsole : IConsole, IDisposable
     /// </summary>
     public void Flush()
     {
-        _underlyingConsole.Out.Write(_textWriter.ToString());        
+        var text = _textWriter.ToString();
+        _underlyingConsole.Out.Write(text);        
     }
 }

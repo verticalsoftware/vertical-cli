@@ -15,27 +15,11 @@ public interface IHelpProvider
     string? GetRemarks(IHelpSubject subject);
 
     /// <summary>
-    /// Gets the number of content sections for a command.
+    /// Gets extended command remarks.
     /// </summary>
     /// <param name="command">The command instance.</param>
-    /// <returns><see cref="int"/></returns>
-    int GetCommandSectionsCount(Command command);
-
-    /// <summary>
-    /// Gets a command section heading.
-    /// </summary>
-    /// <param name="command">The command instance that contains the section.</param>
-    /// <param name="sectionId">The zero based section id.</param>
-    /// <returns>The section heading.</returns>
-    string GetCommandSectionHeading(Command command, int sectionId);
-    
-    /// <summary>
-    /// Gets a command section remarks.
-    /// </summary>
-    /// <param name="command">The command instance that contains the section.</param>
-    /// <param name="sectionId">The zero based section id.</param>
-    /// <returns>The section heading.</returns>
-    string GetCommandSectionRemarks(Command command, int sectionId);
+    /// <returns>An array of tuples containing section titles and extended remarks.</returns>
+    IEnumerable<CommandExtendedRemarks> GetExtendedRemarks(Command command);
 
     /// <summary>
     /// Gets an identifier for a argument, option, or switch symbol.

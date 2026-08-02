@@ -6,8 +6,6 @@ using Vertical.Cli.Invocation;
 using Vertical.Cli.IO;
 using Vertical.Cli.Middleware;
 using Vertical.Cli.Middleware.Components;
-using Vertical.Cli.Parsing;
-using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli;
 
@@ -66,7 +64,7 @@ public class CommandLineApplication
     /// <param name="converter">A delegate that converts a string argument value to <typeparamref name="TValue"/>.</param>
     /// <typeparam name="TValue">The target value type.</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public CommandLineApplication AddArgumentConverter<TValue>(ArgumentConverter<TValue> converter)
+    public CommandLineApplication AddArgumentConverter<TValue>(Converter<string, TValue> converter)
     {
         _configuration.AddArgumentConverter(converter);
         return this;
@@ -81,7 +79,7 @@ public class CommandLineApplication
     /// <typeparam name="TCollection">Collection type</typeparam>
     /// <returns>A reference to this instance</returns>
     public CommandLineApplication AddCollectionConverter<TElement, TCollection>(
-        CollectionConverter<TElement, TCollection> converter)
+        Converter<IEnumerable<TElement>, TCollection> converter)
         where TCollection : IEnumerable<TElement>
     {
         _configuration.AddCollectionConverter(converter);

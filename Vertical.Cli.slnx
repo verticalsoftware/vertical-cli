@@ -14,4 +14,7 @@
   <Folder Name="/test/scenario/">
     <Project Path="test/scenario/Vertical.Cli.ScenarioTests.csproj" />
   </Folder>
+  <Folder Name="/test/unit/">
+    <Project Path="test/unit/Vertical.Cli.UnitTests.csproj" />
+  </Folder>
 </Solution>

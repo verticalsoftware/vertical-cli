@@ -49,7 +49,7 @@ public sealed class TestApplicationFixture
         );
 
         app.ConfigureParser<ICreateOptions>(builder => builder
-            .MapMultiValuedArgument(x => x.InputFiles,
+            .MapMultiValuedArgument<FileInfo, List<FileInfo>>(x => x.InputFiles,
                 ordinalPosition: 0,
                 arity: Arity.OneOrMore,
                 helpTopic: HelpResources.InputFilesArgument)

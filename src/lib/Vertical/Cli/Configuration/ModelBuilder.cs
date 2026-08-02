@@ -15,11 +15,11 @@ namespace Vertical.Cli.Configuration;
 /// <typeparam name="TModel">The model class that represents an application's arguments.</typeparam>
 public sealed class ModelBuilder<TModel> where TModel : class
 {
-    private readonly ModelConfiguration _configuration;
+    internal ModelConfiguration Configuration { get; }
 
     internal ModelBuilder(ModelConfiguration configuration)
     {
-        _configuration = configuration;
+        Configuration = configuration;
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Action<ValidationEventInfo<TModel, TValue>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
-        _configuration.AddBindingSource(new CliSymbol<TModel, TValue>(
+        Configuration.AddBindingSource(new CliSymbol<TModel, TValue>(
             expression,
             SymbolKind.PositionArgument,
             expression.BindingName,
@@ -79,7 +79,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Action<ValidationEventInfo<TModel, TElement, TElement[]>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
-        _configuration.AddBindingSource(new CliSymbol<TModel, TElement[]>(
+        Configuration.AddBindingSource(new CliSymbol<TModel, TElement[]>(
             expression,
             SymbolKind.PositionArgument,
             expression.BindingName,
@@ -113,11 +113,11 @@ public sealed class ModelBuilder<TModel> where TModel : class
         int ordinalPosition,
         Arity? arity = null,
         Func<TCollection>? defaultProvider = null,
-        Action<ValidationEventInfo<TModel, TCollection>>? validate = null,
+        Action<ValidationEventInfo<TModel, TElement, TCollection>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
         where TCollection : IEnumerable<TElement>
     {
-        _configuration.AddBindingSource(new CliSymbol<TModel, TCollection>(
+        Configuration.AddBindingSource(new CliSymbol<TModel, TCollection>(
             expression,
             SymbolKind.PositionArgument,
             expression.BindingName,
@@ -156,12 +156,12 @@ public sealed class ModelBuilder<TModel> where TModel : class
     {
         var bindingName = expression.BindingName;
         
-        _configuration.AddBindingSource(new CliSymbol<TModel, TValue>(
+        Configuration.AddBindingSource(new CliSymbol<TModel, TValue>(
             expression,
             SymbolKind.Option,
             bindingName,
             0,
-            ValidateAliasesOrGetDefault(bindingName, aliases),
+            ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
             required ? Arity.One : Arity.ZeroOrOne,
             defaultProvider,
             helpTopic,
@@ -190,17 +190,17 @@ public sealed class ModelBuilder<TModel> where TModel : class
         string[]? aliases = null,
         Arity? arity = null,
         Func<TElement[]>? defaultProvider = null,
-        Action<ValidationEventInfo<TModel, TElement[]>>? validate = null,
+        Action<ValidationEventInfo<TModel, TElement, TElement[]>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
         var bindingName = expression.BindingName;
         
-        _configuration.AddBindingSource(new CliSymbol<TModel, TElement[]>(
+        Configuration.AddBindingSource(new CliSymbol<TModel, TElement[]>(
             expression,
             SymbolKind.Option,
             bindingName,
             0,
-            ValidateAliasesOrGetDefault(bindingName, aliases),
+            ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
             arity ?? Arity.ZeroOrMore,
             defaultProvider,
             helpTopic,
@@ -236,12 +236,12 @@ public sealed class ModelBuilder<TModel> where TModel : class
     {
         var bindingName = expression.BindingName;
         
-        _configuration.AddBindingSource(new CliSymbol<TModel, TCollection>(
+        Configuration.AddBindingSource(new CliSymbol<TModel, TCollection>(
             expression,
             SymbolKind.Option,
             bindingName,
             0,
-            ValidateAliasesOrGetDefault(bindingName, aliases),
+            ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
             arity ?? Arity.ZeroOrMore,
             defaultProvider,
             helpTopic,
@@ -270,12 +270,12 @@ public sealed class ModelBuilder<TModel> where TModel : class
     {
         var bindingName = expression.BindingName;
         
-        _configuration.AddBindingSource(new CliSymbol<TModel, bool>(
+        Configuration.AddBindingSource(new CliSymbol<TModel, bool>(
             expression,
             SymbolKind.Switch,
             bindingName,
             0,
-            ValidateAliasesOrGetDefault(bindingName, aliases),
+            ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
             Arity.ZeroOrOne,
             () => false,
             helpTopic,
@@ -315,7 +315,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
             expression.BindingName,
             valueProvider);
         
-        _configuration.AddBindingSource(bindingSource);
+        Configuration.AddBindingSource(bindingSource);
         return this;
     }
 
@@ -339,25 +339,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <returns>A reference to this instance.</returns>
     public ModelBuilder<TModel> SetBinder(ModelBinder<TModel> binder)
     {
-        _configuration.SetBinder(binder);
+        Configuration.SetBinder(binder);
         return this;
-    }
-
-    private static string[] ValidateAliasesOrGetDefault(string bindingName, string[]? aliases)
-    {
-        return aliases is not { Length: > 0 }
-            ? [ArgumentSyntax.CreateGnuAlias(bindingName)]
-            : ValidateAliases(aliases);
-    }
-
-    private static string[] ValidateAliases(string[] aliases)
-    {
-        if (aliases.Where(alias => ArgumentSyntax.GetSyntaxKind(alias) != SyntaxKind.Option).ToArray()
-            is { Length: > 0 } invalid)
-        {
-            throw Exceptions.InvalidOptionOrSwitchAliases(invalid);
-        }
-
-        return aliases;
     }
 }

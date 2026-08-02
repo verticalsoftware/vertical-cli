@@ -1,6 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
 using Vertical.Cli.IO;
-using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Help;
 
@@ -23,24 +22,6 @@ public class HelpArticleWriter
         WriteArgumentsSection(eventInfo);
         WriteOptionsSection(eventInfo);
         WriteDirectivesSection(eventInfo);
-        WriteCommandAdditionalRemarks(eventInfo);
-    }
-
-    private static void WriteCommandAdditionalRemarks(HelpEventInfo eventInfo)
-    {
-        var (writer, command) = (eventInfo.OutputWriter, eventInfo.Command);
-        var provider = eventInfo.HelpProvider;
-        var sectionCount = provider.GetCommandSectionsCount(command);
-
-        for (var sectionId = 0; sectionId < sectionCount; sectionId++)
-        {
-            writer.WriteLine(provider.GetCommandSectionHeading(command, sectionId), DisplayElement.Heading);
-            writer.WriteParagraph(
-                provider.GetCommandSectionRemarks(command, sectionId),
-                new LineBounds(IndentSpaces, eventInfo.DisplayWidth - IndentSpaces),
-                DisplayElement.Remarks);
-            writer.WriteLine();
-        }
     }
 
     private static void WriteArgumentsSection(HelpEventInfo eventInfo)
@@ -100,14 +81,12 @@ public class HelpArticleWriter
         if (command.SubCommands.Count == 0) return;
         
         writer.WriteLine("Commands:", DisplayElement.Heading);
-        writer.WriteTable(
-            command.SubCommands,
-            sub => sub.Name.Length,
-            sub => writer.Write(sub.Name, DisplayElement.ListIdentifier),
-            provider.GetRemarks,
-            DisplayElement.Remarks,
-            lineBounds,
-            IndentSpaces);
+
+        var elements = command
+            .SubCommands
+            .Select(subCommand => CommandSymbolElement.Create(provider, subCommand));
+        
+        writer.WriteTable(elements, lineBounds);
         writer.WriteLine();
     }
 
@@ -174,14 +153,30 @@ public class HelpArticleWriter
 
     private static void WriteCommandDescription(HelpEventInfo eventInfo)
     {
-        if (eventInfo.HelpProvider.GetRemarks(eventInfo.Command) is not { Length: > 0 } remarks)
-            return;
+        var provider = eventInfo.HelpProvider;
+        var command = eventInfo.Command;
+        var remarks = provider.GetRemarks(command);
+        var extendedRemarks = provider.GetExtendedRemarks(command).ToArray();
 
+        if (remarks is null && extendedRemarks.Length == 0)
+            return;
+        
         var writer = eventInfo.OutputWriter;
         writer.WriteLine("Description:", DisplayElement.Heading);
-        writer.WriteParagraph(remarks, 
-            LineBounds.RightJustified(IndentSpaces, eventInfo.DisplayWidth),
-            DisplayElement.Remarks);
-        writer.WriteLine();
+
+        var lineBounds = LineBounds.RightJustified(IndentSpaces, eventInfo.DisplayWidth);
+
+        if (remarks is not null)
+        {
+            writer.WriteParagraph(remarks, lineBounds, DisplayElement.Remarks);
+            writer.WriteLine();
+        }
+
+        foreach (var extendedRemark in extendedRemarks)
+        {
+            writer.WriteLine(extendedRemark.Title, DisplayElement.Heading);
+            writer.WriteParagraph(extendedRemark.Remarks, lineBounds, DisplayElement.Remarks);
+            writer.WriteLine();
+        }
     }
 }

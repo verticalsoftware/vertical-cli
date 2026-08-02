@@ -4,11 +4,15 @@ using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Help;
 
+/// <summary>
+/// Implements a <see cref="IHelpProvider"/> using an xml resource.
+/// </summary>
 public sealed class XmlHelpProvider : IHelpProvider
 {
     private readonly Lazy<(XPathDocument Document, XPathNavigator Navigator)> _lazyResources;
     
     private const string CommandTypeName = "command";
+    private const string CommandExtendedTypeName = "command.extended";
     private const string SymbolTypeName = "symbol";
     private const string DirectiveTypeName = "directive";
     private const string ParameterNameAttribute = "parameter-name";
@@ -30,29 +34,37 @@ public sealed class XmlHelpProvider : IHelpProvider
     {
         return subject switch
         {
-            Command command => GetCommandNode(command)?.Value.Trim(),
-            CliSymbol symbol => GetSymbolNode(symbol)?.Value.Trim(),
-            IDirectiveSymbol directive => GetDirectiveNode(directive)?.Value.Trim(),
+            Command command => GetCommandNode(command)?.SelectSingleNode("remarks")?.Value,
+            CliSymbol symbol => GetSymbolNode(symbol)?.Value,
+            IDirectiveSymbol directive => GetDirectiveNode(directive)?.Value,
             _ => null
         };
     }
 
     /// <inheritdoc />
-    public int GetCommandSectionsCount(Command command)
+    public IEnumerable<CommandExtendedRemarks> GetExtendedRemarks(Command command)
     {
-        return 0;
-    }
+        var sectionNodesIterator = GetCommandNode(command)?
+            .SelectSingleNode("sections")?
+            .SelectChildren(XPathNodeType.Element);
 
-    /// <inheritdoc />
-    public string GetCommandSectionHeading(Command command, int sectionId)
-    {
-        throw new NotImplementedException();
-    }
+        if (sectionNodesIterator is null)
+            yield break;
 
-    /// <inheritdoc />
-    public string GetCommandSectionRemarks(Command command, int sectionId)
-    {
-        throw new NotImplementedException();
+        while (sectionNodesIterator.MoveNext())
+        {
+            var current = sectionNodesIterator.Current;
+            if (current is null)
+                continue;
+
+            var title = current.GetAttribute("title", string.Empty);
+            var remarks = current.Value;
+
+            if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(remarks))
+                continue;
+
+            yield return new CommandExtendedRemarks(title, remarks);
+        }
     }
 
     /// <inheritdoc />
@@ -94,9 +106,12 @@ public sealed class XmlHelpProvider : IHelpProvider
         return Navigator.SelectSingleNode(path);
     }
 
-    private XPathNavigator? GetCommandNode(Command command) => GetNode(CommandTypeName, command.Path);
+    private XPathNavigator? GetCommandNode(Command command) => 
+        GetNode(CommandTypeName, command.Path);
 
-    private XPathNavigator? GetSymbolNode(CliSymbol symbol) => GetNode(SymbolTypeName, $"{symbol.ModelType.FullName}.{symbol.BindingName}");
+    private XPathNavigator? GetSymbolNode(CliSymbol symbol) => 
+        GetNode(SymbolTypeName, $"{symbol.ModelType.FullName}.{symbol.BindingName}");
 
-    private XPathNavigator? GetDirectiveNode(IDirectiveSymbol directive) => GetNode(DirectiveTypeName, directive.Identifier);
+    private XPathNavigator? GetDirectiveNode(IDirectiveSymbol directive) => 
+        GetNode(DirectiveTypeName, directive.Identifier);
 }

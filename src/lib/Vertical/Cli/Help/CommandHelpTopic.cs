@@ -8,11 +8,11 @@ public sealed class CommandHelpTopic : HelpTopic
     /// <inheritdoc />
     public CommandHelpTopic(string remarks, 
         string[]? invocationSyntaxes = null,
-        HelpContentSection[]? sectionContent = null) 
+        CommandExtendedRemarks[]? extendedRemarks = null) 
         : base(remarks)
     {
         InvocationSyntaxes = invocationSyntaxes;
-        SectionContent = sectionContent;
+        ExtendedRemarks = extendedRemarks;
     }
 
     /// <summary>
@@ -21,9 +21,9 @@ public sealed class CommandHelpTopic : HelpTopic
     public string[]? InvocationSyntaxes { get; }
 
     /// <summary>
-    /// Gets the section content.
+    /// Gets the commands extended remarks.
     /// </summary>
-    public HelpContentSection[]? SectionContent { get; }
+    public CommandExtendedRemarks[]? ExtendedRemarks { get; }
 
     public static implicit operator CommandHelpTopic(string remarks) => new(remarks);
 }

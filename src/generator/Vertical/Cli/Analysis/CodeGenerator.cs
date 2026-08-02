@@ -5,7 +5,7 @@ namespace Vertical.Cli.Analysis;
 
 public class CodeGenerator
 {
-    public static string Generate(TypeModel[] typeModels)
+    public static string Generate(GenerationInfo generationInfo)
     {
         var buffer = new StringBuilder(5000);
         var writer = new IndentedCodeWriter(buffer, 0);
@@ -15,9 +15,9 @@ public class CodeGenerator
         writer.WriteLine();
         writer.WriteLine($"namespace {NamingConvention.VerticalCliNs};");
         writer.WriteLine();
-
-        WriteModelClasses(typeModels, ref writer);
-        WriteExtensionClass(typeModels, ref writer);
+        
+        WriteModelClasses(generationInfo.TypeModels, ref writer);
+        WriteExtensionClass(generationInfo, ref writer);
 
         return buffer.ToString();
     }
@@ -63,16 +63,16 @@ public class CodeGenerator
             });
     }
 
-    private static void WriteExtensionClass(TypeModel[] typeModels, ref IndentedCodeWriter writer)
+    private static void WriteExtensionClass(GenerationInfo generationInfo, ref IndentedCodeWriter writer)
     {
         writer.WriteLine("/// <summary>");
         writer.WriteLine("/// Provides configuration extensions to the CommandLineApplication class.");
         writer.WriteLine("/// </summary>");
         writer.WriteLine("public static class CommandLineApplicationExtensions");
-        writer.WriteBlock(IndentedCodeWriter.CurlyBraces, (ref inner) => WriteExtensionClassBody(typeModels, ref inner));
+        writer.WriteBlock(IndentedCodeWriter.CurlyBraces, (ref inner) => WriteExtensionClassBody(generationInfo, ref inner));
     }
 
-    private static void WriteExtensionClassBody(TypeModel[] typeModels, ref IndentedCodeWriter writer)
+    private static void WriteExtensionClassBody(GenerationInfo generationInfo, ref IndentedCodeWriter writer)
     {
         writer.WriteLine("/// <summary>");
         writer.WriteLine("/// Adds model binding configurations for types annotated with");
@@ -80,7 +80,7 @@ public class CodeGenerator
         writer.WriteLine("/// </summary>");
         writer.WriteLine("/// <param name=\"app\">The application instance to add configuration to.</param>");
         writer.WriteLine($"public static void Configure(this {NamingConvention.CommandLineApplicationClassFqName} app)");
-        writer.WriteBlock(IndentedCodeWriter.CurlyBraces, (ref inner) => WriteConfigureMethodBody(typeModels, ref inner));
+        writer.WriteBlock(IndentedCodeWriter.CurlyBraces, (ref inner) => WriteConfigureMethodBody(generationInfo, ref inner));
         writer.WriteLine();
         writer.WriteLine("/// <summary>");
         writer.WriteLine("/// Calls the <c>Configure</c> and <c>RunAsync</c> methods.");
@@ -96,10 +96,10 @@ public class CodeGenerator
         });
     }
 
-    private static void WriteConfigureMethodBody(TypeModel[] typeModels, ref IndentedCodeWriter writer)
+    private static void WriteConfigureMethodBody(GenerationInfo generationInfo, ref IndentedCodeWriter writer)
     {
-        AddConverters(typeModels, ref writer);
-        AddModelBinders(typeModels, ref writer);
+        AddConverters(generationInfo, ref writer);
+        AddModelBinders(generationInfo.TypeModels, ref writer);
     }
 
     private static void AddModelBinders(TypeModel[] typeModels, ref IndentedCodeWriter writer)
@@ -110,16 +110,18 @@ public class CodeGenerator
         }
     }
 
-    private static void AddConverters(TypeModel[] typeModels, ref IndentedCodeWriter writer)
+    private static void AddConverters(GenerationInfo generationInfo, ref IndentedCodeWriter writer)
     {
-        var propertyTypes = typeModels
+        var conversionTypes = generationInfo 
+            .TypeModels
             .SelectMany(model => model.PropertyTypes)
+            .Concat(generationInfo.ConversionTypes)
             .Distinct(SymbolEqualityComparer.Default)
             .Cast<ITypeSymbol>();
 
         var visitedArgumentTypes = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
 
-        foreach (var type in propertyTypes)
+        foreach (var type in conversionTypes)
         {
             if (ConversionExpressionFactory.TryCreate(type) is not { } expressionInfo)
                 continue;

@@ -63,6 +63,6 @@ builder.MapArgument(
     x => x.InputFiles,
     ordinalPosition: 0,
     validate: collection => collection
-        .EachValue(element => elementContext.MustExist()),
+    ➡️  .EachValue(element => elementContext.MustExist()),
     /* ... */);
 ```
