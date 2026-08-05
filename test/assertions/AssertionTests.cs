@@ -20,12 +20,12 @@ public class AssertionTests
         var app = new CommandLineApplication(rootCommand);
 
         app.ConfigureParser<IModel>(model => model
-            .MapOption(x => x.MultipleBindings)
+            .ParseOption(x => x.MultipleBindings)
             .MapStaticValue(x => x.MultipleBindings, "value")
-            .MapOption(x => x.Password, ["-p", "--password"])
-            .MapOption(x => x.Port, ["-p", "--port"])
-            .MapMultiValuedArgument(x => x.Variadic1, ordinalPosition: 0, Arity.ZeroOrMore)
-            .MapMultiValuedArgument(x => x.Variadic2, ordinalPosition: 0, Arity.ZeroOrMore)
+            .ParseOption(x => x.Password, ["-p", "--password"])
+            .ParseOption(x => x.Port, ["-p", "--port"])
+            .ParseRepeatableArgument(x => x.Variadic1, ordinalPosition: 0, Arity.ZeroOrMore)
+            .ParseRepeatableArgument(x => x.Variadic2, ordinalPosition: 0, Arity.ZeroOrMore)
         );
 
         var assertions = app.GetConfigurationAssertions();

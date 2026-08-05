@@ -30,52 +30,52 @@ public sealed class TestApplicationFixture
         var app = new CommandLineApplication(rootCommand);
         
         app.ConfigureParser<ISharedOptions>(builder => builder
-            .MapOption(x => x.CompressionType,
+            .ParseOption(x => x.CompressionType,
                 ["-c", "--compression"],
                 defaultProvider: () => CompressionType.GZip,
                 helpTopic: HelpResources.CompressionTypeOption)
-            .MapOption(x => x.EncryptionType,
+            .ParseOption(x => x.EncryptionType,
                 ["-e", "--encrypt"],
                 defaultProvider: () => EncryptionType.RSA,
                 helpTopic: HelpResources.EncryptionTypeOption)
-            .MapOption(x => x.Timeout, 
+            .ParseOption(x => x.Timeout, 
                 helpTopic: HelpResources.TimeoutOption,
                 validate: info => info.MustBeLessThan(TimeSpan.FromMinutes(5)))
-            .MapSwitch(x => x.ComputeSha, helpTopic: HelpResources.ComputeShaSwitch)
-            .MapSwitch(x => x.Overwrite, helpTopic: HelpResources.OverwriteSwitch)
-            .MapOption(x => x.SecretKey,
+            .ParseSwitch(x => x.ComputeSha, helpTopic: HelpResources.ComputeShaSwitch)
+            .ParseSwitch(x => x.Overwrite, helpTopic: HelpResources.OverwriteSwitch)
+            .ParseOption(x => x.SecretKey,
                 ["--secret"],
                 required: true,
                 helpTopic: HelpResources.SecretOption)
         );
 
         app.ConfigureParser<ICreateOptions>(builder => builder
-            .MapMultiValuedArgument<FileInfo, List<FileInfo>>(x => x.InputFiles,
+            .ParseRepeatableArgument<FileInfo, List<FileInfo>>(x => x.InputFiles,
                 ordinalPosition: 0,
                 arity: Arity.OneOrMore,
                 helpTopic: HelpResources.InputFilesArgument)
-            .MapOption(x => x.OutputFile,
+            .ParseOption(x => x.OutputFile,
                 aliases: ["--out"],
                 required: true,
                 helpTopic: HelpResources.CompressOutputFileOption)
-            .MapSwitch(x => x.IncludeMetadata, helpTopic: HelpResources.IncludeMetadataSwitch)
-            .MapOption(x => x.OutputFileSplitSize,
+            .ParseSwitch(x => x.IncludeMetadata, helpTopic: HelpResources.IncludeMetadataSwitch)
+            .ParseOption(x => x.OutputFileSplitSize,
                 ["--split-size"],
                 defaultProvider: () => new FileSize(250, "m"),
                 helpTopic: HelpResources.OutputFileSplitSizeOption)
-            .MapMultiValuedOption<KeyValuePair<string, string>, Dictionary<string, string>>(
+            .ParseRepeatableOption<KeyValuePair<string, string>, Dictionary<string, string>>(
                 x => x.Properties,
                 ["--property"],
                 arity: Arity.ZeroOrMore,
                 helpTopic: HelpResources.PropertiesOption));
 
         app.ConfigureParser<IExtractOptions>(builder => builder
-            .MapArgument(
+            .ParseArgument(
                 x => x.InputFile,
                 ordinalPosition: 0,
                 required: true,
                 helpTopic: HelpResources.InputFileArgument)
-            .MapOption(
+            .ParseOption(
                 x => x.OutputPath,
                 ["--out"],
                 defaultProvider: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
@@ -88,7 +88,7 @@ public sealed class TestApplicationFixture
         //     _ => Task.CompletedTask,
         //     helpTopic: HelpResources.LogLevelDirective);
 
-        app.AddParameterizedDirective<LogLevel>(
+        app.HandleParameterizedDirective<LogLevel>(
             "log-level",
             _ => Task.CompletedTask,
             helpTopic: HelpResources.LogLevelDirective);

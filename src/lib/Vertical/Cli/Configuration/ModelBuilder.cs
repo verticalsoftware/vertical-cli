@@ -33,7 +33,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TValue">The value type</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapArgument<TValue>(
+    public ModelBuilder<TModel> ParseArgument<TValue>(
         Expression<Func<TModel, TValue>> expression,
         int ordinalPosition,
         bool required = false,
@@ -68,7 +68,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TElement">The value type</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+    public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
         Expression<Func<TModel, TElement[]>> expression,
         int ordinalPosition,
         Arity? arity = null,
@@ -104,7 +104,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <typeparam name="TElement">The value type</typeparam>
     /// <typeparam name="TCollection">The property's collection type.</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapMultiValuedArgument<TElement, TCollection>(
+    public ModelBuilder<TModel> ParseRepeatableArgument<TElement, TCollection>(
         Expression<Func<TModel, TCollection>> expression,
         int ordinalPosition,
         Arity? arity = null,
@@ -141,7 +141,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TValue">The value type</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapOption<TValue>(
+    public ModelBuilder<TModel> ParseOption<TValue>(
         Expression<Func<TModel, TValue>> expression,
         string[]? aliases = null,
         bool required = false,
@@ -179,7 +179,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TElement">The value type</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+    public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
         Expression<Func<TModel, TElement[]>> expression,
         string[]? aliases = null,
         Arity? arity = null,
@@ -218,7 +218,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <typeparam name="TElement">The value type</typeparam>
     /// <typeparam name="TCollection">The property's collection type.</typeparam>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapMultiValuedOption<TElement, TCollection>(
+    public ModelBuilder<TModel> ParseRepeatableOption<TElement, TCollection>(
         Expression<Func<TModel, TCollection>> expression,
         string[]? aliases = null,
         Arity? arity = null,
@@ -254,7 +254,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <param name="validate">A delegate that performs data validation checks.</param>
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapSwitch(
+    public ModelBuilder<TModel> ParseSwitch(
         Expression<Func<TModel, bool>> expression,
         string[]? aliases = null,
         Action<IValidationEventInfo<TModel, bool>>? validate = null,

@@ -28,7 +28,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, IEnumerable<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -63,7 +63,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, ICollection<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -98,7 +98,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, IReadOnlyCollection<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -133,7 +133,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, IList<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -168,7 +168,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, IReadOnlyList<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -203,7 +203,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, List<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -238,7 +238,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, LinkedList<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -273,7 +273,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, ISet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -308,7 +308,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, IReadOnlySet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -343,7 +343,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, HashSet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -378,7 +378,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, SortedSet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -413,7 +413,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, ImmutableArray<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -448,7 +448,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, ImmutableList<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -483,7 +483,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, ImmutableHashSet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -518,7 +518,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, ImmutableSortedSet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -553,7 +553,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, ImmutableStack<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -588,7 +588,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedArgument<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableArgument<TElement>(
             Expression<Func<TModel, ImmutableQueue<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
@@ -624,7 +624,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, IEnumerable<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -662,7 +662,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ICollection<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -700,7 +700,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, IReadOnlyCollection<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -738,7 +738,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, IList<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -776,7 +776,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, IReadOnlyList<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -814,7 +814,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, List<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -852,7 +852,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, LinkedList<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -890,7 +890,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ISet<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -928,7 +928,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, IReadOnlySet<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -966,7 +966,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, HashSet<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -1004,7 +1004,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, SortedSet<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -1042,7 +1042,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableArray<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -1080,7 +1080,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableList<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -1118,7 +1118,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableHashSet<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -1156,7 +1156,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableSortedSet<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -1194,7 +1194,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableStack<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,
@@ -1232,7 +1232,7 @@ public static class ModelBuilderExtensions
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
         /// <returns>A reference to this instance.</returns>
-        public ModelBuilder<TModel> MapMultiValuedOption<TElement>(
+        public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableQueue<TElement>>> expression,
             string[]? aliases = null,
             Arity? arity = null,

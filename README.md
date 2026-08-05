@@ -4,11 +4,11 @@ Develop CLI applications using a rich argument binding framework.
 
 ## Features
 
-- Parses scalar and variadic arguments and GNU style short and long from options.
+- Parses position arguments and GNU style short and long from options.
 - Binds string arguments to strongly typed application option models.
 - Performs value conversion, collection creation, and model composition using a source generator.
 - Supports application directives and response file annotations.
-- Supports a hierarchical command structure.
+- Supports hierarchical command structures.
 - Provides a customizable help system.
 - Offers optional integration with the application's services for command handler resolution.
 
@@ -31,7 +31,7 @@ command.SetHandler((IOptions options, CancellationToken cancellationToken) =>
 
 // Define the application and the options model
 var app = new CommandLineApplication(command);
-app.ConfigureModel<IOptions>(builder => builder.MapArgument(x => x.UserName, required: true));
+app.ConfigureModel<IOptions>(builder => builder.ParseArgument(x => x.UserName, required: true));
 
 // 
 app.Configure();
@@ -65,7 +65,7 @@ For a setup walkthrough example, we'll build an application that performs the si
 
 ### Defining models
 
-Command handlers are provided instances of applicationd defined model types that have property values derived from the client's arguments. The library's source generator will convert and bind string arguments to the following types automatically:
+Command handlers are provided instances of application defined model types that have property values derived from the client's arguments. The library's source generator will convert and bind string arguments to the following types automatically:
 
 - Any type that implements `IParsable<T>`, and any nullable value type that has an `IParsable<T>` type argument (this covers most `System` primitive types suchs as booleans, integers, floats, decimals, and the temporal structs.)
 - Strings
@@ -73,7 +73,7 @@ Command handlers are provided instances of applicationd defined model types that
 - File system types `FileInfo` and `DirectoryInfo`.
 - `System.Uri`
 
-Models are defined by the application using interfaces. This was chosen so that common symbols can be reused throughout command hierarchies and model types can be composed across mutliple interface base types. The source generator will create a class that complies with the interface and bind argument values to it.
+Models are defined by the application using interfaces. This was chosen so that common symbols can be reused throughout command hierarchies and model types can be composed across multiple interface base types. The source generator will create a class that complies with the interface and bind argument values to it.
 
 ```csharp
 // Define an interface that models the compress commands options
@@ -133,7 +133,7 @@ rootCommand.SetHandler(async (
 ### Associating position arguments and option symbols to the model type
 
 The parser needs to know what property the converted value of each argument should be assigned to. It must be also be configured with the following:
-- The _arity_ requirement of the arugment or option. This informs the parser whether use of the argument of option is required, or in the case of variadic arguments, the minimum and maximum number of occurrences are expected and allowed.
+- The _arity_ requirement of the argument or option. This informs the parser whether use of the argument or option is required, or in the case of repeatable symbols, the minimum and maximum number of occurrences are expected and allowed.
 - The ordinal index of position arguments, since they are not named. The first argument should have a position of `0`, the second `1`, and so on.
 - One or more _alias_ assignments to options and switches. These are the GNU option identifiers such as `-u` or `--user-id`. If an alias isn't defined by the application, the library will create an alias using a lower case kebab format of the property name.
 
@@ -148,16 +148,16 @@ The code example continues by configuring the parser for the `ICompressOptions` 
 var app = new CommandLineApplication(rootCommand);
 
 app.ConfigureParser<ICompressOptions>(builder => builder
-    .MapArgument(x => x.InputFile,
+    .ParseArgument(x => x.InputFile,
         ordinalPosition: 0,
         required: true)
-    .MapArgument(x => x.OutputFile,
+    .ParseArgument(x => x.OutputFile,
         ordinalPosition: 1,
         required: true)
-    .MapOption(x => x.CompressionType,
+    .ParseOption(x => x.CompressionType,
         aliases: ["--compression"],
         defaultProvider: () => CompressionType.GZip)
-    .MapSwitch(x => x.Overwrite)
+    .ParseSwitch(x => x.Overwrite)
 );
 ```
 

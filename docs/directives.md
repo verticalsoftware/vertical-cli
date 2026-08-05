@@ -2,7 +2,7 @@
 
 ## Overview
 
-In addition to full routing and model binding capability, the framework also provides various hooks into the control flow of the application in the form of directives, unbound options, and middleware.
+In addition to full routing and model binding capability, the framework also provides various hooks into the control flow of the application in the form of directives and middleware.
 
 ## Directives
 
@@ -21,7 +21,7 @@ var app = new CommandLineApplication(rootCommand);
 
 // Other configuration
 
-app.AddParameterizedDirective(
+app.HandleParameterizedDirective(
     "log-level",
     // The attribute will ensure the string argument can be converted
     // to the LogLevel enum

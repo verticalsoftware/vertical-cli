@@ -14,17 +14,17 @@ The following extends the initial example by checking if the input file to the c
 
 ```csharp
 app.ConfigureParser<ICompressOptions>(builder => builder
-    .MapArgument(x => x.InputFile,
+    .ParseArgument(x => x.InputFile,
         ordinalPosition: 0,
         required: true,
     ➡️ validate: file => file.Exists())
-    .MapArgument(x => x.OutputFile,
+    .ParseArgument(x => x.OutputFile,
         ordinalPosition: 1,
         required: true)
-    .MapOption(x => x.CompressionType,
+    .ParseOption(x => x.CompressionType,
         aliases: ["--compression"],
         defaultProvider: () => CompressionType.GZip)
-    .MapSwitch(x => x.Overwrite)
+    .ParseSwitch(x => x.Overwrite)
 );
 ```
 

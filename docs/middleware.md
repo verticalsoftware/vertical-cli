@@ -34,6 +34,11 @@ Common implementation patterns include:
 - Pass control to the rest of the pipeline first with `await next(context)`, then evaluate the state of the context and perform post application work.
 - Detect a state in the context, perform any work, and then short circuit.
 
+## Middleware use cases
+
+An application should write a middleware component when:
+- It needs to read, react to, or manipulate the user's input.
+- Perform an action before or after a command action runs, or before a specific middleware is run.
 
 ## Configuring the pipeline
 

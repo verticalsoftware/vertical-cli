@@ -30,13 +30,13 @@ var command = new RootCommand(
 app.ConfigureParser<IOptions>(builder =>
     
     // Use a string for a help topic
-    builder.MapArgument(
+    builder.ParseArgument(
         x => x.InputFile,
         ordinalPosition: 0,
         helpTopic: "Path to the input file.")
 
     // Customize a parameter name for an option
-    builder.MapOption(
+    builder.ParseOption(
         x => x.OutputFile,
         helpTopic: new SymbolHelpTopic(
             "Path to the output file",

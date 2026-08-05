@@ -6,7 +6,7 @@ The framework performs the following to get a strongly typed options object to a
 
 - Parses the raw input strings provided by the application's entry point `args` into `ArgumentToken` values. The parser determines the structure of each argument, e.g. whether it has a symbol, an attached parameter value, etc.
 - Composes a `ParseResult`, which associates each input token with the property of the model, performs conversions from `string` to the property type, and checks to see if arity requirements are met.
-- Invokes the `ModelBinder<TModel>` delegate. This delegate receives a `BindingContext<TModel>` and is responsible for create instances of `TModel` using the parsed and converted values.
+- Invokes the `ModelBinder<TModel>` delegate. This delegate receives a `BindingContext<TModel>` and is responsible for creating instances of `TModel` using the parsed and converted values.
 
 ## Model Binding
 
@@ -68,7 +68,7 @@ app.ConfigureParser<OptionsImpl>(builder =>
 
 ## Configuring private bindings
 
-When applications need option objects constructed with data that is not specified with user input, it configures a private binding. The parser can be configured with application data that the user is not aware of.
+When applications need option objects constructed with data that is not specified derived from user input, it configures a private binding. The parser can be configured with application data that the user has no influence on.
 
 The following example shows different ways private bindings can be configured:
 
@@ -92,7 +92,7 @@ app.ConfigureParser<IOptions>(builder =>
 
 ## Using custom application types
 
-If an application has control over a model's type, then the most direct way to provide conversion support is to implement `IParsable<T>`. The source generator will detect this when inspecting the property type, and a converter will be made automatically available.
+If an application has control over a model's type, then the most direct way to provide conversion support is to implement `IParsable<T>`. The source generator will detect this when inspecting the property types, and a converter will be made automatically available.
 
 Otherwise, a `Converter<string, TValue>` must be provided. When implemnting an argument converter, throw an exception if the conversion fails. Only include a short description of the problem - the parser will compose a message with the appropriate identifier.
 
@@ -121,8 +121,10 @@ app.AddCollectionConverter(
         new Dictionary<string, string>(values));
 )
 
+// Configure the parser - both the argument type and the model's collection
+// type need to be specified.
 app.ConfigureParser<IOptions>(builder => builder
-    .MapMultiValuedArgument(
+    .ParseRepeatableArgument<KeyValuePair<string, string>, Dictionary<string, string>>(
         x => x.ConnectionProperties,
         ordinalPosition: 0,
         arity: Arity.OneOrMore

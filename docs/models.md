@@ -36,7 +36,7 @@ var app = new CommandLineAppliation(rootCommand);
 
 app.ConfigureParser<ISubCommand1Options>(builder =>
     builder
-        .AddOption(
+        .MapOption(
             x => x.LogLevel, 
             ["-log-level"], 
             defaultProvider: () => LogLevel.Information));
@@ -76,7 +76,7 @@ var app = new CommandLineAppliation(rootCommand);
 
 app.ConfigureParser<ILoggingOptions>(builder =>
     builder
-        .AddOption(
+        .MapOption(
             x => x.LogLevel, 
             ["-log-level"], 
             defaultProvider: () => LogLevel.Information));

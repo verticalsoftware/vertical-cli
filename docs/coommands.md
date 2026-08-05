@@ -15,7 +15,7 @@ In the vertical-cli framework:
 
 This hierarchy demonstrates the concept of _abstract_ commands in the sense that `dotnet nuget` by itself will not perform a function, therefore the following concepts present themselves:
 - A command can be abstract and have no set handling function. In this case it must define one or more sub-commands to have any use.
-- A command can be concrete with a set handling function.
+- A command can be invokable by establishing a handling function.
 - Commands can have both a handling function and sub commands.
 
 ### Hierarchy example

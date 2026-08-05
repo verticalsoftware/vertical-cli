@@ -103,7 +103,7 @@ public class CommandLineApplication
     /// <param name="handler">An asynchronous handler that is invoked when a token is matched.</param>
     /// <param name="helpTopic">Optional help topic to associate with the directive.</param>
     /// <returns>A reference to this instance.</returns>
-    public CommandLineApplication AddDirective(
+    public CommandLineApplication HandleDirective(
         string identifier,
         Func<DirectiveEventInfo, Task> handler,
         SymbolHelpTopic? helpTopic = null)
@@ -124,7 +124,7 @@ public class CommandLineApplication
     /// <param name="defaultProvider">A function that returns a default value.</param>
     /// <param name="helpTopic">Optional help topic to associate with the directive.</param>
     /// <returns>A reference to this instance.</returns>
-    public CommandLineApplication AddParameterizedDirective<TValue>(
+    public CommandLineApplication HandleParameterizedDirective<TValue>(
         string identifier,
         Func<DirectiveEventInfo<TValue>, Task> handler,
         Func<TValue>? defaultProvider = null,

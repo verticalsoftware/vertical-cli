@@ -15,7 +15,7 @@ public class DirectiveTests
 
         var app = new CommandLineApplication(command);
         app.ConfigureParser<object>(builder => builder.SetBinder(_ => new object()));
-        app.AddDirective(
+        app.HandleDirective(
             "test",
             eventInfo =>
             {
@@ -35,7 +35,7 @@ public class DirectiveTests
 
         var app = new CommandLineApplication(command);
         app.ConfigureParser<object>(builder => builder.SetBinder(_ => new object()));
-        app.AddParameterizedDirective<string>(
+        app.HandleParameterizedDirective<string>(
             "test",
             eventInfo =>
             {
