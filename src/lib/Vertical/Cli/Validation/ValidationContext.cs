@@ -58,7 +58,7 @@ public sealed class ValidationContext
         _errorList.Add(error);
     }
 
-    private IEnumerable<CommandLineError> Validate()
+    private List<CommandLineError> Validate()
     {
         foreach (var symbol in Symbols)
         {
