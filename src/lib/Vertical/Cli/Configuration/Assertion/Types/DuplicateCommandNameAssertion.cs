@@ -13,8 +13,19 @@ public sealed class DuplicateCommandNameAssertion : ConfigurationAssertion
         SubCommands = subCommands;
     }
 
+    /// <summary>
+    /// Gets the parent command.
+    /// </summary>
     public Command Command { get; }
+    
+    /// <summary>
+    /// Gets the name shared between two or more sub commands.
+    /// </summary>
     public string Name { get; }
+    
+    /// <summary>
+    /// Gets the sub command that share a common name.
+    /// </summary>
     public IEnumerable<Command> SubCommands { get; }
 
     /// <inheritdoc />

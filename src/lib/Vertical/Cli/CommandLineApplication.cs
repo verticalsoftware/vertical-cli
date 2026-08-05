@@ -15,6 +15,10 @@ public class CommandLineApplication
 {
     private readonly RootConfiguration _configuration;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CommandLineApplication"/> class.
+    /// </summary>
+    /// <param name="rootCommand">The application's root command.</param>
     public CommandLineApplication(RootCommand rootCommand)
     {
         ArgumentNullException.ThrowIfNull(rootCommand);

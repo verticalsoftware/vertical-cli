@@ -11,6 +11,6 @@ public interface IHandler<in TModel> where TModel : class
     /// </summary>
     /// <param name="options">The constructed options model.</param>
     /// <param name="cancellationToken">A token that can be observed for cancellation.</param>
-    /// <returns><see cref="Task{int}"/></returns>
+    /// <returns>A task with the application exit code.</returns>
     Task<int> HandleAsync(TModel options, CancellationToken cancellationToken);
 }

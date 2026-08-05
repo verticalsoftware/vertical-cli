@@ -25,5 +25,8 @@ public sealed class CommandHelpTopic : HelpTopic
     /// </summary>
     public CommandExtendedRemarks[]? ExtendedRemarks { get; }
 
+    /// <summary>
+    /// Implicitly converts the given remarks to a help topic.
+    /// </summary>
     public static implicit operator CommandHelpTopic(string remarks) => new(remarks);
 }

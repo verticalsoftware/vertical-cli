@@ -2,6 +2,9 @@
 
 namespace Vertical.Cli.Configuration.Assertion;
 
+/// <summary>
+/// Extends <see cref="CommandLineApplication"/> with assertion functions.
+/// </summary>
 public static class ConfigurationAssertionExtensions
 {
     /// <summary>

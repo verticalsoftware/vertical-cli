@@ -113,5 +113,8 @@ public sealed class InvocationContext : IDisposable
 
     internal ServiceContext ServiceContext => _configuration.ServiceContext;
 
+    /// <summary>
+    /// Signals cancellation on the internal source.
+    /// </summary>
     public void RequestCancel() => _cancelSource.Cancel();
 }

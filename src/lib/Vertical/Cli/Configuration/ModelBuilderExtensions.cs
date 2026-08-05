@@ -8,6 +8,9 @@ using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;
 
+/// <summary>
+/// Provides extension methods for <see cref="ModelBuilder{TModel}"/>
+/// </summary>
 public static class ModelBuilderExtensions
 {
     extension<TModel>(ModelBuilder<TModel> builder) where TModel : class

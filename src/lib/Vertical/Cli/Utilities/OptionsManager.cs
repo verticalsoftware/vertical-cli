@@ -18,7 +18,7 @@ public sealed class OptionsManager
     /// Gets or creates the options type.
     /// </summary>
     /// <typeparam name="TOptions">Options type</typeparam>
-    /// <returns><see cref="TOptions"/></returns>
+    /// <returns>A singleton instance of the options type.</returns>
     public TOptions GetOptions<TOptions>() where TOptions : class, new()
     {
         return (TOptions)_data.GetOrAdd(typeof(TOptions), () => new TOptions());

@@ -3,6 +3,9 @@ using Vertical.Cli.Parsing;
 
 namespace Vertical.Cli.Configuration;
 
+/// <summary>
+/// Represents a directive symbol.
+/// </summary>
 public interface IDirectiveSymbol : ICliSymbol
 {
     /// <summary>

@@ -1,5 +1,8 @@
 ﻿namespace Vertical.Cli.Validation;
 
+/// <summary>
+/// Defines validation function based on set values.
+/// </summary>
 public static class SetValidationExtensions
 {
     extension<TModel, TValue>(IValidationEventInfo<TModel, TValue> eventInfo) where TModel : class

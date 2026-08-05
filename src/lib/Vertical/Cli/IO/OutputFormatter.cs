@@ -24,11 +24,20 @@ public class OutputFormatter
         //[DisplayElement.RequiredAnnotation] = "\e[38;5;166m"
     };
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OutputFormatter"/> class.
+    /// </summary>
+    /// <param name="theme">A dictionary containing formatting codes for the display elements.</param>
     public OutputFormatter(Dictionary<DisplayElement, string>? theme = null)
     {
         _theme = theme ?? _defaultTheme;
     }
     
+    /// <summary>
+    /// Writes an ANSI formatting control sequence.
+    /// </summary>
+    /// <param name="textWriter">The text writer where output is being directed to.</param>
+    /// <param name="element">The element type being written immediately after the control code.</param>
     public virtual void WriteControlSequence(TextWriter textWriter, DisplayElement element)
     {
         var controlCode = _theme.GetValueOrDefault(element) ?? "\e[0m";

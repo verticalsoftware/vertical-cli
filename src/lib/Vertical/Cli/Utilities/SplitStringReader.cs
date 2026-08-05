@@ -1,6 +1,6 @@
 ﻿namespace Vertical.Cli.Utilities;
 
-public ref struct SplitStringReader
+internal ref struct SplitStringReader
 {
     private readonly int _splitLength;
     private ReadOnlySpan<char> _span;

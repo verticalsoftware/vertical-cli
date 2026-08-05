@@ -2,6 +2,9 @@
 
 namespace Vertical.Cli;
 
+/// <summary>
+/// Defines ancillary configuration methods.
+/// </summary>
 public static partial class CommandLineApplicationExtensions
 {
     /// <summary>

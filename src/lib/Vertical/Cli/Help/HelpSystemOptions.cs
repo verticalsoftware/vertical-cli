@@ -1,5 +1,8 @@
 ﻿namespace Vertical.Cli.Help;
 
+/// <summary>
+/// Represents configuration options for the help system.
+/// </summary>
 public sealed class HelpSystemOptions
 {
     /// <summary>

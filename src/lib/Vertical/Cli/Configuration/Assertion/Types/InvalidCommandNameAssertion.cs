@@ -10,6 +10,9 @@ public sealed class InvalidCommandNameAssertion : ConfigurationAssertion
         Command = command;
     }
 
+    /// <summary>
+    /// Ges the command with the invalid name.
+    /// </summary>
     public Command Command { get; }
 
     /// <inheritdoc />

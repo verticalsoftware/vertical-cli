@@ -9,7 +9,7 @@ public interface IConversionProvider
     /// Gets an argument converter for the given value type.
     /// </summary>
     /// <typeparam name="TValue">Target value type conversion is requested for.</typeparam>
-    /// <returns><see cref="Converter{string, TValue}"/></returns>
+    /// <returns><see cref="Converter{TInput,TOutput}"/></returns>
     Converter<string, TValue> GetArgumentConverter<TValue>();
 
     /// <summary>

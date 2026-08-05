@@ -3,6 +3,9 @@ using Vertical.Cli.Parsing;
 
 namespace Vertical.Cli.Invocation;
 
+/// <summary>
+/// Determines the target command.
+/// </summary>
 public static class CommandResolver
 {
     /// <summary>

@@ -8,9 +8,12 @@ using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;
 
+/// <summary>
+/// Represents a position argument, option, or switch.
+/// </summary>
 public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
 {
-    protected CliSymbol(
+    internal CliSymbol(
         SymbolKind kind,
         PropertyInfo propertyInfo,
         int? ordinalPosition,
@@ -104,6 +107,11 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
     }
 }
 
+/// <summary>
+/// Represents a position argument, option, or switch.
+/// </summary>
+/// <typeparam name="TModel">Model type</typeparam>
+/// <typeparam name="TValue">Property type</typeparam>
 public sealed class CliSymbol<TModel, TValue> : CliSymbol where TModel : class
 {
     private readonly Expression<Func<TModel, TValue>> _expression;

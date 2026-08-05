@@ -7,9 +7,14 @@ namespace Vertical.Cli.Diagnostics;
 /// </summary>
 public sealed class CommandLineException : Exception
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CommandLineException"/> class.
+    /// </summary>
+    /// <param name="errors">The errors to wrap into the exception.</param>
     public CommandLineException(IReadOnlyCollection<CommandLineError> errors)
         : base(FormatMessage(errors))
     {
+        ArgumentNullException.ThrowIfNull(errors);
         Errors = errors;
     }
 

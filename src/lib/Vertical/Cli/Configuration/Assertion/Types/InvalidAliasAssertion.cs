@@ -1,5 +1,8 @@
 ﻿namespace Vertical.Cli.Configuration.Assertion.Types;
 
+/// <summary>
+/// Indicates an option or switch was assigned an invalid alias.
+/// </summary>
 public sealed class InvalidAliasAssertion : ConfigurationAssertion
 {
     internal InvalidAliasAssertion(Type modelType, CliSymbol symbol, string[] aliases)

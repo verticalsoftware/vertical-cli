@@ -17,12 +17,24 @@ public sealed class ResponseArgumentNotSupportedError : CommandLineError
         Argument = argument;
     }
 
+    /// <summary>
+    /// Gets the annotation.
+    /// </summary>
     public string Annotation { get; }
 
+    /// <summary>
+    /// Gets the line number the error was detected on.
+    /// </summary>
     public int LineNumber { get; }
 
+    /// <summary>
+    /// Gets the syntax kind that is not supported.
+    /// </summary>
     public SyntaxKind SyntaxKind { get; }
 
+    /// <summary>
+    /// Gets the argument.
+    /// </summary>
     public string Argument { get; }
 
     private static string FormatMessage(string annotation, int lineNumber, SyntaxKind syntaxKind, string argument)

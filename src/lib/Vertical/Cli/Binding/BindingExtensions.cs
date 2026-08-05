@@ -3,10 +3,21 @@ using Vertical.Cli.Diagnostics;
 
 namespace Vertical.Cli.Binding;
 
+/// <summary>
+/// Extends the <see cref="PropertyBindingInfo"/> type.
+/// </summary>
 public static class BindingExtensions
 {
     extension(PropertyBindingInfo bindingInfo)
     {
+        /// <summary>
+        /// Creates a single value binding result.
+        /// </summary>
+        /// <param name="symbol">The bound symbol.</param>
+        /// <param name="argument">The string argument value to convert.</param>
+        /// <typeparam name="TModel">Model type</typeparam>
+        /// <typeparam name="TValue">Value type</typeparam>
+        /// <returns><see cref="BindingResult{TValue}"/></returns>
         public BindingResult<TValue> CreateScalarBindingResult<TModel, TValue>(
             CliSymbol<TModel, TValue> symbol,
             string argument) 
@@ -32,6 +43,15 @@ public static class BindingExtensions
             }
         }
 
+        /// <summary>
+        /// Creates a collection value result.
+        /// </summary>
+        /// <param name="symbol">The bound symbol.</param>
+        /// <param name="arguments">The arguments to convert and place in the collection.</param>
+        /// <typeparam name="TModel">Model type</typeparam>
+        /// <typeparam name="TElement">Element type</typeparam>
+        /// <typeparam name="TCollection">Collection type</typeparam>
+        /// <returns><see cref="BindingResult{TValue}"/></returns>
         public BindingResult<TCollection> CreateCollectionBindingResult<TModel, TElement, TCollection>(
             CliSymbol<TModel, TCollection> symbol,
             IEnumerable<string> arguments)
@@ -77,6 +97,11 @@ public static class BindingExtensions
         }
     }
 
+    /// <summary>
+    /// Gets zero or more errors contained in the binding results.
+    /// </summary>
+    /// <param name="bindingResults">The binding result dictionary.</param>
+    /// <returns>An enumeration that contains detected input errors.</returns>
     public static IEnumerable<CommandLineError> GetErrors(this Dictionary<string, IBindingResult> bindingResults)
     {
          return  bindingResults

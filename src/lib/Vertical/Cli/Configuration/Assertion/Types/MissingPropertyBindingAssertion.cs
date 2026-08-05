@@ -14,7 +14,14 @@ public sealed class MissingPropertyBindingAssertion : ConfigurationAssertion
         Property = property;
     }
 
+    /// <summary>
+    /// Gets the model type.
+    /// </summary>
     public Type ModelType { get; }
+    
+    /// <summary>
+    /// Gets the property that is missing a binding.
+    /// </summary>
     public PropertyInfo Property { get; }
 
     /// <inheritdoc />

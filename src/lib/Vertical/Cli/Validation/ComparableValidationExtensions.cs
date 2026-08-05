@@ -1,5 +1,8 @@
 ﻿namespace Vertical.Cli.Validation;
 
+/// <summary>
+/// Defines functions for types for comparable types.
+/// </summary>
 public static class ComparableValidationExtensions
 {
     extension<TModel, TValue>(IValidationEventInfo<TModel, TValue> eventInfo) where TModel : class

@@ -16,6 +16,12 @@ public sealed class XmlHelpProvider : IHelpProvider
     private const string DirectiveTypeName = "directive";
     private const string ParameterNameAttribute = "parameter-name";
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlHelpProvider"/> class.
+    /// </summary>
+    /// <param name="resourceStreamProvider">
+    /// A function invoked by the help system that returns the xml content stream.
+    /// </param>
     public XmlHelpProvider(Func<Stream> resourceStreamProvider)
     {
         _lazyResources = new Lazy<(XPathDocument Document, XPathNavigator Navigator)>(() =>

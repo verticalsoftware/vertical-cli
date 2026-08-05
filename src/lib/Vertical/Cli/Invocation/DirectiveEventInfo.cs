@@ -4,6 +4,9 @@ using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Invocation;
 
+/// <summary>
+/// Represents data used to handle the invocation of a directive.
+/// </summary>
 public class DirectiveEventInfo
 {
     internal DirectiveEventInfo(
@@ -32,6 +35,10 @@ public class DirectiveEventInfo
     public IDirectiveSymbol Symbol { get; }
 }
 
+/// <summary>
+/// Represents data used to handle the invocation of a directive.
+/// </summary>
+/// <typeparam name="TValue">The directive's parameter type.</typeparam>
 public sealed class DirectiveEventInfo<TValue> : DirectiveEventInfo
 {
     /// <inheritdoc />

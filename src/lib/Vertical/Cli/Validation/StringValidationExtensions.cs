@@ -2,6 +2,9 @@
 
 namespace Vertical.Cli.Validation;
 
+/// <summary>
+/// Defines validation functions for strings.
+/// </summary>
 public static class StringValidationExtensions
 {
     extension<TModel>(IValidationEventInfo<TModel, string> eventInfo) where TModel : class

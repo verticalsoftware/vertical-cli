@@ -2,6 +2,9 @@
 
 namespace Vertical.Cli.Parsing;
 
+/// <summary>
+/// Represents a read-only view of the token list.
+/// </summary>
 public sealed class ReadOnlyTokenList : ITokenList
 {
     internal ReadOnlyTokenList(IEnumerable<ArgumentToken> tokens)

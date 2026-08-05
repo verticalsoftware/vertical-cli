@@ -1,5 +1,10 @@
 ﻿namespace Vertical.Cli.Validation;
 
+/// <summary>
+/// Describes data used in validation. 
+/// </summary>
+/// <typeparam name="TModel">Model type</typeparam>
+/// <typeparam name="TValue">Value type</typeparam>
 public interface IValidationEventInfo<out TModel, out TValue> where TModel : class
 {
     /// <summary>
@@ -30,6 +35,12 @@ public interface IValidationEventInfo<out TModel, out TValue> where TModel : cla
     IValidationEventInfo<TModel, TValue> Error(string message);
 }
 
+/// <summary>
+/// Describes data used in validation.
+/// </summary>
+/// <typeparam name="TModel">Model type</typeparam>
+/// <typeparam name="TElement">Element type</typeparam>
+/// <typeparam name="TCollection">Collection type</typeparam>
 public interface IValidationEventInfo<out TModel, out TElement, out TCollection> : IValidationEventInfo<TModel, TCollection>
     where TModel : class
     where TCollection : IEnumerable<TElement>

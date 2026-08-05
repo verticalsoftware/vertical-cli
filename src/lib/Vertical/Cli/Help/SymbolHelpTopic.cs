@@ -16,5 +16,8 @@ public sealed class SymbolHelpTopic : HelpTopic
     /// </summary>
     public string? ParameterSyntax { get; }
 
-    public static implicit operator SymbolHelpTopic(string content) => new(content);
+    /// <summary>
+    /// Implicitly converts a string to this help topic type.
+    /// </summary>
+    public static implicit operator SymbolHelpTopic(string remarks) => new(remarks);
 }

@@ -72,6 +72,9 @@ public readonly struct Arity
     /// </summary>
     public static Arity OneOrMore => new(1, null);
 
+    /// <summary>
+    /// Deconstructs the object.
+    /// </summary>
     public void Deconstruct(out int min, out int max)
     {
         min = Minimum;

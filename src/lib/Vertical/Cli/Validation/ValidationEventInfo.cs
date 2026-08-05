@@ -10,6 +10,9 @@ namespace Vertical.Cli.Validation;
 /// <typeparam name="TValue">The property value type.</typeparam>
 public class ValidationEventInfo<TModel, TValue> : IValidationEventInfo<TModel, TValue> where TModel : class
 {
+    /// <summary>
+    /// Gets the validation context.
+    /// </summary>
     protected ValidationContext Context { get; }
 
     internal ValidationEventInfo(

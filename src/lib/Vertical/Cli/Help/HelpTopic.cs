@@ -1,5 +1,8 @@
 ﻿namespace Vertical.Cli.Help;
 
+/// <summary>
+/// Represents a help topic.
+/// </summary>
 public abstract class HelpTopic
 {
     /// <summary>

@@ -52,8 +52,13 @@ public sealed class ValidationContext
     /// </summary>
     public IHelpProvider HelpProvider { get; }
 
+    /// <summary>
+    /// Reports a validation error.
+    /// </summary>
+    /// <param name="error">The error instance.</param>
     public void AddError(SymbolValidationError error)
     {
+        ArgumentNullException.ThrowIfNull(error);
         _errorList.Add(error);
     }
 

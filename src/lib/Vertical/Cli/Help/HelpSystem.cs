@@ -3,8 +3,16 @@ using Vertical.Cli.IO;
 
 namespace Vertical.Cli.Help;
 
+/// <summary>
+/// Manages the lifecycle of help system components.
+/// </summary>
 public static class HelpSystem
 {
+    /// <summary>
+    /// Writes a help article to the console abstraction.
+    /// </summary>
+    /// <param name="configuration">The application configuration object.</param>
+    /// <param name="targetCommand">The command to display help content for.</param>
     public static void WriteArticle(IRootConfigurationView configuration, Command targetCommand)
     {
         using var bufferedConsole = new BufferedConsole(configuration.Console);
