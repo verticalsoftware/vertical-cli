@@ -12,17 +12,17 @@ jobs:
       matrix: 
         dotnet-version: ['10.0.x']
         
-steps:
-  - uses: actions/checkout@v2
-  - name: Setup .NET Code SDK ${{ matrix.dotnet-version }}
-    uses: actions/setup-dotnet@v3
-    with:
-      dotnet-version: ${{ matrix.dotnet-version }}
-  - name: Install dependencies
-    run: dotnet restore
-  - name: Run tests
-    run: dotnet test --no-restore --collect:"XPlat Code Coverage"
-  - name: Build source generator
-    run: dotnet build src/generator/ -c Release --no-restore -o analyzers
-  - name: Pack core library
-    run: dotnet build src/lib -c Release --no-restore
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Code SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Run tests
+        run: dotnet test --no-restore --collect:"XPlat Code Coverage"
+      - name: Build source generator
+        run: dotnet build src/generator/ -c Release --no-restore -o analyzers
+      - name: Pack core library
+        run: dotnet build src/lib -c Release --no-restore
