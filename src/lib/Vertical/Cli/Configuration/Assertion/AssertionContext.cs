@@ -13,7 +13,10 @@ internal sealed class AssertionContext
         Application = application;
         Commands = BuildCommands();
         CallSites = Commands.Where(command => command.CanCreateCallSite).ToArray();
+        Directives = application.GetConfiguration().GetDirectives();
     }
+
+    public IReadOnlyList<IDirectiveSymbol> Directives { get; set; }
 
     public Command[] CallSites { get; set; }
 

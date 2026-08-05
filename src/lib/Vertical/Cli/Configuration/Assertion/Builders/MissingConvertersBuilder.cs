@@ -14,6 +14,11 @@ internal sealed class MissingConvertersBuilder : IAssertionBuilder
             .SelectMany(configuration => configuration
                 .BindingSources
                 .Select(source => source.ValueType))
+            .Concat(context
+                .Directives
+                .Select(directive => directive.ParameterType)
+                .Where(type => type is not null)
+                .Cast<Type>())
             .Distinct();
 
         var configuration = context.Configuration;

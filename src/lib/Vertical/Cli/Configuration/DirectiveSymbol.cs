@@ -35,6 +35,9 @@ public sealed class DirectiveSymbol : IDirectiveSymbol
     /// </summary>
     public ParameterArity? ParameterArity { get; }
 
+    /// <inheritdoc />
+    public Type? ParameterType => null;
+
     /// <summary>
     /// Gets the help topic.
     /// </summary>
@@ -89,6 +92,9 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
 
     /// <inheritdoc/>
     public ParameterArity? ParameterArity { get; }
+
+    /// <inheritdoc />
+    public Type? ParameterType => typeof(TValue);
 
     /// <summary>
     /// Gets the default provider.

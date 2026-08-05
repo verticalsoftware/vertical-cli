@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Testing.Platform.Logging;
 using Vertical.Cli.Configuration;
+using Vertical.Cli.Conversion;
 using Vertical.Cli.IO;
 using Vertical.Cli.Validation;
 
@@ -93,6 +94,7 @@ public sealed class TestApplicationFixture
             helpTopic: HelpResources.LogLevelDirective);
 
         app.AddArgumentConverter(KeyValuePairConverter.Convert);
+        app.AddArgumentConverter(Converters.Enum<LogLevel>());
         app.AddCollectionConverter((IEnumerable<KeyValuePair<string, string>> values) =>
             new Dictionary<string, string>(values));
         app.UseServices(_ => services.BuildServiceProvider());

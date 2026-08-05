@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 
 # Verify temorary
 *.received.txt
+
+# Ide prefs
+*.DotSettings.user
