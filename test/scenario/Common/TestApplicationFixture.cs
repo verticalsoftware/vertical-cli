@@ -111,6 +111,14 @@ public sealed class TestApplicationFixture
         return Console.ToString();
     }
 
+    public static async Task<string> GetOutputAsync(CommandLineApplication app, string[] args)
+    {
+        var console = new TestConsole();
+        app.UseConsole(console);
+        _ = await app.RunAsync(args);
+        return console.ToString();
+    }
+
     public TestConsole Console { get; }
 
     public CommandLineApplication Application { get; }
