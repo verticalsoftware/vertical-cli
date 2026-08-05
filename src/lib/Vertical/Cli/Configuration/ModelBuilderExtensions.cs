@@ -30,7 +30,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<IEnumerable<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, IEnumerable<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, IEnumerable<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IEnumerable<TElement>>(
@@ -65,7 +65,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<ICollection<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, ICollection<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, ICollection<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ICollection<TElement>>(
@@ -100,7 +100,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<IReadOnlyCollection<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, IReadOnlyCollection<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, IReadOnlyCollection<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IReadOnlyCollection<TElement>>(
@@ -135,7 +135,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<IList<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, IList<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, IList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IList<TElement>>(
@@ -170,7 +170,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<IReadOnlyList<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, IReadOnlyList<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, IReadOnlyList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IReadOnlyList<TElement>>(
@@ -205,7 +205,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<List<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, List<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, List<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, List<TElement>>(
@@ -240,7 +240,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<LinkedList<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, LinkedList<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, LinkedList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, LinkedList<TElement>>(
@@ -275,7 +275,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<ISet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, ISet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, ISet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ISet<TElement>>(
@@ -310,7 +310,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<IReadOnlySet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, IReadOnlySet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, IReadOnlySet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, IReadOnlySet<TElement>>(
@@ -345,7 +345,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<HashSet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, HashSet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, HashSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, HashSet<TElement>>(
@@ -380,7 +380,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<SortedSet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, SortedSet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, SortedSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, SortedSet<TElement>>(
@@ -415,7 +415,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<ImmutableArray<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, ImmutableArray<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, ImmutableArray<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableArray<TElement>>(
@@ -450,7 +450,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<ImmutableList<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, ImmutableList<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, ImmutableList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableList<TElement>>(
@@ -485,7 +485,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<ImmutableHashSet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, ImmutableHashSet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, ImmutableHashSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableHashSet<TElement>>(
@@ -520,7 +520,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<ImmutableSortedSet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, ImmutableSortedSet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, ImmutableSortedSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableSortedSet<TElement>>(
@@ -555,7 +555,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<ImmutableStack<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, ImmutableStack<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, ImmutableStack<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableStack<TElement>>(
@@ -590,7 +590,7 @@ public static class ModelBuilderExtensions
             int ordinalPosition,
             Arity? arity = null,
             Func<ImmutableQueue<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, TElement, ImmutableQueue<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, TElement, ImmutableQueue<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             builder.Configuration.AddBindingSource(new CliSymbol<TModel, ImmutableQueue<TElement>>(
@@ -626,7 +626,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<IEnumerable<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, IEnumerable<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, IEnumerable<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -664,7 +664,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<ICollection<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, ICollection<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, ICollection<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -702,7 +702,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<IReadOnlyCollection<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, IReadOnlyCollection<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, IReadOnlyCollection<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -740,7 +740,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<IList<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, IList<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, IList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -778,7 +778,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<IReadOnlyList<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, IReadOnlyList<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, IReadOnlyList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -816,7 +816,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<List<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, List<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, List<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -854,7 +854,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<LinkedList<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, LinkedList<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, LinkedList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -892,7 +892,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<ISet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, ISet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, ISet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -930,7 +930,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<IReadOnlySet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, IReadOnlySet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, IReadOnlySet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -968,7 +968,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<HashSet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, HashSet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, HashSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -1006,7 +1006,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<SortedSet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, SortedSet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, SortedSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -1044,7 +1044,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<ImmutableArray<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, ImmutableArray<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, ImmutableArray<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -1082,7 +1082,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<ImmutableList<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, ImmutableList<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, ImmutableList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -1120,7 +1120,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<ImmutableHashSet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, ImmutableHashSet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, ImmutableHashSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -1158,7 +1158,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<ImmutableSortedSet<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, ImmutableSortedSet<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, ImmutableSortedSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -1196,7 +1196,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<ImmutableStack<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, ImmutableStack<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, ImmutableStack<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;
@@ -1234,7 +1234,7 @@ public static class ModelBuilderExtensions
             string[]? aliases = null,
             Arity? arity = null,
             Func<ImmutableQueue<TElement>>? defaultProvider = null,
-            Action<ValidationEventInfo<TModel, ImmutableQueue<TElement>>>? validate = null,
+            Action<IValidationEventInfo<TModel, ImmutableQueue<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
             var bindingName = expression.BindingName;

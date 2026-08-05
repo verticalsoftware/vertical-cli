@@ -4,7 +4,7 @@ namespace Vertical.Cli.Validation;
 
 public static class StringValidationExtensions
 {
-    extension<TModel>(ValidationEventInfo<TModel, string> eventInfo) where TModel : class
+    extension<TModel>(IValidationEventInfo<TModel, string> eventInfo) where TModel : class
     {
         /// <summary>
         /// Adds a minimum string length check.
@@ -15,7 +15,7 @@ public static class StringValidationExtensions
         /// </param>
         /// <returns>A reference to this instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Length is less than 1.</exception>
-        public ValidationEventInfo<TModel, string> MustBeOfLength(int length, Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, string> MustBeOfLength(int length, Func<string>? formatMessage = null)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(length, 1);
 
@@ -33,11 +33,11 @@ public static class StringValidationExtensions
         /// </param>
         /// <returns>A reference to this instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Length is less than 1.</exception>
-        public ValidationEventInfo<TModel, string> MustNotExceedLength(int length, Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, string> MustNotExceedLength(int length, Func<string>? formatMessage = null)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(length, 1);
 
-            return eventInfo.Value.Length >= length
+            return eventInfo.Value.Length <= length
                 ? eventInfo.OK
                 : eventInfo.Error(formatMessage?.Invoke() ?? $"value must be {length} character(s).");
         }
@@ -50,7 +50,7 @@ public static class StringValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, string> MustMatchPattern(string pattern, Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, string> MustMatchPattern(string pattern, Func<string>? formatMessage = null)
         {
             ArgumentNullException.ThrowIfNull(pattern);
 
@@ -67,7 +67,7 @@ public static class StringValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, string> MustMatchPattern(Regex regex, Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, string> MustMatchPattern(Regex regex, Func<string>? formatMessage = null)
         {
             ArgumentNullException.ThrowIfNull(regex);
 
@@ -77,7 +77,7 @@ public static class StringValidationExtensions
         }
     }
     
-    extension<TModel>(ValidationEventInfo<TModel, string?> eventInfo) where TModel : class
+    extension<TModel>(IValidationEventInfo<TModel, string?> eventInfo) where TModel : class
     {
         /// <summary>
         /// Adds a minimum string length check.
@@ -88,7 +88,7 @@ public static class StringValidationExtensions
         /// </param>
         /// <returns>A reference to this instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Length is less than 1.</exception>
-        public ValidationEventInfo<TModel, string?> MustBeOfLengthOrBeNull(int length, Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, string?> MustBeOfLengthOrBeNull(int length, Func<string>? formatMessage = null)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(length, 1);
 
@@ -106,11 +106,11 @@ public static class StringValidationExtensions
         /// </param>
         /// <returns>A reference to this instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Length is less than 1.</exception>
-        public ValidationEventInfo<TModel, string?> MustNotExceedLengthOrBeNull(int length, Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, string?> MustNotExceedLengthOrBeNull(int length, Func<string>? formatMessage = null)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(length, 1);
 
-            return eventInfo.Value is null || eventInfo.Value.Length >= length
+            return eventInfo.Value is null || eventInfo.Value.Length <= length
                 ? eventInfo.OK
                 : eventInfo.Error(formatMessage?.Invoke() ?? $"value must be {length} character(s).");
         }
@@ -123,7 +123,7 @@ public static class StringValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, string?> MustMatchPatternOrBeNull(string pattern, Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, string?> MustMatchPatternOrBeNull(string pattern, Func<string>? formatMessage = null)
         {
             ArgumentNullException.ThrowIfNull(pattern);
 
@@ -140,7 +140,7 @@ public static class StringValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, string?> MustMatchPatternOrBeNull(Regex regex, Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, string?> MustMatchPatternOrBeNull(Regex regex, Func<string>? formatMessage = null)
         {
             ArgumentNullException.ThrowIfNull(regex);
 

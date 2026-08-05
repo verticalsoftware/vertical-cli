@@ -10,13 +10,13 @@ namespace Vertical.Cli.Diagnostics;
 public sealed class SymbolValidationError : CommandLineError
 {
     private SymbolValidationError(
-        CliSymbol symbol,
+        IValidatable subject,
         object model,
         object? receivedValue,
         string validationMessage,
         string message) : base(message)
     {
-        Symbol = symbol;
+        Subject = subject;
         Model = model;
         ReceivedValue = receivedValue;
         ValidationMessage = validationMessage;
@@ -25,7 +25,7 @@ public sealed class SymbolValidationError : CommandLineError
     /// <summary>
     /// Gets the associated symbol.
     /// </summary>
-    public CliSymbol Symbol { get; }
+    public IValidatable Subject { get; }
     
     /// <summary>
     /// Gets a reference to the model.
@@ -48,11 +48,11 @@ public sealed class SymbolValidationError : CommandLineError
         IHelpProvider helpProvider)
         where TModel : class
     {
-        var identifier = GetSymbolIdentifier(helpProvider, eventInfo.Symbol);
+        var identifier = GetSymbolIdentifier(helpProvider, eventInfo.Subject);
         var baseMessage = $"{identifier}: {validationMessage}";
         
         return new SymbolValidationError(
-            eventInfo.Symbol,
+            eventInfo.Subject,
             eventInfo.Model,
             eventInfo.Value,
             validationMessage, 

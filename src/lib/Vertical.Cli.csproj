@@ -9,6 +9,7 @@
   
   <ItemGroup>
     <InternalsVisibleTo Include="Vertical.Cli.ConfigurationAssertions" />
+    <InternalsVisibleTo Include="Vertical.Cli.UnitTests" />
   </ItemGroup>
 
 </Project>

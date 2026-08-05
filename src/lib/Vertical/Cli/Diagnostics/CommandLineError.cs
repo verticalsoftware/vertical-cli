@@ -41,13 +41,13 @@ public abstract class CommandLineError
     /// Gets a description of the symbol for output.
     /// </summary>
     /// <param name="helpProvider">The help provider used to discover parameter names.</param>
-    /// <param name="symbol">The symbol instance.</param>
+    /// <param name="obj">The symbol instance.</param>
     /// <returns><see cref="string"/></returns>
-    public static string GetSymbolIdentifier(IHelpProvider helpProvider, ICliSymbol symbol)
+    public static string GetSymbolIdentifier(IHelpProvider helpProvider, object obj)
     {
-        return symbol switch
+        return obj switch
         {
-            CliSymbol { Kind: SymbolKind.PositionArgument } => $"Argument {helpProvider.GetParameterName(symbol)}",
+            CliSymbol { Kind: SymbolKind.PositionArgument } symbol => $"Argument {helpProvider.GetParameterName(symbol)}",
             
             CliSymbol { Kind: SymbolKind.Option } optionSymbol => $"Option {FormatAliases(optionSymbol.Aliases)}",
             

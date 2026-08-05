@@ -5,7 +5,7 @@ namespace Vertical.Cli.Validation;
 internal static class ValidationHelpers
 {
     public static Action<CliSymbol, ValidationContext>? TryCreateValidationAction<TModel, TValue>(
-        Action<ValidationEventInfo<TModel, TValue>>? validate) 
+        Action<IValidationEventInfo<TModel, TValue>>? validate) 
         where TModel : class
     {
         return validate is null
@@ -23,7 +23,7 @@ internal static class ValidationHelpers
     }
 
     public static Action<CliSymbol, ValidationContext>? TryCreateValidationAction<TModel, TElement, TCollection>(
-        Action<ValidationEventInfo<TModel, TElement, TCollection>>? validate)
+        Action<IValidationEventInfo<TModel, TElement, TCollection>>? validate)
         where TModel : class
         where TCollection : IEnumerable<TElement>
     {

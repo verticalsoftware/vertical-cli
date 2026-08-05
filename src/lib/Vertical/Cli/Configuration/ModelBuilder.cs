@@ -38,7 +38,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         int ordinalPosition,
         bool required = false,
         Func<TValue>? defaultProvider = null,
-        Action<ValidationEventInfo<TModel, TValue>>? validate = null,
+        Action<IValidationEventInfo<TModel, TValue>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
         Configuration.AddBindingSource(new CliSymbol<TModel, TValue>(
@@ -73,7 +73,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         int ordinalPosition,
         Arity? arity = null,
         Func<TElement[]>? defaultProvider = null,
-        Action<ValidationEventInfo<TModel, TElement, TElement[]>>? validate = null,
+        Action<IValidationEventInfo<TModel, TElement, TElement[]>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
         Configuration.AddBindingSource(new CliSymbol<TModel, TElement[]>(
@@ -109,7 +109,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         int ordinalPosition,
         Arity? arity = null,
         Func<TCollection>? defaultProvider = null,
-        Action<ValidationEventInfo<TModel, TElement, TCollection>>? validate = null,
+        Action<IValidationEventInfo<TModel, TElement, TCollection>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
         where TCollection : IEnumerable<TElement>
     {
@@ -146,7 +146,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         string[]? aliases = null,
         bool required = false,
         Func<TValue>? defaultProvider = null,
-        Action<ValidationEventInfo<TModel, TValue>>? validate = null,
+        Action<IValidationEventInfo<TModel, TValue>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
         var bindingName = expression.BindingName;
@@ -184,7 +184,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         string[]? aliases = null,
         Arity? arity = null,
         Func<TElement[]>? defaultProvider = null,
-        Action<ValidationEventInfo<TModel, TElement, TElement[]>>? validate = null,
+        Action<IValidationEventInfo<TModel, TElement, TElement[]>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
         var bindingName = expression.BindingName;
@@ -223,7 +223,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         string[]? aliases = null,
         Arity? arity = null,
         Func<TCollection>? defaultProvider = null,
-        Action<ValidationEventInfo<TModel, TCollection>>? validate = null,
+        Action<IValidationEventInfo<TModel, TCollection>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
         where TCollection : IEnumerable<TElement>
     {
@@ -257,7 +257,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     public ModelBuilder<TModel> MapSwitch(
         Expression<Func<TModel, bool>> expression,
         string[]? aliases = null,
-        Action<ValidationEventInfo<TModel, bool>>? validate = null,
+        Action<IValidationEventInfo<TModel, bool>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
         var bindingName = expression.BindingName;

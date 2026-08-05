@@ -2,7 +2,7 @@
 
 public static class ComparableValidationExtensions
 {
-    extension<TModel, TValue>(ValidationEventInfo<TModel, TValue> eventInfo) where TModel : class
+    extension<TModel, TValue>(IValidationEventInfo<TModel, TValue> eventInfo) where TModel : class
     {
         /// <summary>
         /// Adds a check that verifies an argument is less than the provided value.
@@ -13,7 +13,7 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue> MustBeLessThan(TValue value,
+        public IValidationEventInfo<TModel, TValue> MustBeLessThan(TValue value,
             IComparer<TValue>? comparer = null,
             Func<string>? formatMessage = null)
         {
@@ -31,7 +31,7 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue> MustBeLessOrEqualTo(TValue value,
+        public IValidationEventInfo<TModel, TValue> MustBeLessOrEqualTo(TValue value,
             IComparer<TValue>? comparer = null,
             Func<string>? formatMessage = null)
         {
@@ -49,7 +49,7 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue> MustBeGreaterThan(TValue value,
+        public IValidationEventInfo<TModel, TValue> MustBeGreaterThan(TValue value,
             IComparer<TValue>? comparer = null,
             Func<string>? formatMessage = null)
         {
@@ -67,7 +67,7 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue> MustBeGreaterOrEqualTo(TValue value,
+        public IValidationEventInfo<TModel, TValue> MustBeGreaterOrEqualTo(TValue value,
             IComparer<TValue>? comparer = null,
             Func<string>? formatMessage = null)
         {
@@ -86,15 +86,15 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue> MustBeInTheInclusiveRangeOf(
+        public IValidationEventInfo<TModel, TValue> MustBeInTheInclusiveRangeOf(
             TValue lowerValue,
             TValue upperValue,
             IComparer<TValue>? comparer = null,
             Func<string>? formatMessage = null)
         {
             return eventInfo
-                .MustBeLessOrEqualTo(lowerValue, comparer, formatMessage)
-                .MustBeGreaterOrEqualTo(upperValue, comparer, formatMessage);
+                .MustBeGreaterOrEqualTo(lowerValue, comparer, formatMessage)
+                .MustBeLessOrEqualTo(upperValue, comparer, formatMessage);
         }
         
         /// <summary>
@@ -107,19 +107,19 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue> MustBeInTheExclusiveRangeOf(
+        public IValidationEventInfo<TModel, TValue> MustBeInTheExclusiveRangeOf(
             TValue lowerValue,
             TValue upperValue,
             IComparer<TValue>? comparer = null,
             Func<string>? formatMessage = null)
         {
             return eventInfo
-                .MustBeLessThan(lowerValue, comparer, formatMessage)
-                .MustBeGreaterThan(upperValue, comparer, formatMessage);
+                .MustBeGreaterThan(lowerValue, comparer, formatMessage)
+                .MustBeLessThan(upperValue, comparer, formatMessage);
         }
     }
     
-    extension<TModel, TValue>(ValidationEventInfo<TModel, TValue?> eventInfo) 
+    extension<TModel, TValue>(IValidationEventInfo<TModel, TValue?> eventInfo) 
         where TModel : class
         where TValue : struct
     {
@@ -132,8 +132,8 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue?> MustBeLessThanOrBeNull(
-            TValue value,
+        public IValidationEventInfo<TModel, TValue?> MustBeLessThanOrBeNull(
+            TValue? value,
             IComparer<TValue?>? comparer = null,
             Func<string>? formatMessage = null)
         {
@@ -151,7 +151,8 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue?> MustBeLessOrEqualToOrBeNull(TValue? value,
+        public IValidationEventInfo<TModel, TValue?> MustBeLessOrEqualToOrBeNull(
+            TValue? value,
             IComparer<TValue?>? comparer = null,
             Func<string>? formatMessage = null)
         {
@@ -169,7 +170,8 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue?> MustBeGreaterThanOrBeNull(TValue? value,
+        public IValidationEventInfo<TModel, TValue?> MustBeGreaterThanOrBeNull(
+            TValue? value,
             IComparer<TValue?>? comparer = null,
             Func<string>? formatMessage = null)
         {
@@ -187,7 +189,7 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue?> MustBeGreaterOrEqualToOrBeNull(TValue? value,
+        public IValidationEventInfo<TModel, TValue?> MustBeGreaterOrEqualToOrBeNull(TValue? value,
             IComparer<TValue?>? comparer = null,
             Func<string>? formatMessage = null)
         {
@@ -206,15 +208,15 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue?> MustBeInTheInclusiveRangeOfOrBeNull(
+        public IValidationEventInfo<TModel, TValue?> MustBeInTheInclusiveRangeOfOrBeNull(
             TValue? lowerValue,
             TValue? upperValue,
             IComparer<TValue?>? comparer = null,
             Func<string>? formatMessage = null)
         {
             return eventInfo
-                .MustBeLessOrEqualTo(lowerValue, comparer, formatMessage)
-                .MustBeGreaterOrEqualTo(upperValue, comparer, formatMessage);
+                .MustBeGreaterOrEqualToOrBeNull(lowerValue, comparer, formatMessage)
+                .MustBeLessOrEqualToOrBeNull(upperValue, comparer, formatMessage);
         }
         
         /// <summary>
@@ -227,15 +229,15 @@ public static class ComparableValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, TValue?> MustBeInTheExclusiveRangeOfOrBeNull(
+        public IValidationEventInfo<TModel, TValue?> MustBeInTheExclusiveRangeOfOrBeNull(
             TValue? lowerValue,
             TValue? upperValue,
             IComparer<TValue?>? comparer = null,
             Func<string>? formatMessage = null)
         {
             return eventInfo
-                .MustBeLessThan(lowerValue, comparer, formatMessage)
-                .MustBeGreaterThan(upperValue, comparer, formatMessage);
+                .MustBeGreaterThanOrBeNull(lowerValue, comparer, formatMessage)
+                .MustBeLessThanOrBeNull<TModel, TValue>(upperValue, comparer, formatMessage);
         }
     }
 }

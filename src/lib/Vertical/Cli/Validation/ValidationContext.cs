@@ -1,5 +1,4 @@
-﻿using Vertical.Cli.Configuration;
-using Vertical.Cli.Diagnostics;
+﻿using Vertical.Cli.Diagnostics;
 using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
 
@@ -12,10 +11,10 @@ public sealed class ValidationContext
 {
     private readonly List<CommandLineError> _errorList = [];
     
-    private ValidationContext(object model, IEnumerable<CliSymbol> symbols, IHelpProvider helpProvider)
+    private ValidationContext(object model, IEnumerable<IValidatable> subjects, IHelpProvider helpProvider)
     {
         Model = model;
-        Symbols = symbols;
+        Subjects = subjects;
         HelpProvider = helpProvider;
     }
 
@@ -23,17 +22,17 @@ public sealed class ValidationContext
     /// Aggregates the results of validation on the given symbols.
     /// </summary>
     /// <param name="context">The invocation context.</param>
-    /// <param name="symbols">The symbols to validate.</param>
+    /// <param name="subjects">The subject collection to validate.</param>
     /// <param name="model">The constructed model.</param>
     /// <returns><see cref="IEnumerable{T}"/></returns>
     public static IEnumerable<CommandLineError> GetErrors(
         InvocationContext context,
-        IEnumerable<CliSymbol> symbols,
+        IEnumerable<IValidatable> subjects,
         object model)
     {
         return new ValidationContext(
                 model,
-                symbols,
+                subjects,
                 context.Configuration.HelpOptions.HelpProvider)
             .Validate();
     }
@@ -46,7 +45,7 @@ public sealed class ValidationContext
     /// <summary>
     /// Gets the symbols being validated.
     /// </summary>
-    public IEnumerable<CliSymbol> Symbols { get; }
+    public IEnumerable<IValidatable> Subjects { get; }
 
     /// <summary>
     /// Gets the help provider.
@@ -60,7 +59,7 @@ public sealed class ValidationContext
 
     private List<CommandLineError> Validate()
     {
-        foreach (var symbol in Symbols)
+        foreach (var symbol in Subjects)
         {
             symbol.Validate(this);
         }

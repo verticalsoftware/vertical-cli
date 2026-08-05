@@ -8,19 +8,19 @@ namespace Vertical.Cli.Validation;
 /// </summary>
 /// <typeparam name="TModel">The model type the property is a member of.</typeparam>
 /// <typeparam name="TValue">The property value type.</typeparam>
-public class ValidationEventInfo<TModel, TValue> where TModel : class
+public class ValidationEventInfo<TModel, TValue> : IValidationEventInfo<TModel, TValue> where TModel : class
 {
     protected ValidationContext Context { get; }
 
     internal ValidationEventInfo(
         ValidationContext context, 
-        CliSymbol symbol,
+        IValidatable subject,
         TModel model,
         TValue value)
     
     {
         Context = context;
-        Symbol = symbol;
+        Subject = subject;
         Model = model;
         Value = value;
     }
@@ -28,7 +28,7 @@ public class ValidationEventInfo<TModel, TValue> where TModel : class
     /// <summary>
     /// Gets a reference to the symbol being validated.
     /// </summary>
-    public CliSymbol Symbol { get; }
+    public IValidatable Subject { get; }
 
     /// <summary>
     /// Gets the constructed model reference.
@@ -43,14 +43,14 @@ public class ValidationEventInfo<TModel, TValue> where TModel : class
     /// <summary>
     /// Returns a reference to this instance.
     /// </summary>
-    public ValidationEventInfo<TModel, TValue> OK => this;
+    public IValidationEventInfo<TModel, TValue> OK => this;
 
     /// <summary>
     /// Reports a validation error.
     /// </summary>
     /// <param name="message">The message to report.</param>
     /// <returns>A reference to this instance.</returns>
-    public ValidationEventInfo<TModel, TValue> Error(string message)
+    public IValidationEventInfo<TModel, TValue> Error(string message)
     {
         Context.AddError(SymbolValidationError.Create(this, message, Context.HelpProvider));
         return this;
@@ -63,8 +63,9 @@ public class ValidationEventInfo<TModel, TValue> where TModel : class
 /// <typeparam name="TModel">The model type the property is a member of.</typeparam>
 /// <typeparam name="TElement">The collection's element type.</typeparam>
 /// <typeparam name="TCollection">The property type.</typeparam>
-public sealed class ValidationEventInfo<TModel, TElement, TCollection> : ValidationEventInfo<TModel, TCollection>
-    where TModel : class
+public sealed class ValidationEventInfo<TModel, TElement, TCollection> : 
+    ValidationEventInfo<TModel, TCollection>,
+    IValidationEventInfo<TModel, TElement, TCollection> where TModel : class
     where TCollection : IEnumerable<TElement>
 {
     /// <inheritdoc />
@@ -84,12 +85,12 @@ public sealed class ValidationEventInfo<TModel, TElement, TCollection> : Validat
     /// An action that evaluates the model and/or subject value.
     /// </param>
     /// <returns>The provided context object.</returns>
-    public ValidationEventInfo<TModel, TElement, TCollection> EachValue(
-        Action<ValidationEventInfo<TModel, TElement>> validate)
+    public IValidationEventInfo<TModel, TElement, TCollection> EachValue(
+        Action<IValidationEventInfo<TModel, TElement>> validate)
     {
         foreach (var value in Value)
         {
-            var elementInfo = new ValidationEventInfo<TModel, TElement>(Context, Symbol, Model, value);
+            var elementInfo = new ValidationEventInfo<TModel, TElement>(Context, Subject, Model, value);
             validate(elementInfo);
         }
 

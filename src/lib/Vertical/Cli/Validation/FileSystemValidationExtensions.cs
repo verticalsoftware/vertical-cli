@@ -2,7 +2,7 @@
 
 public static class FileSystemValidationExtensions
 {
-    extension<TModel>(ValidationEventInfo<TModel, FileInfo> eventInfo) where TModel : class
+    extension<TModel>(IValidationEventInfo<TModel, FileInfo> eventInfo) where TModel : class
     {
         /// <summary>
         /// Adds a value check that verifies the file exists.
@@ -11,7 +11,7 @@ public static class FileSystemValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, FileInfo> MustExist(Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, FileInfo> MustExist(Func<string>? formatMessage = null)
         {
             return eventInfo.Value.Exists
                 ? eventInfo.OK
@@ -25,7 +25,7 @@ public static class FileSystemValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, FileInfo> CannotExist(Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, FileInfo> CannotExist(Func<string>? formatMessage = null)
         {
             return !eventInfo.Value.Exists
                 ? eventInfo.OK
@@ -33,7 +33,7 @@ public static class FileSystemValidationExtensions
         }
     }
     
-    extension<TModel>(ValidationEventInfo<TModel, FileInfo?> eventInfo) where TModel : class
+    extension<TModel>(IValidationEventInfo<TModel, FileInfo?> eventInfo) where TModel : class
     {
         /// <summary>
         /// Adds a value check that verifies the file exists.
@@ -42,7 +42,7 @@ public static class FileSystemValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, FileInfo?> MustExistOrBeNull(Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, FileInfo?> MustExistOrBeNull(Func<string>? formatMessage = null)
         {
             return eventInfo.Value is null || eventInfo.Value.Exists
                 ? eventInfo.OK
@@ -56,7 +56,7 @@ public static class FileSystemValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, FileInfo?> CannotExistOrBeNull(Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, FileInfo?> CannotExistOrBeNull(Func<string>? formatMessage = null)
         {
             return eventInfo.Value is null || !eventInfo.Value.Exists
                 ? eventInfo.OK
@@ -64,7 +64,7 @@ public static class FileSystemValidationExtensions
         }
     }
     
-    extension<TModel>(ValidationEventInfo<TModel, DirectoryInfo> eventInfo) where TModel : class
+    extension<TModel>(IValidationEventInfo<TModel, DirectoryInfo> eventInfo) where TModel : class
     {
         /// <summary>
         /// Adds a value check that verifies the directory exists.
@@ -73,7 +73,7 @@ public static class FileSystemValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, DirectoryInfo> MustExist(Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, DirectoryInfo> MustExist(Func<string>? formatMessage = null)
         {
             return eventInfo.Value.Exists
                 ? eventInfo.OK
@@ -87,7 +87,7 @@ public static class FileSystemValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, DirectoryInfo> CannotExist(Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, DirectoryInfo> CannotExist(Func<string>? formatMessage = null)
         {
             return !eventInfo.Value.Exists
                 ? eventInfo.OK
@@ -95,7 +95,7 @@ public static class FileSystemValidationExtensions
         }
     }
     
-    extension<TModel>(ValidationEventInfo<TModel, DirectoryInfo?> eventInfo) where TModel : class
+    extension<TModel>(IValidationEventInfo<TModel, DirectoryInfo?> eventInfo) where TModel : class
     {
         /// <summary>
         /// Adds a value check that verifies the directory exists.
@@ -104,7 +104,7 @@ public static class FileSystemValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, DirectoryInfo?> MustExistOrBeNull(Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, DirectoryInfo?> MustExistOrBeNull(Func<string>? formatMessage = null)
         {
             return eventInfo.Value is null || eventInfo.Value.Exists
                 ? eventInfo.OK
@@ -118,7 +118,7 @@ public static class FileSystemValidationExtensions
         /// An optional method used to format the message displayed to the user.
         /// </param>
         /// <returns>A reference to this instance.</returns>
-        public ValidationEventInfo<TModel, DirectoryInfo?> CannotExistOrBeNull(Func<string>? formatMessage = null)
+        public IValidationEventInfo<TModel, DirectoryInfo?> CannotExistOrBeNull(Func<string>? formatMessage = null)
         {
             return eventInfo.Value is null || !eventInfo.Value.Exists
                 ? eventInfo.OK

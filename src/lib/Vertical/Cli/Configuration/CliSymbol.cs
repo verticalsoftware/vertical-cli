@@ -8,7 +8,7 @@ using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;
 
-public abstract class CliSymbol : IBindingSource, ICliSymbol
+public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
 {
     protected CliSymbol(
         SymbolKind kind,
