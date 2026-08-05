@@ -59,4 +59,23 @@ internal static class CollectionExtensions
             }
         }
     }
+
+    extension<TKey, TValue>(Dictionary<TKey, TValue> dictionary) where TKey : notnull
+    {
+        public void AddKeys(TKey key, IEnumerable<TValue> values)
+        {
+            foreach (var value in values)
+            {
+                dictionary.Add(key, value);
+            }
+        }
+
+        public void AddValues(IEnumerable<TKey> keys, TValue value)
+        {
+            foreach (var key in keys)
+            {
+                dictionary.Add(key, value);
+            }
+        }
+    }
 }

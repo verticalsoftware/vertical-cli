@@ -19,7 +19,7 @@ internal sealed class ScalarPropertyBinder<TModel, TValue> : PropertyBinder wher
         var argumentValues = bindingInfo
             .ParseResult
             .GetArgumentValues(_symbol.BindingName)
-            .ToArray();
+            .ToArray();        
         
         var bindingName = _symbol.BindingName;
 
@@ -30,14 +30,17 @@ internal sealed class ScalarPropertyBinder<TModel, TValue> : PropertyBinder wher
             { argumentValues.Length: 1 } => new BindingResult<TValue>(
                     bindingName, 
                     default!,
-                    new MissingParameterError(_symbol)),
+                    MissingParameterError.Create(_symbol, bindingInfo.HelpProvider)),
             
             { argumentValues.Length: 0, _symbol.DefaultProvider: not null } =>
                 new BindingResult<TValue>(bindingName, _symbol.DefaultProvider()),
             
             { argumentValues.Length: 0, _symbol.Arity.Minimum: 0 } => new BindingResult<TValue>(bindingName, default!),
             
-            _ => new BindingResult<TValue>(bindingName, default!, new SymbolArityError(_symbol, []))
+            _ => new BindingResult<TValue>(
+                bindingName, 
+                default!, 
+                SymbolArityError.Create(_symbol, [], bindingInfo.HelpProvider))
         };
     }
 }

@@ -73,7 +73,7 @@ Command handlers are provided instances of applicationd defined model types that
 - File system types `FileInfo` and `DirectoryInfo`.
 - `System.Uri`
 
-Models are defined by the application using interfaces. This was chosen so that common symbols can be reused throughout command hierarchies and model types can be composed across mutliple interface base types. The source generator will create a class that complies with the interface, but command handlers need to only accept the interface.
+Models are defined by the application using interfaces. This was chosen so that common symbols can be reused throughout command hierarchies and model types can be composed across mutliple interface base types. The source generator will create a class that complies with the interface and bind argument values to it.
 
 ```csharp
 // Define an interface that models the compress commands options
@@ -185,7 +185,10 @@ return await app.RunAsync(args);
 - [Defining and structuring commands](docs/coommands.md)
 - [Using multi valued & variadic symbols](docs/multi-valued-symbols.md)
 - [Validating user input](docs/validation.md)
+- [Working with the polymorphic model system](docs/models.md)
+- [Showing help for a command](docs/help-system.md)
 - [Application data & services](docs/services.md)
 - [Implement directives for ancillary application control](docs/directives.md)
 - [Tapping into framework flow with middleware](docs/middleware.md)
 - [Implementing advanced model binding](docs/binding.md)
+- [Unit testing the application's configuration](docs/unit-testing.md)

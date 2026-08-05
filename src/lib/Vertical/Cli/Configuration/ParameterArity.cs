@@ -6,11 +6,6 @@
 public enum ParameterArity
 {
     /// <summary>
-    /// Indicates a parameter value is not supported.
-    /// </summary>
-    Zero,
-    
-    /// <summary>
     /// Indicates a parameter value is optional.
     /// </summary>
     ZeroOrOne,

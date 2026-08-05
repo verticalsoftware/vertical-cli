@@ -50,24 +50,6 @@ public partial class ArgumentSyntax
             _ => SyntaxKind.None
         };
     }
-    
-    internal static string[] ValidateAliasesOrGetDefault(string bindingName, string[]? aliases)
-    {
-        return aliases is not { Length: > 0 }
-            ? [ArgumentSyntax.CreateGnuAlias(bindingName)]
-            : ValidateAliases(aliases);
-    }
-
-    internal static string[] ValidateAliases(string[] aliases)
-    {
-        if (aliases.Where(alias => ArgumentSyntax.GetSyntaxKind(alias) != SyntaxKind.Option).ToArray()
-            is { Length: > 0 } invalid)
-        {
-            throw Exceptions.InvalidOptionOrSwitchAliases(invalid);
-        }
-
-        return aliases;
-    }
 
     private static ArgumentSyntax ParseDirective(string argument)
     {

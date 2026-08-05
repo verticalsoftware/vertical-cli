@@ -1,0 +1,35 @@
+﻿Binding configuration:
+  No binder defined for model Vertical.Cli.ConfigurationAssertionTests.IModel
+
+Command 'app create':
+  One or more position arguments have ambiguous ordinal position assignments
+    Argument -> Variadic1: ordinal position 0
+    Argument -> Variadic2: ordinal position 0
+  No handler set/no sub-commands are configured (path is a dead-end).
+  Alias '-p' used across multiple symbols:
+    Option -p, --password
+    Option -p, --port
+  Multiple variadic arguments in parser configuration
+    Argument -> Variadic1 (variadic)
+    Argument -> Variadic2 (variadic)
+
+Command 'app':
+  Sub command 'create' used across multiple sub command:
+    CallSite: (abstract), sub commands: 0
+    CallSite: Vertical.Cli.ConfigurationAssertionTests.IModel, sub commands: 0
+
+Conversion services:
+  Argument converter for type System.String not found
+  Argument converter for type System.Int32 not found
+  Collection converter for IEnumerable<System.Int32> -> System.Int32[] not found
+
+Model type Vertical.Cli.ConfigurationAssertionTests.IModel:
+  Property System.String 'UserId' has no symbol or binding defined
+  Property System.Boolean 'Unbound' has no symbol or binding defined
+  Property Vertical.Cli.ConfigurationAssertionTests.IModel.MultipleBindings  bound multiple times:
+    option --multiple-bindings
+    (static value)
+
+Service configuration:
+  Application has no service provider configured. The following handlers cannot be resolved:
+    'app create' -> IHandler<Vertical.Cli.ConfigurationAssertionTests.IModel>

@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 
 namespace Vertical.Cli.Diagnostics;
 
@@ -7,12 +8,13 @@ namespace Vertical.Cli.Diagnostics;
 /// </summary>
 public class ArgumentConversionError : CommandLineError
 {
-    internal ArgumentConversionError(
+    private ArgumentConversionError(
         ICliSymbol symbol,
         Type expectedType,
         string receivedArgument,
-        Exception? exception = null)
-        : base(FormatMessage(symbol, expectedType, receivedArgument))
+        string message,
+        Exception? exception)
+        : base(message)
     {
         Symbol = symbol;
         ExpectedType = expectedType;
@@ -40,10 +42,22 @@ public class ArgumentConversionError : CommandLineError
     /// </summary>
     public Exception? Exception { get; }
 
-    private static string FormatMessage(ICliSymbol symbol, Type expectedType, string receivedArgument)
+    internal static ArgumentConversionError Create(
+        ICliSymbol symbol,
+        Type expectedType,
+        string receivedArgument,
+        IHelpProvider helpProvider,
+        Exception? exception = null)
     {
-        var identifier = GetSymbolIdentifier(symbol);
+        var identifier = GetSymbolIdentifier(helpProvider, symbol);
+        var message = $"{identifier}: cannot convert '{receivedArgument}' to {expectedType.Name}.";
 
-        return $"{identifier}: cannot convert '{receivedArgument}' to {expectedType.Name}.";
+        
+        return new ArgumentConversionError(
+            symbol, 
+            expectedType, 
+            receivedArgument,
+            message, 
+            exception);
     }
 }

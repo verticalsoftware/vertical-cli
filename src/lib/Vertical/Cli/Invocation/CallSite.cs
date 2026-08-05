@@ -46,7 +46,7 @@ internal static class CallSite
         var modelInstance = modelBinder(bindingContext);
         
         // Run validations
-        if (context.AddErrors(ValidationContext.GetErrors(symbols, modelInstance)) > 0)
+        if (context.AddErrors(ValidationContext.GetErrors(context, symbols, modelInstance)) > 0)
             return -1;
         
         await using var handlerContext = handlerContextFactory();

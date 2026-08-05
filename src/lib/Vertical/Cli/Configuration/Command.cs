@@ -12,17 +12,13 @@ public abstract class Command : IHelpSubject
 {
     private delegate Task<int> CallSiteFactory(InvocationContext context, ITokenList tokenList);
 
-    private record CallSiteInfo(CallSiteFactory SiteFactory, Type ModelType);
+    private record CallSiteInfo(CallSiteFactory SiteFactory, Type ModelType, bool RequiresServices);
     private readonly List<Command> _subCommands = [];
     private CallSiteInfo? _callSiteInfo;
 
     internal Command(string name, CommandHelpTopic? helpTopic)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        if (ArgumentSyntax.GetSyntaxKind(name) != SyntaxKind.None)
-        {
-            throw Exceptions.InvalidCommandName(name);
-        }
         
         Name = name;
         HelpTopic = helpTopic;
@@ -34,6 +30,8 @@ public abstract class Command : IHelpSubject
             ? throw Exceptions.CallSiteNotSupported(this)
             : _callSiteInfo.SiteFactory(context, tokenList);
     }
+
+    internal bool RequiresServices => true == _callSiteInfo?.RequiresServices;
 
     /// <summary>
     /// Gets the model type for the set handler.
@@ -130,7 +128,8 @@ public abstract class Command : IHelpSubject
             (context, tokenList) => CallSite.Create(
                 context,
                 () => HandlerServiceContext.Create(context, handler), tokenList),
-            typeof(TModel));
+            typeof(TModel),
+            RequiresServices: false);
     }
 
     /// <summary>
@@ -147,7 +146,8 @@ public abstract class Command : IHelpSubject
             (context, tokenList) => CallSite.Create(
                 context,
                 () => HandlerServiceContext.Create(context, serviceResolver), tokenList),
-            typeof(TModel));
+            typeof(TModel),
+            RequiresServices: false);
     }
 
     /// <summary>
@@ -165,6 +165,7 @@ public abstract class Command : IHelpSubject
             (context, tokenList) => CallSite.Create(
                 context,
                 () => HandlerServiceContext.Create<TModel, THandler>(context), tokenList),
-            typeof(TModel));
+            typeof(TModel),
+            RequiresServices: true);
     }
 }

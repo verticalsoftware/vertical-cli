@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Diagnostics;
@@ -8,15 +9,17 @@ namespace Vertical.Cli.Diagnostics;
 /// </summary>
 public sealed class SymbolValidationError : CommandLineError
 {
-    internal SymbolValidationError(
+    private SymbolValidationError(
         CliSymbol symbol,
         object model,
         object? receivedValue,
-        string validationMessage) : base(FormatMessage(symbol, validationMessage))
+        string validationMessage,
+        string message) : base(message)
     {
         Symbol = symbol;
         Model = model;
         ReceivedValue = receivedValue;
+        ValidationMessage = validationMessage;
     }
 
     /// <summary>
@@ -34,21 +37,25 @@ public sealed class SymbolValidationError : CommandLineError
     /// </summary>
     public object? ReceivedValue { get; }
 
+    /// <summary>
+    /// Gets the validation message.
+    /// </summary>
+    public string ValidationMessage { get; }
+
     internal static SymbolValidationError Create<TModel, TValue>(
         ValidationEventInfo<TModel, TValue> eventInfo,
-        string message)
+        string validationMessage,
+        IHelpProvider helpProvider)
         where TModel : class
     {
+        var identifier = GetSymbolIdentifier(helpProvider, eventInfo.Symbol);
+        var baseMessage = $"{identifier}: {validationMessage}";
+        
         return new SymbolValidationError(
             eventInfo.Symbol,
             eventInfo.Model,
             eventInfo.Value,
-            message);
-    }
-
-    private static string FormatMessage(CliSymbol symbol, string message)
-    {
-        var identifier = GetSymbolIdentifier(symbol);
-        return $"{identifier}: {message}";
+            validationMessage, 
+            baseMessage);
     }
 }

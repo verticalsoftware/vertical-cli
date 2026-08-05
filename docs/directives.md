@@ -49,3 +49,7 @@ class AppOptions
     public LogLevel { get; set; } = LogLevel.Information;
 }
 ```
+
+> 💡Note
+>
+> The source generator add argument conversions automatically for all supported types in option models. However, it has no visibility to directive parameter types. Application's can either add an argument converter or decorate the `DirectiveEventInfo<TValue>` parameter with the `GeneratedConversion` attribute.

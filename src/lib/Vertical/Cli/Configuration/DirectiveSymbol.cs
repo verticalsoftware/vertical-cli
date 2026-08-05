@@ -2,6 +2,7 @@
 using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
 using Vertical.Cli.Parsing;
+using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;
 
@@ -14,15 +15,14 @@ public sealed class DirectiveSymbol : IDirectiveSymbol
 
     internal DirectiveSymbol(
         string identifier,
-        ParameterArity parameterArity,
+        ParameterArity? parameterArity,
         Func<DirectiveEventInfo, Task> handler,
-        SymbolHelpTopic? helpTopic
-    )
+        SymbolHelpTopic? helpTopic)
     {
-        _handler = handler;
         Identifier = identifier;
         ParameterArity = parameterArity;
         HelpTopic = helpTopic;
+        _handler = handler;
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public sealed class DirectiveSymbol : IDirectiveSymbol
     /// <summary>
     /// Gets the parameter arity.
     /// </summary>
-    public ParameterArity ParameterArity { get; }
+    public ParameterArity? ParameterArity { get; }
 
     /// <summary>
     /// Gets the help topic.
@@ -48,6 +48,11 @@ public sealed class DirectiveSymbol : IDirectiveSymbol
 
     /// <inheritdoc />
     public Arity Arity => default;
+
+    /// <inheritdoc />
+    public void Validate(ValidationContext context)
+    {
+    }
 
     /// <inheritdoc />
     public async Task HandleAsync(InvocationContext context, ArgumentToken token)
@@ -79,13 +84,20 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
         _handler = handler;
     }
 
+    /// <inheritdoc/>
     public string Identifier { get; }
 
-    public ParameterArity ParameterArity { get; }
+    /// <inheritdoc/>
+    public ParameterArity? ParameterArity { get; }
 
-
+    /// <summary>
+    /// Gets the default provider.
+    /// </summary>
     public Func<TValue>? DefaultProvider { get; }
 
+    /// <summary>
+    /// Gets the help topic.
+    /// </summary>
     public SymbolHelpTopic? HelpTopic { get; }
 
     HelpTopic? IHelpSubject.HelpTopic => HelpTopic;
@@ -93,29 +105,34 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
     /// <inheritdoc />
     public async Task HandleAsync(InvocationContext context, ArgumentToken token)
     {
+        var helpProvider = context.Configuration.HelpOptions.HelpProvider;
+        
         switch (token, me: this)
         {
             case { token.Value: null, me.DefaultProvider: not null }:
                 await _handler(new DirectiveEventInfo<TValue>(context, token, this, DefaultProvider()));
                 break;
                 
-            case { token.Value: null, me.ParameterArity: ParameterArity.ZeroOrOne }:
+            case { token.Value: null, me.ParameterArity: Configuration.ParameterArity.ZeroOrOne }:
                 await _handler(new DirectiveEventInfo<TValue>(context, token, this, default!));
                 break;
                 
             case { token.Value: null }:
-                context.AddError(new SymbolArityError(this, []));
+                context.AddError(SymbolArityError.Create(this, [], helpProvider));
                 break;
                 
             default:
-                if (!TryConvertValue(context, token.Value!, out var parameterValue))
+                if (!TryConvertValue(context, token.Value!, helpProvider, out var parameterValue))
                     return;
                 await _handler(new DirectiveEventInfo<TValue>(context, token, this, parameterValue));
                 break;
         }
     }
 
-    private bool TryConvertValue(InvocationContext context, string parameterValue, out TValue value)
+    private bool TryConvertValue(InvocationContext context, 
+        string parameterValue,
+        IHelpProvider helpProvider,
+        out TValue value)
     {
         var converter = context.Configuration.GetArgumentConverter<TValue>();
 
@@ -126,10 +143,12 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
         }
         catch (Exception exception)
         {
-            context.AddError(new ArgumentConversionError(this,
+            context.AddError(ArgumentConversionError.Create(this,
                 typeof(TValue),
                 parameterValue,
+                helpProvider,
                 exception));
+            
             value = default!;
             return false;
         }
@@ -139,5 +158,10 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
     public SymbolKind Kind => SymbolKind.Directive;
 
     /// <inheritdoc />
-    public Arity Arity => ParameterArity == ParameterArity.ZeroOrOne ? Arity.ZeroOrOne : Arity.One;
+    public Arity Arity => Configuration.ParameterArity.One == ParameterArity ? Arity.One : Arity.ZeroOrOne;
+
+    /// <inheritdoc />
+    public void Validate(ValidationContext context)
+    {
+    }
 }

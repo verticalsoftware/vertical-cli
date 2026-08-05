@@ -11,6 +11,9 @@
     <Project Path="src/lib/Vertical.Cli.csproj" />
   </Folder>
   <Folder Name="/test/" />
+  <Folder Name="/test/assertions/">
+    <Project Path="test/assertions/Vertical.Cli.ConfigurationAssertionTests.csproj" />
+  </Folder>
   <Folder Name="/test/scenario/">
     <Project Path="test/scenario/Vertical.Cli.ScenarioTests.csproj" />
   </Folder>

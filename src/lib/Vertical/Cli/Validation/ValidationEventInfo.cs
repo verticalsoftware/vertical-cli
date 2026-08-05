@@ -52,7 +52,7 @@ public class ValidationEventInfo<TModel, TValue> where TModel : class
     /// <returns>A reference to this instance.</returns>
     public ValidationEventInfo<TModel, TValue> Error(string message)
     {
-        Context.AddError(new SymbolValidationError(Symbol, Model, Value, message));
+        Context.AddError(SymbolValidationError.Create(this, message, Context.HelpProvider));
         return this;
     }
 }

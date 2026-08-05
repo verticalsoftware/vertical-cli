@@ -1,4 +1,5 @@
-﻿using Vertical.Cli.Configuration;
+﻿using Vertical.Cli.Binding;
+using Vertical.Cli.Configuration;
 
 namespace Vertical.Cli.Diagnostics;
 
@@ -79,29 +80,5 @@ internal static class Exceptions
                 } 
              """
             );
-    }
-
-    public static ArgumentException InvalidOptionOrSwitchAliases(string[] aliases)
-    {
-        var csv = string.Join(", ", aliases);
-        
-        return new ArgumentException(
-            $"""
-             One or more invalid aliases: {csv}
-             -> Option or switch aliases must match one of the following patterns:
-                GNU short switch, e.g.:   -a
-                GNU long option, e.g.:    --option, --long-option
-             """,
-            nameof(aliases));
-    }
-    
-    public static ArgumentException InvalidUnboundSymbolAliases(string[] aliases)
-    {
-        var csv = string.Join(", ", aliases);
-
-        return new ArgumentException(
-            $"""
-            
-             """, nameof(aliases));
     }
 }

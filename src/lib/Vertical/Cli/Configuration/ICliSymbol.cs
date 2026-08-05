@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Help;
+using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;
 
@@ -16,4 +17,10 @@ public interface ICliSymbol : IHelpSubject
     /// Gets the symbol or parameter arity.
     /// </summary>
     Arity Arity { get; }
+
+    /// <summary>
+    /// Performs application defined validation.
+    /// </summary>
+    /// <param name="context">The validation contet.</param>
+    void Validate(ValidationContext context);
 }

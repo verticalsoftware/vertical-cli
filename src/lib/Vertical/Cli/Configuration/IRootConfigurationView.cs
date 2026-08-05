@@ -1,5 +1,6 @@
 ﻿using Vertical.Cli.Conversion;
 using Vertical.Cli.Help;
+using Vertical.Cli.Invocation;
 using Vertical.Cli.IO;
 using Vertical.Cli.Middleware;
 using Vertical.Cli.Utilities;
@@ -21,8 +22,14 @@ public interface IRootConfigurationView : IConversionProvider
     OutputFormatter OutputFormatter { get; }
     
     HelpSystemOptions HelpOptions { get; }
+    
+    bool HasClientServiceContext { get; }
 
     Stream GetAnnotationStream(string resource);
 
     IReadOnlyList<IDirectiveSymbol> GetDirectives();
+
+    bool HasArgumentConverter(Type type);
+
+    bool HasCollectionConverter(Type elementType, Type collectionType);
 }

@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 using Vertical.Cli.IO;
 using Vertical.Cli.Utilities;
 
@@ -39,17 +40,14 @@ public abstract class CommandLineError
     /// <summary>
     /// Gets a description of the symbol for output.
     /// </summary>
+    /// <param name="helpProvider">The help provider used to discover parameter names.</param>
     /// <param name="symbol">The symbol instance.</param>
     /// <returns><see cref="string"/></returns>
-    public static string GetSymbolIdentifier(ICliSymbol symbol)
+    public static string GetSymbolIdentifier(IHelpProvider helpProvider, ICliSymbol symbol)
     {
         return symbol switch
         {
-            CliSymbol { Kind: SymbolKind.PositionArgument, HelpTopic.ParameterSyntax: { } parameterSyntax }
-                => $"Argument {parameterSyntax}",
-            
-            CliSymbol { Kind: SymbolKind.PositionArgument } argumentSymbol 
-                => $"Argument {argumentSymbol.BindingName.ToKebabCase(toUpperCase: true)}",
+            CliSymbol { Kind: SymbolKind.PositionArgument } => $"Argument {helpProvider.GetParameterName(symbol)}",
             
             CliSymbol { Kind: SymbolKind.Option } optionSymbol => $"Option {FormatAliases(optionSymbol.Aliases)}",
             

@@ -7,6 +7,11 @@
 public interface IBindingSource
 {
     /// <summary>
+    /// Gets the model type.
+    /// </summary>
+    Type ModelType { get; }
+    
+    /// <summary>
     /// Gets the binding model type.
     /// </summary>
     Type ValueType { get; }
@@ -15,7 +20,7 @@ public interface IBindingSource
     /// Gets the property binding name.
     /// </summary>
     string BindingName { get; }
-    
+
     /// <summary>
     /// When implemented by a class, creates a property binder.
     /// </summary>

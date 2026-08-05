@@ -6,5 +6,9 @@
     <Nullable>enable</Nullable>
     <RootNamespace />
   </PropertyGroup>
+  
+  <ItemGroup>
+    <InternalsVisibleTo Include="Vertical.Cli.ConfigurationAssertions" />
+  </ItemGroup>
 
 </Project>

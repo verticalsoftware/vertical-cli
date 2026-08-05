@@ -1,6 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
-using Vertical.Cli.Conversion;
-using Vertical.Cli.Diagnostics;
+using Vertical.Cli.Configuration.Assertion;
 using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
 using Vertical.Cli.IO;
@@ -21,6 +20,13 @@ public class CommandLineApplication
         ArgumentNullException.ThrowIfNull(rootCommand);
         _configuration = new RootConfiguration(rootCommand);
     }
+
+    internal IRootConfigurationView GetConfiguration() => _configuration;
+
+    /// <summary>
+    /// Gets the root command.
+    /// </summary>
+    public RootCommand RootCommand => _configuration.RootCommand;
 
     /// <summary>
     /// Registers an action that configures the help system.
@@ -101,7 +107,7 @@ public class CommandLineApplication
         ArgumentException.ThrowIfNullOrWhiteSpace(identifier);
         ArgumentNullException.ThrowIfNull(handler);
         
-        var directive = new DirectiveSymbol(identifier, ParameterArity.Zero, handler, helpTopic);
+        var directive = new DirectiveSymbol(identifier, parameterArity: null, handler, helpTopic);
         _configuration.AddDirectiveSymbol(directive);
         return this;
     }
@@ -198,6 +204,8 @@ public class CommandLineApplication
     /// <returns>The result code to return.</returns>
     public async Task<int> RunAsync(string[] args)
     {
+        this.AssertConfiguration();
+        
         var context = new InvocationContext(_configuration, args);
 
         var middlewarePipeline = _configuration

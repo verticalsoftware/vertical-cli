@@ -1,5 +1,6 @@
 ﻿using Vertical.Cli.Configuration;
 using Vertical.Cli.Conversion;
+using Vertical.Cli.Help;
 using Vertical.Cli.Parsing;
 
 namespace Vertical.Cli.Binding;
@@ -20,6 +21,11 @@ public sealed class PropertyBindingInfo
     /// Gets the conversion provider.
     /// </summary>
     public IConversionProvider ConversionProvider => _configuration;
+
+    /// <summary>
+    /// Gets the help provider.
+    /// </summary>
+    public IHelpProvider HelpProvider => _configuration.HelpOptions.HelpProvider;
 
     /// <summary>
     /// Gets the parse result.

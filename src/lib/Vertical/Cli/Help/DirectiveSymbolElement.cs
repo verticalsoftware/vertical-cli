@@ -39,7 +39,7 @@ internal sealed class DirectiveSymbolElement : IListElement
         var parameterName = provider.GetParameterName(directive);
         var parameterSyntax = directive.ParameterArity switch
         {
-            ParameterArity.Zero => string.Empty,
+            null => string.Empty,
             ParameterArity.ZeroOrOne => $"[=<{parameterName}>]",
             _ => $"=<{parameterName}>"
         };

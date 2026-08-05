@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 
 namespace Vertical.Cli.Diagnostics;
 
@@ -7,21 +8,37 @@ namespace Vertical.Cli.Diagnostics;
 /// </summary>
 public sealed class SymbolArityError : CommandLineError
 {
-    /// <inheritdoc />
-    internal SymbolArityError(ICliSymbol symbol, string[] argumentsReceived) 
-        : base(FormatMessage(symbol, argumentsReceived.Length))
+    private SymbolArityError(ICliSymbol symbol, string[] argumentsReceived, string message) 
+        : base(message)
     {
+        Symbol = symbol;
         ArgumentsReceived = argumentsReceived;
     }
+
+    /// <summary>
+    /// Gets the symbol.
+    /// </summary>
+    public ICliSymbol Symbol { get; }
 
     /// <summary>
     /// Gets the received arguments.
     /// </summary>
     public string[] ArgumentsReceived { get; }
 
-    private static string FormatMessage(ICliSymbol symbol, int argumentCount)
+    internal static SymbolArityError Create(
+        ICliSymbol symbol, 
+        string[] argumentsReceived,
+        IHelpProvider helpProvider)
     {
-        var identifier = GetSymbolIdentifier(symbol);
+        return new SymbolArityError(
+            symbol, 
+            argumentsReceived, 
+            FormatMessage(helpProvider, symbol, argumentsReceived.Length));
+    }
+
+    private static string FormatMessage(IHelpProvider helpProvider, ICliSymbol symbol, int argumentCount)
+    {
+        var identifier = GetSymbolIdentifier(helpProvider, symbol);
         var (min, max) = symbol.Arity;
         var parameterType = symbol.Kind == SymbolKind.PositionArgument
             ? "value"

@@ -2,6 +2,7 @@
 using System.Reflection;
 using Vertical.Cli.Binding;
 using Vertical.Cli.Help;
+using Vertical.Cli.Parsing;
 using Vertical.Cli.Utilities;
 using Vertical.Cli.Validation;
 
@@ -12,7 +13,7 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol
     protected CliSymbol(
         SymbolKind kind,
         PropertyInfo propertyInfo,
-        int ordinalPosition,
+        int? ordinalPosition,
         string[] aliases,
         Arity arity,
         SymbolHelpTopic? helpTopic)
@@ -54,7 +55,7 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol
     /// <summary>
     /// Gets the parsing order for a positional argument.
     /// </summary>
-    public int OrdinalPosition { get; }
+    public int? OrdinalPosition { get; }
 
     /// <summary>
     /// Gets the aliases of an option or switch symbol.
@@ -78,6 +79,29 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol
     /// </summary>
     /// <param name="context"><see cref="ValidationContext"/></param>
     public abstract void Validate(ValidationContext context);
+
+    /// <inheritdoc />
+    public override string ToString() => Kind switch
+    {
+        SymbolKind.Option => $"option {string.Join(", ", Aliases)}",
+        SymbolKind.Switch => $"switch {string.Join(", ", Aliases)}",
+        SymbolKind.PositionArgument => $"argument {BindingName}",
+        _ => throw new NotSupportedException()
+    };
+
+    /// <summary>
+    /// Gets an identifier for this symbol.
+    /// </summary>
+    public string Identifier => Kind == SymbolKind.Option
+        ? string.Join(", ", Aliases)
+        : BindingName;
+    
+    internal static string[] GetAliasesOrDefault(string bindingName, string[]? aliases)
+    {
+        return aliases is { Length: > 0 }
+            ? aliases
+            : [ArgumentSyntax.CreateGnuAlias(bindingName)];
+    }
 }
 
 public sealed class CliSymbol<TModel, TValue> : CliSymbol where TModel : class
@@ -89,7 +113,7 @@ public sealed class CliSymbol<TModel, TValue> : CliSymbol where TModel : class
     internal CliSymbol(
         Expression<Func<TModel, TValue>> expression,
         SymbolKind kind,
-        int ordinalPosition,
+        int? ordinalPosition,
         string[] aliases,
         Arity arity,
         Func<TValue>? defaultProvider,

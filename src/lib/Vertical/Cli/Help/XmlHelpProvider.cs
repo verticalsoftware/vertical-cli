@@ -12,7 +12,6 @@ public sealed class XmlHelpProvider : IHelpProvider
     private readonly Lazy<(XPathDocument Document, XPathNavigator Navigator)> _lazyResources;
     
     private const string CommandTypeName = "command";
-    private const string CommandExtendedTypeName = "command.extended";
     private const string SymbolTypeName = "symbol";
     private const string DirectiveTypeName = "directive";
     private const string ParameterNameAttribute = "parameter-name";
@@ -94,7 +93,7 @@ public sealed class XmlHelpProvider : IHelpProvider
             CliSymbol { Kind: SymbolKind.Option } option => GetSymbolNode(option)?.GetAttribute(ParameterNameAttribute, string.Empty)
                 ?? option.BindingName.ToKebabCase(),
             CliSymbol { Kind: SymbolKind.Switch } => string.Empty,
-            IDirectiveSymbol { ParameterArity: not ParameterArity.Zero } directive => 
+            IDirectiveSymbol { ParameterArity: not null } directive => 
                 GetDirectiveNode(directive)?.GetAttribute(ParameterNameAttribute, string.Empty) ?? "value",
             _ => throw new NotSupportedException()
         };

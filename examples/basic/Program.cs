@@ -1,9 +1,11 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using BasicDemo;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Vertical.Cli;
 using Vertical.Cli.Configuration;
+using Vertical.Cli.Configuration.Assertion;
 using Vertical.Cli.Conversion;
 using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
@@ -51,7 +53,8 @@ app.ConfigureParser<ICreateCommandOptions>(builder => builder
         defaultProvider: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
         validate: path => path.MustExist())
     .MapMultiValuedArgument(x => x.Patterns, ordinalPosition: 0, arity: Arity.OneOrMore)
-    .MapOption(x => x.SplitSize,
+    .MapOption(
+        x => x.SplitSize,
         ["--split"],
         defaultProvider: () => SplitSize.Parse("250k", null))
     .MapSwitch(x => x.NoManifest)

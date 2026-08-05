@@ -62,10 +62,20 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
     public HelpSystemOptions HelpOptions { get; set; } = new();
 
     /// <inheritdoc />
+    public bool HasClientServiceContext => ServiceContext.ServiceProviderFactory is not null;
+
+    /// <inheritdoc />
     public Stream GetAnnotationStream(string resource) => AnnotationStreamProvider(resource);
 
     /// <inheritdoc />
     public IReadOnlyList<IDirectiveSymbol> GetDirectives() => _directiveSymbols;
+
+    /// <inheritdoc />
+    public bool HasArgumentConverter(Type type) => _argumentConverters.ContainsKey(type);
+
+    /// <inheritdoc />
+    public bool HasCollectionConverter(Type elementType, Type collectionType) =>
+        _collectionConverters.ContainsKey((elementType, collectionType));
 
     public Func<string, Stream> AnnotationStreamProvider { get; set; } = File.OpenRead;
 

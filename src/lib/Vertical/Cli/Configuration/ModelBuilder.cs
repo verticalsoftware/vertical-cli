@@ -1,8 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Vertical.Cli.Binding;
-using Vertical.Cli.Diagnostics;
 using Vertical.Cli.Help;
-using Vertical.Cli.Parsing;
 using Vertical.Cli.Utilities;
 using Vertical.Cli.Validation;
 
@@ -156,8 +154,8 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Configuration.AddBindingSource(new CliSymbol<TModel, TValue>(
             expression,
             SymbolKind.Option,
-            0,
-            ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
+            ordinalPosition: null,
+            CliSymbol.GetAliasesOrDefault(bindingName, aliases),
             required ? Arity.One : Arity.ZeroOrOne,
             defaultProvider,
             helpTopic,
@@ -193,9 +191,9 @@ public sealed class ModelBuilder<TModel> where TModel : class
         
         Configuration.AddBindingSource(new CliSymbol<TModel, TElement[]>(
             expression,
-            SymbolKind.Option,
-            0,
-            ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
+            SymbolKind.Option, 
+            ordinalPosition: null,
+            CliSymbol.GetAliasesOrDefault(bindingName, aliases),
             arity ?? Arity.ZeroOrMore,
             defaultProvider,
             helpTopic,
@@ -234,8 +232,8 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Configuration.AddBindingSource(new CliSymbol<TModel, TCollection>(
             expression,
             SymbolKind.Option,
-            0,
-            ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
+            ordinalPosition: null,
+            CliSymbol.GetAliasesOrDefault(bindingName, aliases),
             arity ?? Arity.ZeroOrMore,
             defaultProvider,
             helpTopic,
@@ -267,8 +265,8 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Configuration.AddBindingSource(new CliSymbol<TModel, bool>(
             expression,
             SymbolKind.Switch,
-            0,
-            ArgumentSyntax.ValidateAliasesOrGetDefault(bindingName, aliases),
+            ordinalPosition: null, 
+            CliSymbol.GetAliasesOrDefault(bindingName, aliases),
             Arity.ZeroOrOne,
             () => false,
             helpTopic,
@@ -287,7 +285,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <returns>A reference to this instance.</returns>
     public ModelBuilder<TModel> MapStaticValue<TValue>(Expression<Func<TModel, TValue>> expression, TValue value)
     {
-        return MapBindingInfoValue(expression, _ => value);
+        return MapBindingInfoValue(expression, _ => value, "(static value)");
     }
 
     /// <summary>
@@ -304,9 +302,10 @@ public sealed class ModelBuilder<TModel> where TModel : class
         ArgumentNullException.ThrowIfNull(expression);
         ArgumentNullException.ThrowIfNull(valueProvider);
         
-        var bindingSource = new PrivateBindingSource<TValue>(
+        var bindingSource = new PrivateBindingSource<TModel, TValue>(
             expression.BindingName,
-            valueProvider);
+            valueProvider,
+            $"Func<PropertyBindingInfo, {typeof(TValue)}>");
         
         Configuration.AddBindingSource(bindingSource);
         return this;
@@ -333,6 +332,23 @@ public sealed class ModelBuilder<TModel> where TModel : class
     public ModelBuilder<TModel> SetBinder(ModelBinder<TModel> binder)
     {
         Configuration.SetBinder(binder);
+        return this;
+    }
+    
+    private ModelBuilder<TModel> MapBindingInfoValue<TValue>(
+        Expression<Func<TModel, TValue>> expression,
+        Func<PropertyBindingInfo, TValue> valueProvider,
+        string description)
+    {
+        ArgumentNullException.ThrowIfNull(expression);
+        ArgumentNullException.ThrowIfNull(valueProvider);
+        
+        var bindingSource = new PrivateBindingSource<TModel, TValue>(
+            expression.BindingName,
+            valueProvider,
+            description);
+        
+        Configuration.AddBindingSource(bindingSource);
         return this;
     }
 }

@@ -12,13 +12,13 @@ public class DefaultHelpProvider : IHelpProvider
     public virtual string? GetRemarks(IHelpSubject subject) => subject.HelpTopic?.Remarks;
 
     /// <inheritdoc />
-    public IEnumerable<CommandExtendedRemarks> GetExtendedRemarks(Command command)
+    public virtual IEnumerable<CommandExtendedRemarks> GetExtendedRemarks(Command command)
     {
         return command.HelpTopic?.ExtendedRemarks ?? [];
     }
 
     /// <inheritdoc />
-    public string GetListIdentifier(IHelpSubject subject)
+    public virtual string GetListIdentifier(IHelpSubject subject)
     {
         return subject switch
         {
@@ -32,7 +32,7 @@ public class DefaultHelpProvider : IHelpProvider
     }
 
     /// <inheritdoc />
-    public string GetParameterName(IHelpSubject subject)
+    public virtual string GetParameterName(IHelpSubject subject)
     {
         return subject switch
         {

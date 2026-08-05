@@ -21,7 +21,13 @@ public static class BindingExtensions
             }
             catch (Exception exception)
             {
-                var error = new ArgumentConversionError(symbol, typeof(TValue), argument, exception);
+                var error = ArgumentConversionError.Create(
+                    symbol, 
+                    typeof(TValue), 
+                    argument,
+                    bindingInfo.HelpProvider,
+                    exception);
+                
                 return new BindingResult<TValue>(symbol.BindingName, default!, error);
             }
         }
@@ -47,7 +53,13 @@ public static class BindingExtensions
                 }
                 catch (Exception exception)
                 {
-                    var error = new ArgumentConversionError(symbol, typeof(TElement), argument, exception);
+                    var error = ArgumentConversionError.Create(
+                        symbol, 
+                        typeof(TElement), 
+                        argument,
+                        bindingInfo.HelpProvider,
+                        exception);
+                    
                     (errors ??= []).Add(error);
                 }
             }

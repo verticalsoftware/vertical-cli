@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
+using Vertical.Cli.Help;
 
 namespace Vertical.Cli.Diagnostics;
 
@@ -7,16 +8,21 @@ namespace Vertical.Cli.Diagnostics;
 /// </summary>
 public sealed class MissingParameterError : CommandLineError
 {
-    internal MissingParameterError(ICliSymbol symbol) : base(FormatMessage(symbol))
+    private MissingParameterError(ICliSymbol symbol, string message) : base(message)
     {
         Symbol = symbol;
     }
 
+    /// <summary>
+    /// Gets the symbol.
+    /// </summary>
     public ICliSymbol Symbol { get; }
 
-    private static string FormatMessage(ICliSymbol symbol)
+    internal static MissingParameterError Create(ICliSymbol symbol, IHelpProvider helpProvider)
     {
-        var identifier = GetSymbolIdentifier(symbol);
-        return $"{identifier}: missing required parameter.";
+        var identifier = GetSymbolIdentifier(helpProvider, symbol);
+        var message =  $"{identifier}: missing required parameter.";
+
+        return new MissingParameterError(symbol, message);
     }
 }

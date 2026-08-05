@@ -28,7 +28,7 @@ internal sealed class CollectionPropertyBinder<TModel, TElement, TCollection> : 
             return new BindingResult<TCollection>(
                 _symbol.BindingName,
                 default!,
-                new MissingParameterError(_symbol));
+                MissingParameterError.Create(_symbol, bindingInfo.HelpProvider));
         }
         
         var (min, max) = _symbol.Arity;
@@ -45,7 +45,10 @@ internal sealed class CollectionPropertyBinder<TModel, TElement, TCollection> : 
             { } when count >= min && count <= max => bindingInfo
                 .CreateCollectionBindingResult<TModel, TElement, TCollection>(_symbol, argumentValues),
             
-            _ => new BindingResult<TCollection>(_symbol.BindingName, default!, new SymbolArityError(_symbol, argumentValues))
+            _ => new BindingResult<TCollection>(
+                _symbol.BindingName, 
+                default!, 
+                SymbolArityError.Create(_symbol, argumentValues, bindingInfo.HelpProvider))
         };
     }
 }

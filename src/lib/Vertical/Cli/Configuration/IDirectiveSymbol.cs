@@ -13,7 +13,7 @@ public interface IDirectiveSymbol : ICliSymbol
     /// <summary>
     /// Gets the parameter arity.
     /// </summary>
-    ParameterArity ParameterArity { get; }
+    ParameterArity? ParameterArity { get; }
 
     /// <summary>
     /// Asynchronously handles the matched token action.
