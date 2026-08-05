@@ -25,10 +25,10 @@ jobs:
       - name: Build source generator
         run: dotnet build src/generator/ -c Release --no-restore -o analyzers
       - name: Pack core library
-        run: dotnet build src/lib -c Release --no-restore -o dist
+        run: dotnet pack src/lib -c Release --no-restore -o ./pack
       - name: Retain latest package build
         uses: actions/upload-artifact@v4
         with:
           name: latest-build
-          path: dist/
+          path: pack/
           retention-days: 7
