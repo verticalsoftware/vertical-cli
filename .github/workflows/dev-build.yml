@@ -25,7 +25,7 @@ jobs:
       - name: Build source generator
         run: dotnet build src/generator/ -c Release --no-restore -o analyzers
       - name: Pack core library
-        run: dotnet pack src/lib -c Release --no-restore -p:ContinuousIntegrationBuilder=true -o ./pack
+        run: dotnet pack src/lib -c Release --no-restore -p:ContinuousIntegrationBuild=true -o ./pack
       - name: Retain latest package build
         uses: actions/upload-artifact@v4
         with:
