@@ -22,7 +22,7 @@ jobs:
       - name: Run unit tests
         run: dotnet test --no-restore
       - name: Set build label
-        run: echo "DEVLABEL=$(date + '%Y%m%d')" >> $GITHUB_ENV
+        run: echo "DEVLABEL=$(date +'%Y%m%d')" >> $GITHUB_ENV
       - name: Build source generator
         run: dotnet build src/generator/ -c Release --no-restore -o analyzers
       - name: Pack core library
