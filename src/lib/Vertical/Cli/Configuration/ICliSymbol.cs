@@ -19,8 +19,7 @@ public interface ICliSymbol : IHelpSubject
     Arity Arity { get; }
 
     /// <summary>
-    /// Performs application defined validation.
+    /// Gets the aliases for the symbol.
     /// </summary>
-    /// <param name="context">The validation contet.</param>
-    void Validate(ValidationContext context);
+    string[] Aliases => [];
 }

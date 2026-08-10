@@ -53,7 +53,7 @@ internal static class HelpOutputWriterExtensions
                 return;
             }
 
-            var column2Left = lineBounds.Left + column1Width + spacing;
+            var column2Left = lineBounds.Left + column1Width;
             var column2LineBounds = new LineBounds(column2Left, column2Left + column2Width);
 
             writer.Return();
@@ -61,7 +61,7 @@ internal static class HelpOutputWriterExtensions
             for (var c = 0; c < entryArray.Length; c++)
             {
                 var entry = entryArray[c];
-                writer.WriteWhiteSpace(lineBounds.Left);
+                writer.TryMoveToColumnPosition(lineBounds.Left + 1);
                 entry.RenderSyntax(writer);
 
                 if (entry.Remarks is not { Length: > 0 } column2Content)
@@ -71,15 +71,10 @@ internal static class HelpOutputWriterExtensions
                 }
 
                 var reader = new SplitStringReader(column2Content, column2LineBounds.Width);
-                var lineId = 0;
 
                 while (reader.TryReadLine(out var lineSpan))
                 {
-                    var wsCount = lineId++ == 0
-                        ? column2LineBounds.Left - column1CellWidths[c]
-                        : column2LineBounds.Left + lineBounds.Left - FormattingConstants.ColumnSeparatorWidth;
-                    
-                    writer.WriteWhiteSpace(wsCount);
+                    writer.TryMoveToColumnPosition(column2LineBounds.Left + 1);
                     writer.Write(lineSpan, DisplayElement.Remarks);
                     writer.WriteLine();
                 }
@@ -100,6 +95,13 @@ internal static class HelpOutputWriterExtensions
                 writer.WriteParagraph(entry.Remarks, remarksBounds, DisplayElement.Remarks);
                 writer.WriteLine();
             }
+        }
+
+        private void TryMoveToColumnPosition(int position)
+        {
+            var count = position - writer.ColumnPosition;
+            if (count <= 0) return;
+            writer.WriteWhiteSpace(count);
         }
     }
 }

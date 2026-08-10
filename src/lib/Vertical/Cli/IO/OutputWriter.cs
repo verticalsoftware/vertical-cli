@@ -32,6 +32,11 @@ public sealed class OutputWriter
     public bool IsNewLine { get; private set; } = true;
 
     /// <summary>
+    /// Gets the current column position.
+    /// </summary>
+    public int ColumnPosition { get; private set; } = 1;
+
+    /// <summary>
     /// Sets the display element.
     /// </summary>
     /// <param name="element">The display element to set.</param>
@@ -47,6 +52,7 @@ public sealed class OutputWriter
         TrySetDisplayElement(element);
         _writer.Write(c);
         IsNewLine = false;
+        ++ColumnPosition;
     }
 
     /// <summary>
@@ -60,6 +66,7 @@ public sealed class OutputWriter
         TrySetDisplayElement(element);
         _writer.Write(span);
         IsNewLine = false;
+        ColumnPosition += span.Length;
     }
 
     /// <summary>
@@ -73,6 +80,7 @@ public sealed class OutputWriter
         TrySetDisplayElement(element);
         _writer.Write(str);
         IsNewLine = false;
+        ColumnPosition += str.Length;
     }
 
     /// <summary>
@@ -105,6 +113,7 @@ public sealed class OutputWriter
         }
 
         IsNewLine = IsNewLine && count % _displayWidth == 0;
+        ColumnPosition += count;
     }
 
     /// <summary>
@@ -136,6 +145,7 @@ public sealed class OutputWriter
     {
         _writer.Write('\n');
         IsNewLine = true;
+        ColumnPosition = 1;
     }
 
     /// <summary>

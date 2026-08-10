@@ -10,7 +10,7 @@ internal class OptionSymbolElement : IListElement
         string identifierList,
         string leftParameterEnclosure,
         string rightParameterEnclosure,
-        string parameterName,
+        string? parameterName,
         string aritySyntax,
         string remarks,
         int computedWidth)
@@ -22,7 +22,7 @@ internal class OptionSymbolElement : IListElement
         RightParameterEnclosure = rightParameterEnclosure;
         ArityAnnotation = arityAnnotation;
         IdentifierList = identifierList;
-        ParameterName = parameterName;
+        ParameterName = parameterName ?? " ";
         AritySyntax = aritySyntax;
     }
 
@@ -55,7 +55,7 @@ internal class OptionSymbolElement : IListElement
         writer.Write(AritySyntax, DisplayElement.ParameterSyntax);
     }
 
-    public static OptionSymbolElement Create(IHelpProvider provider, CliSymbol option)
+    public static OptionSymbolElement Create(IHelpProvider provider, ICliSymbol option)
     {
         var required = option.Arity.Minimum > 0;
         var arityAnnotation = required
@@ -63,7 +63,7 @@ internal class OptionSymbolElement : IListElement
             : "  ";
         var identifier = provider.GetListIdentifier(option);
         var parameterName = provider.GetParameterName(option);
-        var (leftEnclosure, rightEnclosure) = option.Kind == SymbolKind.Option
+        var (leftEnclosure, rightEnclosure) = option is CliSymbol { Kind: SymbolKind.Option }
             ? (" <", ">")
             : (string.Empty, string.Empty);
         var aritySyntax = option.Arity.Maximum.GetValueOrDefault(2) > 1
@@ -73,7 +73,7 @@ internal class OptionSymbolElement : IListElement
         var computedLength = arityAnnotation.Length +
                              identifier.Length +
                              leftEnclosure.Length +
-                             parameterName.Length +
+                             parameterName?.Length ?? 0 +
                              rightEnclosure.Length +
                              aritySyntax.Length;
 

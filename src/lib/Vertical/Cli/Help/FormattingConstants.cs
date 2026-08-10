@@ -3,5 +3,5 @@
 internal static class FormattingConstants
 {
     public const int IndentSpaces = 2;
-    public const int ColumnSeparatorWidth = 4;
+    public const int ColumnSeparatorWidth = 5;
 }

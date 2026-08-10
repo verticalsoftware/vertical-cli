@@ -33,6 +33,11 @@ public sealed class HelpEventInfo
     public required Command Command { get; init; }
 
     /// <summary>
+    /// Gets the help option symbol.
+    /// </summary>
+    public required HelpOptionSymbol HelpOptionSymbol { get; init; }
+    
+    /// <summary>
     /// Gets the symbols to display in the help topic.
     /// </summary>
     public IReadOnlyList<CliSymbol> Symbols { get; }
@@ -51,16 +56,6 @@ public sealed class HelpEventInfo
     /// Gets the directive symbols.
     /// </summary>
     public required IReadOnlyCollection<IDirectiveSymbol> DirectiveSymbols { get; init; }
-    
-    /// <summary>
-    /// Gets the aliases used to trigger the help system.
-    /// </summary>
-    public required string[] HelpOptionAliases { get; init; }
-    
-    /// <summary>
-    /// Gets the remarks to display for the help option.
-    /// </summary>
-    public required string HelpOptionRemarks { get; init; }
     
     /// <summary>
     /// Gets the output writer.

@@ -143,7 +143,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <returns>A reference to this instance.</returns>
     public ModelBuilder<TModel> ParseOption<TValue>(
         Expression<Func<TModel, TValue>> expression,
-        string[]? aliases = null,
+        AliasList? aliases = null,
         bool required = false,
         Func<TValue>? defaultProvider = null,
         Action<IValidationEventInfo<TModel, TValue>>? validate = null,
@@ -155,7 +155,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
             expression,
             SymbolKind.Option,
             ordinalPosition: null,
-            CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+            (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
             required ? Arity.One : Arity.ZeroOrOne,
             defaultProvider,
             helpTopic,
@@ -181,7 +181,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <returns>A reference to this instance.</returns>
     public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
         Expression<Func<TModel, TElement[]>> expression,
-        string[]? aliases = null,
+        AliasList? aliases = null,
         Arity? arity = null,
         Func<TElement[]>? defaultProvider = null,
         Action<IValidationEventInfo<TModel, TElement, TElement[]>>? validate = null,
@@ -193,7 +193,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
             expression,
             SymbolKind.Option, 
             ordinalPosition: null,
-            CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+            (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
             arity ?? Arity.ZeroOrMore,
             defaultProvider,
             helpTopic,
@@ -220,7 +220,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <returns>A reference to this instance.</returns>
     public ModelBuilder<TModel> ParseRepeatableOption<TElement, TCollection>(
         Expression<Func<TModel, TCollection>> expression,
-        string[]? aliases = null,
+        AliasList? aliases = null,
         Arity? arity = null,
         Func<TCollection>? defaultProvider = null,
         Action<IValidationEventInfo<TModel, TCollection>>? validate = null,
@@ -233,7 +233,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
             expression,
             SymbolKind.Option,
             ordinalPosition: null,
-            CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+            (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
             arity ?? Arity.ZeroOrMore,
             defaultProvider,
             helpTopic,
@@ -256,7 +256,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// <returns>A reference to this instance.</returns>
     public ModelBuilder<TModel> ParseSwitch(
         Expression<Func<TModel, bool>> expression,
-        string[]? aliases = null,
+        AliasList? aliases = null,
         Action<IValidationEventInfo<TModel, bool>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
@@ -266,7 +266,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
             expression,
             SymbolKind.Switch,
             ordinalPosition: null, 
-            CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+            (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
             Arity.ZeroOrOne,
             () => false,
             helpTopic,

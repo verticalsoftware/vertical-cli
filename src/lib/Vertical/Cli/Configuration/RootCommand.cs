@@ -8,7 +8,7 @@ namespace Vertical.Cli.Configuration;
 public sealed class RootCommand : Command
 {
     /// <inheritdoc />
-    public RootCommand(string name, CommandHelpTopic? helpTopic = null) : base(name, helpTopic)
+    public RootCommand(CommandName name, CommandHelpTopic? helpTopic = null) : base(name.Value, helpTopic)
     {
     }
 }

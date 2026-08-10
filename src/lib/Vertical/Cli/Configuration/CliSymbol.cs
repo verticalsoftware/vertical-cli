@@ -148,8 +148,5 @@ public sealed class CliSymbol<TModel, TValue> : CliSymbol where TModel : class
     public override PropertyBinder CreatePropertyBinder() => _binderFactory(this);
 
     /// <inheritdoc />
-    public override void Validate(ValidationContext context)
-    {
-        _validate?.Invoke(this, context);
-    }
+    public override void Validate(ValidationContext context) => _validate?.Invoke(this, context);
 }

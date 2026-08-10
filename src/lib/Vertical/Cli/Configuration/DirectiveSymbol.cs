@@ -165,9 +165,4 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
 
     /// <inheritdoc />
     public Arity Arity => Configuration.ParameterArity.One == ParameterArity ? Arity.One : Arity.ZeroOrOne;
-
-    /// <inheritdoc />
-    public void Validate(ValidationContext context)
-    {
-    }
 }

@@ -45,7 +45,7 @@
     </topic>
     
     <topic type="symbol" id="BasicDemo.ICreateCommandOptions.NoManifest">
-        Exclude writing a manifest. v
+        Exclude writing a manifest.
     </topic>
     
     <topic type="symbol" id="BasicDemo.IOverwriteOptions.Overwrite">

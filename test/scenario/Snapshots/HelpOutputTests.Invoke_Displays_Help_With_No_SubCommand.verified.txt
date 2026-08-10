@@ -6,9 +6,12 @@ Usage:
   archive --help | -?
 
 Commands:
-  create       Creates an archive set from one or more input files.
-  extract      Extracts an archive file or set.
+  create      Creates an archive set from one or more input files.
+  extract     Extracts an archive file or set.
+
+Options:
+  --help, -?     Displays help for the current command.
 
 Directives:
-  [log-level=<level>]      Configures verbosity of output logging. <level> = trace|debug|information|warning
+  [log-level=<level>]     Configures verbosity of output logging. <level> = trace|debug|information|warning
 

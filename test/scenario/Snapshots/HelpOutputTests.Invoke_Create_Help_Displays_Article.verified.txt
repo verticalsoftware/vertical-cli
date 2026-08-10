@@ -6,7 +6,7 @@ Usage:
   archive create --help | -?
 
 Arguments:
-* <path>...    One or more input files to include in the archive.
+* <path>...     One or more input files to include in the archive.
 
 Options:
   -c, --compression <type>     Compression type to use, one of gzip or brotli.
@@ -22,7 +22,8 @@ Options:
   --include-metadata           Include source file metadata in the archive.
   --split-size <size[bkmg]>    The maximum allowable size of each split output file.
   --property <key=value>...    An addition metadata  key/value pair to include in the archive.
+  --help, -?                   Displays help for the current command.
 
 Directives:
-  [log-level=<level>]      Configures verbosity of output logging. <level> = trace|debug|information|warning
+  [log-level=<level>]     Configures verbosity of output logging. <level> = trace|debug|information|warning
 

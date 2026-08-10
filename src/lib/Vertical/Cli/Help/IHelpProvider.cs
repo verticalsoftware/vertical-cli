@@ -31,7 +31,7 @@ public interface IHelpProvider
     /// <summary>
     /// Gets the syntax of a symbol's parameter.
     /// </summary>
-    /// <param name="subject">The symbol or directive instance.</param>
+    /// <param name="symbol">The symbol or directive instance.</param>
     /// <returns><see cref="string"/></returns>
-    string GetParameterName(IHelpSubject subject);
+    string? GetParameterName(ICliSymbol symbol);
 }

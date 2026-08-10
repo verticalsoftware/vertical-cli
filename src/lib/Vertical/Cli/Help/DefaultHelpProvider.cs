@@ -26,13 +26,14 @@ public class DefaultHelpProvider : IHelpProvider
                 argument.HelpTopic?.ParameterSyntax ?? argument.BindingName.ToKebabCase(),
             CliSymbol { Kind: SymbolKind.Option or SymbolKind.Switch } named => 
                 string.Join(", ", named.Aliases),
+            HelpOptionSymbol helpSymbol => string.Join(", ", helpSymbol.Aliases),
             IDirectiveSymbol directive => directive.Identifier,
             _ => throw new NotSupportedException()
         };
     }
 
     /// <inheritdoc />
-    public virtual string GetParameterName(IHelpSubject subject)
+    public virtual string? GetParameterName(ICliSymbol subject)
     {
         return subject switch
         {
@@ -40,9 +41,10 @@ public class DefaultHelpProvider : IHelpProvider
             CliSymbol { Kind: SymbolKind.Option } option => option.HelpTopic?.ParameterSyntax ??
                                                                   option.BindingName.ToKebabCase(),
             CliSymbol { Kind: SymbolKind.Switch } => string.Empty,
-            IDirectiveSymbol { HelpTopic: SymbolHelpTopic topic } => topic.ParameterSyntax ?? "value",
-            IDirectiveSymbol => "value",
-            _ => throw new NotSupportedException()
+            IDirectiveSymbol { ParameterArity: not null, HelpTopic: SymbolHelpTopic topic } => topic.ParameterSyntax ?? "value",
+            IDirectiveSymbol => string.Empty,
+            HelpOptionSymbol => string.Empty,
+            _ => null
         };
     }
 }

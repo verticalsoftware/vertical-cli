@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using Vertical.Cli.Binding;
 using Vertical.Cli.Help;
-using Vertical.Cli.Parsing;
 using Vertical.Cli.Utilities;
 using Vertical.Cli.Validation;
 
@@ -626,7 +625,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, IEnumerable<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<IEnumerable<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, IEnumerable<TElement>>>? validate = null,
@@ -638,7 +637,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -664,7 +663,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ICollection<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<ICollection<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, ICollection<TElement>>>? validate = null,
@@ -676,7 +675,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -702,7 +701,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, IReadOnlyCollection<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<IReadOnlyCollection<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, IReadOnlyCollection<TElement>>>? validate = null,
@@ -714,7 +713,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -740,7 +739,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, IList<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<IList<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, IList<TElement>>>? validate = null,
@@ -752,7 +751,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -778,7 +777,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, IReadOnlyList<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<IReadOnlyList<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, IReadOnlyList<TElement>>>? validate = null,
@@ -790,7 +789,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -816,7 +815,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, List<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<List<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, List<TElement>>>? validate = null,
@@ -828,7 +827,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -854,7 +853,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, LinkedList<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<LinkedList<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, LinkedList<TElement>>>? validate = null,
@@ -866,7 +865,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -892,7 +891,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ISet<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<ISet<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, ISet<TElement>>>? validate = null,
@@ -904,7 +903,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -930,7 +929,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, IReadOnlySet<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<IReadOnlySet<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, IReadOnlySet<TElement>>>? validate = null,
@@ -942,7 +941,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -968,7 +967,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, HashSet<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<HashSet<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, HashSet<TElement>>>? validate = null,
@@ -980,7 +979,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -1006,7 +1005,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, SortedSet<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<SortedSet<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, SortedSet<TElement>>>? validate = null,
@@ -1018,7 +1017,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -1044,7 +1043,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableArray<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<ImmutableArray<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, ImmutableArray<TElement>>>? validate = null,
@@ -1056,7 +1055,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -1082,7 +1081,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableList<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<ImmutableList<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, ImmutableList<TElement>>>? validate = null,
@@ -1094,7 +1093,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -1120,7 +1119,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableHashSet<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<ImmutableHashSet<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, ImmutableHashSet<TElement>>>? validate = null,
@@ -1132,7 +1131,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -1158,7 +1157,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableSortedSet<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<ImmutableSortedSet<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, ImmutableSortedSet<TElement>>>? validate = null,
@@ -1170,7 +1169,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -1196,7 +1195,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableStack<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<ImmutableStack<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, ImmutableStack<TElement>>>? validate = null,
@@ -1208,7 +1207,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,
@@ -1234,7 +1233,7 @@ public static class ModelBuilderExtensions
         /// <returns>A reference to this instance.</returns>
         public ModelBuilder<TModel> ParseRepeatableOption<TElement>(
             Expression<Func<TModel, ImmutableQueue<TElement>>> expression,
-            string[]? aliases = null,
+            AliasList? aliases = null,
             Arity? arity = null,
             Func<ImmutableQueue<TElement>>? defaultProvider = null,
             Action<IValidationEventInfo<TModel, ImmutableQueue<TElement>>>? validate = null,
@@ -1246,7 +1245,7 @@ public static class ModelBuilderExtensions
                 expression,
                 SymbolKind.Option,
                 0,
-                CliSymbol.GetAliasesOrDefault(bindingName, aliases),
+                (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
                 defaultProvider,
                 helpTopic,

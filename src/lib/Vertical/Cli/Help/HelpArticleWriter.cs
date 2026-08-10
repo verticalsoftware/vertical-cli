@@ -43,7 +43,6 @@ public class HelpArticleWriter
     private static void WriteOptionsSection(HelpEventInfo eventInfo)
     {
         var symbols = eventInfo.NamedSymbols;
-        if (symbols.Count == 0) return;
         
         var writer = eventInfo.OutputWriter;
         var provider = eventInfo.HelpProvider;
@@ -51,7 +50,10 @@ public class HelpArticleWriter
         
         writer.WriteLine("Options:", DisplayElement.Heading);
 
-        var elements = symbols.Select(symbol => OptionSymbolElement.Create(provider, symbol));
+        var elements = symbols
+            .Select(symbol => OptionSymbolElement.Create(provider, symbol))
+            .Append(OptionSymbolElement.Create(provider, eventInfo.HelpOptionSymbol));
+        
         writer.WriteTable(elements, lineBounds);
         writer.WriteLine();
     }
@@ -97,7 +99,7 @@ public class HelpArticleWriter
         writer.WriteLine("Usage:", DisplayElement.Heading);
         WriteUsageSubCommandSyntax(writer, command);
         WriteUsageInvocationSyntax(eventInfo, writer, command);
-        WriteUsageHelpSyntax(writer, command, eventInfo.HelpOptionAliases);
+        WriteUsageHelpSyntax(writer, command, eventInfo.HelpOptionSymbol.Aliases);
         writer.WriteLine();
     }
 

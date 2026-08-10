@@ -22,8 +22,7 @@ public static class HelpSystem
         var articleInfo = new HelpEventInfo(cliSymbols)
         {
             Command = targetCommand,
-            HelpOptionAliases = helpOptions.OptionAliases,
-            HelpOptionRemarks = helpOptions.OptionRemarks,
+            HelpOptionSymbol = helpOptions.OptionSymbol,
             HelpProvider = helpOptions.HelpProvider,
             OutputWriter = new OutputWriter(bufferedConsole, configuration.OutputFormatter),
             DirectiveSymbols = configuration.GetDirectives()

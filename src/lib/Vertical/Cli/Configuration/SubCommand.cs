@@ -10,7 +10,7 @@ namespace Vertical.Cli.Configuration;
 public sealed class SubCommand : Command
 {
     /// <inheritdoc />
-    public SubCommand(string name, CommandHelpTopic? helpTopic = null) : base(name, helpTopic)
+    public SubCommand(CommandName name, CommandHelpTopic? helpTopic = null) : base(name.Value, helpTopic)
     {
     }
 }

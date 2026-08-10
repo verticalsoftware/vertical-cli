@@ -25,7 +25,7 @@ internal static class DisplayHelpOptionSuggestionMiddleware
         output.Write(commandTarget.Path, DisplayElement.CommandName);
         output.WriteWhiteSpace();
 
-        var aliasString = string.Join(", ", context.Configuration.HelpOptions.OptionAliases);
+        var aliasString = string.Join(", ", context.Configuration.HelpOptions.OptionSymbol.Aliases);
         output.WriteLine(aliasString, DisplayElement.Default);
     }
 }

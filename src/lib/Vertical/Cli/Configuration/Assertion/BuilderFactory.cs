@@ -10,7 +10,6 @@ internal static class BuilderFactory
         new CallSiteServiceContextBuilder(),
         new DeadEndCommandsBuilder(),
         new DuplicateAliasesBuilder(),
-        new InvalidAliasesBuilder(),
         new InvalidVariadicArgumentsBuilder(),
         new MissingConvertersBuilder(),
         new MissingModelBindersBuilder(),

@@ -7,7 +7,7 @@ namespace Vertical.Cli.Help;
 /// <summary>
 /// Implements a <see cref="IHelpProvider"/> using an xml resource.
 /// </summary>
-public sealed class XmlHelpProvider : IHelpProvider
+public sealed class XmlHelpProvider : DefaultHelpProvider
 {
     private readonly Lazy<(XPathDocument Document, XPathNavigator Navigator)> _lazyResources;
     
@@ -35,7 +35,7 @@ public sealed class XmlHelpProvider : IHelpProvider
     private XPathNavigator Navigator => _lazyResources.Value.Navigator;
 
     /// <inheritdoc />
-    public string? GetRemarks(IHelpSubject subject)
+    public override  string? GetRemarks(IHelpSubject subject)
     {
         return subject switch
         {
@@ -43,37 +43,43 @@ public sealed class XmlHelpProvider : IHelpProvider
             CliSymbol symbol => GetSymbolNode(symbol)?.Value,
             IDirectiveSymbol directive => GetDirectiveNode(directive)?.Value,
             _ => null
-        };
+        } ?? base.GetRemarks(subject);
     }
 
     /// <inheritdoc />
-    public IEnumerable<CommandExtendedRemarks> GetExtendedRemarks(Command command)
+    public override IEnumerable<CommandExtendedRemarks> GetExtendedRemarks(Command command)
     {
-        var sectionNodesIterator = GetCommandNode(command)?
-            .SelectSingleNode("sections")?
-            .SelectChildren(XPathNodeType.Element);
-
-        if (sectionNodesIterator is null)
-            yield break;
-
-        while (sectionNodesIterator.MoveNext())
+        var result = GetResult().ToArray();
+        return result.Length > 0 ? result : base.GetExtendedRemarks(command);
+        
+        IEnumerable<CommandExtendedRemarks> GetResult()
         {
-            var current = sectionNodesIterator.Current;
-            if (current is null)
-                continue;
+            var sectionNodesIterator = GetCommandNode(command)?
+                .SelectSingleNode("sections")?
+                .SelectChildren(XPathNodeType.Element);
 
-            var title = current.GetAttribute("title", string.Empty);
-            var remarks = current.Value;
+            if (sectionNodesIterator is null)
+                yield break;
 
-            if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(remarks))
-                continue;
+            while (sectionNodesIterator.MoveNext())
+            {
+                var current = sectionNodesIterator.Current;
+                if (current is null)
+                    continue;
 
-            yield return new CommandExtendedRemarks(title, remarks);
+                var title = current.GetAttribute("title", string.Empty);
+                var remarks = current.Value;
+
+                if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(remarks))
+                    continue;
+
+                yield return new CommandExtendedRemarks(title, remarks);
+            }
         }
     }
 
     /// <inheritdoc />
-    public string GetListIdentifier(IHelpSubject subject)
+    public override string GetListIdentifier(IHelpSubject subject)
     {
         return subject switch
         {
@@ -86,24 +92,25 @@ public sealed class XmlHelpProvider : IHelpProvider
             
             IDirectiveSymbol directive => directive.Identifier,
             
-            _ => throw new NotSupportedException()
+            _ => base.GetListIdentifier(subject)
         };
     }
 
     /// <inheritdoc />
-    public string GetParameterName(IHelpSubject subject)
+    public override string? GetParameterName(ICliSymbol subject)
     {
         return subject switch
         {
             CliSymbol { Kind: SymbolKind.PositionArgument } => GetListIdentifier(subject),
-            CliSymbol { Kind: SymbolKind.Option } option => GetSymbolNode(option)?.GetAttribute(ParameterNameAttribute, string.Empty)
-                ?? option.BindingName.ToKebabCase(),
+            CliSymbol { Kind: SymbolKind.Option } option => GetSymbolNode(option)
+                                                                ?.GetAttribute(ParameterNameAttribute, string.Empty)
+                                                            ?? option.BindingName.ToKebabCase(),
             CliSymbol { Kind: SymbolKind.Switch } => string.Empty,
-            IDirectiveSymbol { ParameterArity: not null } directive => 
+            IDirectiveSymbol { ParameterArity: not null } directive =>
                 GetDirectiveNode(directive)?.GetAttribute(ParameterNameAttribute, string.Empty) ?? "value",
             IDirectiveSymbol => string.Empty,
-            _ => throw new NotSupportedException($"Subject {subject.GetType()} not supported.")
-        };
+            _ => null
+        } ?? base.GetParameterName(subject);
     }
 
     private XPathNavigator? GetNode(string type, string id)

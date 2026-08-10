@@ -10,7 +10,7 @@ internal static class HelpSystemMiddleware
         var (targetCommand, token) = CommandResolver.GetTarget(context.RootCommand, context.TokenList);
         var helpOptions = context.Configuration.HelpOptions;
         var helpToken = token?.Next ?? context.TokenList.First;
-        var aliases = helpOptions.OptionAliases;
+        var aliases = helpOptions.OptionSymbol.Aliases;
 
         if (helpToken is not null && aliases.Any(alias => alias.Equals(helpToken.Text)))
         {

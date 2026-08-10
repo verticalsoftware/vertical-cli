@@ -85,4 +85,4 @@ app.ConfigureHelp(options =>
 });
 
 app.Configure();
-return await app.RunAsync(args);
+return await app.RunAsync(["create", "-?"]);
