@@ -1,13 +1,12 @@
 ﻿using System.Xml.XPath;
 using Vertical.Cli.Configuration;
-using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Help;
 
 /// <summary>
 /// Implements a <see cref="IHelpProvider"/> using an xml resource.
 /// </summary>
-public sealed class XmlHelpProvider : DefaultHelpProvider
+public sealed class XmlHelpProvider : IHelpProvider
 {
     private readonly Lazy<(XPathDocument Document, XPathNavigator Navigator)> _lazyResources;
     
@@ -35,7 +34,7 @@ public sealed class XmlHelpProvider : DefaultHelpProvider
     private XPathNavigator Navigator => _lazyResources.Value.Navigator;
 
     /// <inheritdoc />
-    public override  string? GetRemarks(IHelpSubject subject)
+    public string? GetRemarks(IHelpSubject subject)
     {
         return subject switch
         {
@@ -43,16 +42,16 @@ public sealed class XmlHelpProvider : DefaultHelpProvider
             CliSymbol symbol => GetSymbolNode(symbol)?.Value,
             IDirectiveSymbol directive => GetDirectiveNode(directive)?.Value,
             _ => null
-        } ?? base.GetRemarks(subject);
+        } ?? subject.GetRemarks();
     }
 
     /// <inheritdoc />
-    public override IEnumerable<CommandExtendedRemarks> GetExtendedRemarks(Command command)
+    public IEnumerable<ExtendedRemarksSection> GetExtendedRemarks(Command command)
     {
         var result = GetResult().ToArray();
-        return result.Length > 0 ? result : base.GetExtendedRemarks(command);
+        return result.Length > 0 ? result : command.GetExtendedRemarksSections();
         
-        IEnumerable<CommandExtendedRemarks> GetResult()
+        IEnumerable<ExtendedRemarksSection> GetResult()
         {
             var sectionNodesIterator = GetCommandNode(command)?
                 .SelectSingleNode("sections")?
@@ -73,44 +72,35 @@ public sealed class XmlHelpProvider : DefaultHelpProvider
                 if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(remarks))
                     continue;
 
-                yield return new CommandExtendedRemarks(title, remarks);
+                yield return new ExtendedRemarksSection(title, remarks);
             }
         }
     }
 
     /// <inheritdoc />
-    public override string GetListIdentifier(IHelpSubject subject)
+    public string GetIdentifier(IHelpSubject subject)
     {
         return subject switch
         {
             CliSymbol { Kind: SymbolKind.PositionArgument } argument  => 
                 GetSymbolNode(argument)?.GetAttribute(ParameterNameAttribute, string.Empty)
-                ??  argument.BindingName.ToKebabCase(),
+                ??  argument.GetListIdentifier(),
             
-            CliSymbol { Kind: SymbolKind.Option or SymbolKind.Switch } named => 
-                string.Join(", ", named.Aliases),
-            
-            IDirectiveSymbol directive => directive.Identifier,
-            
-            _ => base.GetListIdentifier(subject)
+            _ => subject.GetListIdentifier()
         };
     }
 
     /// <inheritdoc />
-    public override string? GetParameterName(ICliSymbol subject)
+    public string? GetParameterName(ICliSymbol subject)
     {
         return subject switch
         {
-            CliSymbol { Kind: SymbolKind.PositionArgument } => GetListIdentifier(subject),
-            CliSymbol { Kind: SymbolKind.Option } option => GetSymbolNode(option)
-                                                                ?.GetAttribute(ParameterNameAttribute, string.Empty)
-                                                            ?? option.BindingName.ToKebabCase(),
-            CliSymbol { Kind: SymbolKind.Switch } => string.Empty,
-            IDirectiveSymbol { ParameterArity: not null } directive =>
-                GetDirectiveNode(directive)?.GetAttribute(ParameterNameAttribute, string.Empty) ?? "value",
-            IDirectiveSymbol => string.Empty,
-            _ => null
-        } ?? base.GetParameterName(subject);
+            CliSymbol { Kind: SymbolKind.Option } option =>
+                GetSymbolNode(option)?.GetAttribute(ParameterNameAttribute, namespaceURI: string.Empty)
+                ?? option.GetParameterName(),
+            
+            _ => subject.GetParameterName()
+        };
     }
 
     private XPathNavigator? GetNode(string type, string id)

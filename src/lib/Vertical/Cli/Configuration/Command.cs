@@ -76,6 +76,18 @@ public abstract class Command : IHelpSubject
     /// </summary>
     public CommandHelpTopic? HelpTopic { get; }
 
+    /// <inheritdoc />
+    public string? GetRemarks() => HelpTopic?.Remarks;
+
+    /// <inheritdoc />
+    public IEnumerable<ExtendedRemarksSection> GetExtendedRemarksSections() => HelpTopic?.ExtendedRemarks ?? [];
+
+    /// <inheritdoc />
+    public string GetListIdentifier() => Name;
+
+    /// <inheritdoc />
+    public string? GetParameterName() => null;
+
     HelpTopic? IHelpSubject.HelpTopic => HelpTopic;
     
     /// <summary>

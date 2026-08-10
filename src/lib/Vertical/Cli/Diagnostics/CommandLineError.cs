@@ -55,7 +55,7 @@ public abstract class CommandLineError
             
             IDirectiveSymbol directive => $"Directive [{directive.Identifier}]",
             
-            _ => throw new NotSupportedException()
+            _ => throw new NotSupportedException($"Cannot format identifier for {obj}.")
         };
     }
 

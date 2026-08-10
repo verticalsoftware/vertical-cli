@@ -60,7 +60,7 @@ public interface IRootConfigurationView : IConversionProvider
     /// </summary>
     /// <param name="resource">The resource being referenced.</param>
     /// <returns><see cref="Stream"/></returns>
-    Stream GetAnnotationStream(string resource);
+    Stream GetAnnotationResourceStream(string resource);
 
     /// <summary>
     /// Gets the directives registered by the application.

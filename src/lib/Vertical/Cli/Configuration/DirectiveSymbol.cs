@@ -44,6 +44,18 @@ public sealed class DirectiveSymbol : IDirectiveSymbol
     public SymbolHelpTopic? HelpTopic { get; }
 
     /// <inheritdoc />
+    public string? GetRemarks() => HelpTopic?.Remarks;
+
+    /// <inheritdoc />
+    public IEnumerable<ExtendedRemarksSection> GetExtendedRemarksSections() => [];
+
+    /// <inheritdoc />
+    public string GetListIdentifier() => Identifier;
+
+    /// <inheritdoc />
+    public string? GetParameterName() => null;
+
+    /// <inheritdoc />
     HelpTopic? IHelpSubject.HelpTopic => HelpTopic;
 
     /// <inheritdoc />
@@ -105,6 +117,18 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
     /// Gets the help topic.
     /// </summary>
     public SymbolHelpTopic? HelpTopic { get; }
+
+    /// <inheritdoc />
+    public string? GetRemarks() => HelpTopic?.Remarks;
+
+    /// <inheritdoc />
+    public IEnumerable<ExtendedRemarksSection> GetExtendedRemarksSections() => [];
+
+    /// <inheritdoc />
+    public string GetListIdentifier() => Identifier;
+
+    /// <inheritdoc />
+    public string? GetParameterName() => HelpTopic?.ParameterSyntax ?? "value";
 
     HelpTopic? IHelpSubject.HelpTopic => HelpTopic;
 

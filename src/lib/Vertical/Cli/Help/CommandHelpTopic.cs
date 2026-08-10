@@ -8,7 +8,7 @@ public sealed class CommandHelpTopic : HelpTopic
     /// <inheritdoc />
     public CommandHelpTopic(string remarks, 
         string[]? invocationSyntaxes = null,
-        CommandExtendedRemarks[]? extendedRemarks = null) 
+        ExtendedRemarksSection[]? extendedRemarks = null) 
         : base(remarks)
     {
         InvocationSyntaxes = invocationSyntaxes;
@@ -23,7 +23,7 @@ public sealed class CommandHelpTopic : HelpTopic
     /// <summary>
     /// Gets the commands extended remarks.
     /// </summary>
-    public CommandExtendedRemarks[]? ExtendedRemarks { get; }
+    public ExtendedRemarksSection[]? ExtendedRemarks { get; }
 
     /// <summary>
     /// Implicitly converts the given remarks to a help topic.

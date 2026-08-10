@@ -19,14 +19,14 @@ public interface IHelpProvider
     /// </summary>
     /// <param name="command">The command instance.</param>
     /// <returns>An array of tuples containing section titles and extended remarks.</returns>
-    IEnumerable<CommandExtendedRemarks> GetExtendedRemarks(Command command);
+    IEnumerable<ExtendedRemarksSection> GetExtendedRemarks(Command command);
 
     /// <summary>
     /// Gets an identifier for a argument, option, or switch symbol.
     /// </summary>
     /// <param name="subject">The symbol instance.</param>
     /// <returns><see cref="string"/></returns>
-    string GetListIdentifier(IHelpSubject subject);
+    string GetIdentifier(IHelpSubject subject);
 
     /// <summary>
     /// Gets the syntax of a symbol's parameter.

@@ -3,14 +3,14 @@
 /// <summary>
 /// Represents an extended remarks section for a command.
 /// </summary>
-public sealed class CommandExtendedRemarks
+public sealed class ExtendedRemarksSection
 {
     /// <summary>
-    /// Initializezs a new instance of the <see cref="CommandExtendedRemarks"/> class.
+    /// Initializes a new instance of the <see cref="ExtendedRemarksSection"/> class.
     /// </summary>
     /// <param name="title">The section title.</param>
     /// <param name="remarks">Remarks to include in the section.</param>
-    public CommandExtendedRemarks(string title, string remarks)
+    public ExtendedRemarksSection(string title, string remarks)
     {
         Title = title;
         Remarks = remarks;

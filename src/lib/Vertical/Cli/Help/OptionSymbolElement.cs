@@ -61,7 +61,7 @@ internal class OptionSymbolElement : IListElement
         var arityAnnotation = required
             ? "* "
             : "  ";
-        var identifier = provider.GetListIdentifier(option);
+        var identifier = provider.GetIdentifier(option);
         var parameterName = provider.GetParameterName(option);
         var (leftEnclosure, rightEnclosure) = option is CliSymbol { Kind: SymbolKind.Option }
             ? (" <", ">")
@@ -73,7 +73,7 @@ internal class OptionSymbolElement : IListElement
         var computedLength = arityAnnotation.Length +
                              identifier.Length +
                              leftEnclosure.Length +
-                             parameterName?.Length ?? 0 +
+                             (parameterName?.Length ?? 0) +
                              rightEnclosure.Length +
                              aritySyntax.Length;
 

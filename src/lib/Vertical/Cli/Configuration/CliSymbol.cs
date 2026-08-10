@@ -74,7 +74,30 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
     /// Gets the help topic associated with the symbol.
     /// </summary>
     public SymbolHelpTopic? HelpTopic { get; }
-    
+
+    /// <inheritdoc />
+    public string? GetRemarks() => HelpTopic?.Remarks;
+
+    /// <inheritdoc />
+    public IEnumerable<ExtendedRemarksSection> GetExtendedRemarksSections() => [];
+
+    /// <inheritdoc />
+    public string GetListIdentifier() => Kind switch
+    {
+        SymbolKind.Option or SymbolKind.Switch => string.Join(", ", Aliases),
+        SymbolKind.PositionArgument => HelpTopic?.ParameterSyntax ?? BindingName,
+        _ => throw new InvalidOperationException($"Cannot return identifier for {Kind}.")
+    };
+
+    /// <inheritdoc />
+    public string? GetParameterName() => Kind switch
+    {
+        SymbolKind.PositionArgument => GetListIdentifier(),
+        SymbolKind.Option => HelpTopic?.ParameterSyntax ?? BindingName.ToKebabCase(),
+        SymbolKind.Switch => null,
+        _ => throw new InvalidOperationException($"Cannot return parameter name for {Kind}.")
+    };
+
     HelpTopic? IHelpSubject.HelpTopic => HelpTopic;
 
     /// <summary>

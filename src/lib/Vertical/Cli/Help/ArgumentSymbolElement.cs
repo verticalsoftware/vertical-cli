@@ -40,7 +40,7 @@ internal sealed class ArgumentSymbolElement : IListElement
         var (leftEnclosure, rightEnclosure) = required
             ? ('<', '>')
             : ('[', ']');
-        var identifier = provider.GetListIdentifier(argument);
+        var identifier = provider.GetIdentifier(argument);
         var aritySyntax = argument.Arity.Maximum.GetValueOrDefault(2) > 1
             ? "..."
             : string.Empty;

@@ -32,7 +32,7 @@ internal static class InjectResponseFileArgumentsMiddleware
                 context,
                 annotation,    
                 token, 
-                context.Configuration.GetAnnotationStream(annotation));
+                context.Configuration.GetAnnotationResourceStream(annotation));
         }
         catch (Exception exception)
         {

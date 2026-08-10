@@ -1,5 +1,4 @@
 ﻿using Vertical.Cli.Configuration;
-using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Help;
 
@@ -15,6 +14,18 @@ public sealed class HelpOptionSymbol : ICliSymbol
     
     /// <inheritdoc />
     public HelpTopic? HelpTopic { get; init; }
+
+    /// <inheritdoc />
+    public string? GetRemarks() => HelpTopic?.Remarks;
+
+    /// <inheritdoc />
+    public IEnumerable<ExtendedRemarksSection> GetExtendedRemarksSections() => [];
+
+    /// <inheritdoc />
+    public string GetListIdentifier() => string.Join(", ", Aliases);
+
+    /// <inheritdoc />
+    public string? GetParameterName() => null;
 
     /// <inheritdoc />
     public SymbolKind Kind => SymbolKind.Option;

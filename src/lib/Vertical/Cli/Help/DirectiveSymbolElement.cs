@@ -35,7 +35,7 @@ internal sealed class DirectiveSymbolElement : IListElement
 
     public static DirectiveSymbolElement Create(IHelpProvider provider, IDirectiveSymbol directive)
     {
-        var identifier = provider.GetListIdentifier(directive);
+        var identifier = provider.GetIdentifier(directive);
         var parameterName = provider.GetParameterName(directive);
         var parameterSyntax = directive.ParameterArity switch
         {

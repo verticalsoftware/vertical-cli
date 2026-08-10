@@ -65,7 +65,7 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
     public bool HasClientServiceContext => ServiceContext.ServiceProviderFactory is not null;
 
     /// <inheritdoc />
-    public Stream GetAnnotationStream(string resource) => AnnotationStreamProvider(resource);
+    public Stream GetAnnotationResourceStream(string resource) => AnnotationStreamProvider(resource);
 
     /// <inheritdoc />
     public IReadOnlyList<IDirectiveSymbol> GetDirectives() => _directiveSymbols;
