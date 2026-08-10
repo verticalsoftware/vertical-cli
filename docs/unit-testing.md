@@ -37,9 +37,9 @@ app.UseConsole(new TestConsole());
 
 ## Unit testing the configuration
 
-When the `RunAsync` method is called, the framework performs a verbose inspection of the configuration and finds things that are missing or misconfigured. Assertion subjects include commands, symbol names, argument position, converters, etc. Unit test projects can call this method without staging argument and called `RunAsync`. Instead, it can call one of the following extension methods on the `CommandLineApplication` class:
+When the `RunAsync` method is called, the framework performs a verbose inspection of the configuration and finds things that are missing or misconfigured. Assertion subjects include commands, symbol names, argument position, converters, etc. Unit test projects can call this method without staging arguments and calling `RunAsync`. Instead, it can call one of the following extension methods on the `CommandLineApplication` class:
 
-|Name|Description|
+|Name| Description|
 |---|---|
-|`AssertConfiguration`|Throws an exception is one or more issues are found.|
-|`GetConfigurationAssertions`|Returns a list of assertion objects, are an empty collection if the configuration is clean|
+|`AssertConfiguration`| Throws an exception is one or more issues are found. The exception contains detailed assertion information.|
+|`GetConfigurationAssertions`| Returns a list of assertion objects, or an empty collection if the configuration is clean|

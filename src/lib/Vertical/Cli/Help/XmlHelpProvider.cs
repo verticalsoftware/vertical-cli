@@ -101,7 +101,8 @@ public sealed class XmlHelpProvider : IHelpProvider
             CliSymbol { Kind: SymbolKind.Switch } => string.Empty,
             IDirectiveSymbol { ParameterArity: not null } directive => 
                 GetDirectiveNode(directive)?.GetAttribute(ParameterNameAttribute, string.Empty) ?? "value",
-            _ => throw new NotSupportedException()
+            IDirectiveSymbol => string.Empty,
+            _ => throw new NotSupportedException($"Subject {subject.GetType()} not supported.")
         };
     }
 
