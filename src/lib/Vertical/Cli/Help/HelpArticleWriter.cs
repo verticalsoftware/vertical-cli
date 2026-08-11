@@ -52,7 +52,7 @@ public class HelpArticleWriter
 
         var elements = symbols
             .Select(symbol => OptionSymbolElement.Create(provider, symbol))
-            .Append(OptionSymbolElement.Create(provider, eventInfo.HelpOptionSymbol));
+            .Concat(eventInfo.UnboundOptionSymbols.Select(symbol => OptionSymbolElement.Create(provider, symbol)));
         
         writer.WriteTable(elements, lineBounds);
         writer.WriteLine();
@@ -99,7 +99,7 @@ public class HelpArticleWriter
         writer.WriteLine("Usage:", DisplayElement.Heading);
         WriteUsageSubCommandSyntax(writer, command);
         WriteUsageInvocationSyntax(eventInfo, writer, command);
-        WriteUsageHelpSyntax(writer, command, eventInfo.HelpOptionSymbol.Aliases);
+        WriteUsageHelpSyntax(writer, eventInfo);
         writer.WriteLine();
     }
 
@@ -136,12 +136,12 @@ public class HelpArticleWriter
         writer.WriteLine();
     }
 
-    private static void WriteUsageHelpSyntax(OutputWriter writer, Command command, string[] aliases)
+    private static void WriteUsageHelpSyntax(OutputWriter writer, HelpEventInfo eventInfo)
     {
         writer.WriteWhiteSpace(IndentSpaces);
-        writer.Write(command.Path, DisplayElement.CommandName);
+        writer.Write(eventInfo.Command.Path, DisplayElement.CommandName);
         writer.WriteWhiteSpace();
-        writer.WriteLine(string.Join(" | ", aliases), DisplayElement.ParameterSyntax);
+        writer.WriteLine(string.Join(" | ", eventInfo.Help.Aliases), DisplayElement.ParameterSyntax);
     }
 
     private static void WriteUsageSubCommandSyntax(OutputWriter writer, Command command)

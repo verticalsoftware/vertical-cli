@@ -41,6 +41,7 @@ public sealed class XmlHelpProvider : IHelpProvider
             Command command => GetCommandNode(command)?.SelectSingleNode("remarks")?.Value,
             CliSymbol symbol => GetSymbolNode(symbol)?.Value,
             IDirectiveSymbol directive => GetDirectiveNode(directive)?.Value,
+            UnboundSymbol unbound => GetUnboundSymbolNode(unbound)?.Value,
             _ => null
         } ?? subject.GetRemarks();
     }
@@ -111,9 +112,12 @@ public sealed class XmlHelpProvider : IHelpProvider
 
     private XPathNavigator? GetCommandNode(Command command) => 
         GetNode(CommandTypeName, command.Path);
-
+    
     private XPathNavigator? GetSymbolNode(CliSymbol symbol) => 
         GetNode(SymbolTypeName, $"{symbol.ModelType.FullName}.{symbol.BindingName}");
+    
+    private XPathNavigator? GetUnboundSymbolNode(UnboundSymbol symbol) => 
+        GetNode(SymbolTypeName, $"@Unbound.{symbol.Identifier}");
 
     private XPathNavigator? GetDirectiveNode(IDirectiveSymbol directive) => 
         GetNode(DirectiveTypeName, directive.Identifier);

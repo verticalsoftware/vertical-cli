@@ -1,4 +1,6 @@
-﻿namespace Vertical.Cli.Help;
+﻿using Vertical.Cli.Configuration;
+
+namespace Vertical.Cli.Help;
 
 /// <summary>
 /// Represents configuration options for the help system.
@@ -8,11 +10,11 @@ public sealed class HelpSystemOptions
     /// <summary>
     /// Gets or sets the help option.
     /// </summary>
-    public HelpOptionSymbol OptionSymbol { get; set; } = new()
-    {
-        Aliases = ["--help", "-?"],
-        HelpTopic = new SymbolHelpTopic("Displays help for the current command.")
-    };
+    public UnboundSymbol Symbol { get; set; } = new(
+        identifier: "Help",
+        ["--help", "-?"],
+        SpecialSymbolKind.HelpSymbol,
+        "Displays help for the current command.");
 
     /// <summary>
     /// Gets or sets the article writer instance.

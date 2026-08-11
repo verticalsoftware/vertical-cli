@@ -81,4 +81,9 @@ internal static class Exceptions
              """
             );
     }
+
+    public static ArgumentException EmptyUnboundSymbolAlias(string parameter)
+    {
+        return new ArgumentException("Unbound symbol must define an alias.", parameter);
+    }
 }

@@ -35,7 +35,13 @@ public sealed class HelpEventInfo
     /// <summary>
     /// Gets the help option symbol.
     /// </summary>
-    public required HelpOptionSymbol HelpOptionSymbol { get; init; }
+    public required IReadOnlyList<UnboundSymbol> UnboundOptionSymbols { get; init; }
+
+    /// <summary>
+    /// Gets the help option.
+    /// </summary>
+    public UnboundSymbol Help => UnboundOptionSymbols.First(symbol => 
+        symbol.SpecialKind == SpecialSymbolKind.HelpSymbol);
     
     /// <summary>
     /// Gets the symbols to display in the help topic.

@@ -28,6 +28,12 @@ public sealed class AliasList : IEnumerable<string>
     }
 
     /// <summary>
+    /// Gets the values of the list.
+    /// </summary>
+    /// <returns>String array.</returns>
+    public string[] GetValues() => _values.ToArray();
+
+    /// <summary>
     /// Gets the alias list values, or generates a result with a single value
     /// created using a default convention.
     /// </summary>
