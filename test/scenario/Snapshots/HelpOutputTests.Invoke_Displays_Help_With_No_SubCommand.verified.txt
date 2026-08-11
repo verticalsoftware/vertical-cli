@@ -10,6 +10,7 @@ Commands:
   extract     Extracts an archive file or set.
 
 Options:
+  --version      Displays version information.
   --help, -?     Displays help for the current command.
 
 Directives:

@@ -9,6 +9,16 @@ using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
 
 var rootCommand = new RootCommand("arcv");
+rootCommand.AddUnboundOption(
+    "Version",
+    ["--version"],
+    UnboundScope.Global,
+    (context, _) =>
+    {
+        Console.WriteLine("BasicDemo v1.0");
+        context.Result = 0;
+        return Task.CompletedTask;
+    });
 
 var createCommand = new SubCommand("create");
 createCommand.SetHandler<ICreateCommandOptions, CreateHandler>();
@@ -85,4 +95,4 @@ app.ConfigureHelp(options =>
 });
 
 app.Configure();
-return await app.RunAsync(["create", "-?"]);
+return await app.RunAsync(["--version"]);

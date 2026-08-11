@@ -11,6 +11,7 @@ public sealed class MiddlewareBuilder
 
     private static List<MiddlewareDelegate> DefaultComponents =>
     [
+        HandleCommandSymbolHooksMiddleware.InvokeAsync,
         HandleDirectiveSymbolHooksMiddleware.InvokeAsync,
         HelpSystemMiddleware.InvokeAsync,
         DisplayHelpOptionSuggestionMiddleware.InvokeAsync,
@@ -46,9 +47,14 @@ public sealed class MiddlewareBuilder
     }
 
     /// <summary>
-    /// Adds middleware that filters directive hooks.
+    /// Adds middleware that evaluates directive tokens matched in the token list.
     /// </summary>
     public MiddlewareBuilder HandleDirectives => AddLast(HandleDirectiveSymbolHooksMiddleware.InvokeAsync);
+
+    /// <summary>
+    /// Adds middleware that evaluates command symbols matched in the token list.
+    /// </summary>
+    public MiddlewareBuilder HandleCommandSymbols => AddLast(HandleCommandSymbolHooksMiddleware.InvokeAsync);
 
     /// <summary>
     /// Adds middleware that displays help articles when the help option is invoked on a command.

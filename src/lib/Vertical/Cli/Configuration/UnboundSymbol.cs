@@ -6,18 +6,20 @@ namespace Vertical.Cli.Configuration;
 /// <summary>
 /// Represents a special symbol for the help option.
 /// </summary>
-public sealed class UnboundSymbol : ICliSymbol
+public class UnboundSymbol : ICliSymbol
 {
     internal UnboundSymbol(
         string identifier,
         AliasList aliasList,
-        SpecialSymbolKind specialKind,
+        UnboundSymbolKind unboundKind,
+        UnboundScope scope,
         HelpTopic? helpTopic)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(identifier);
         
         Identifier = identifier;
-        SpecialKind = specialKind;
+        UnboundKind = unboundKind;
+        Scope = scope;
         Aliases = aliasList.GetValues() is { Length: > 0 } aliases
             ? aliases
             : throw Exceptions.EmptyUnboundSymbolAlias(nameof(aliasList));
@@ -32,7 +34,12 @@ public sealed class UnboundSymbol : ICliSymbol
     /// <summary>
     /// Gets the unbound symbol kind.
     /// </summary>
-    public SpecialSymbolKind SpecialKind { get; }
+    public UnboundSymbolKind UnboundKind { get; }
+
+    /// <summary>
+    /// Gets the symbol's scope.
+    /// </summary>
+    public UnboundScope Scope { get; }
 
     /// <summary>
     /// Gets the aliases assigned to the help symbol.

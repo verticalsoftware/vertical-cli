@@ -8,12 +8,41 @@ namespace Vertical.Cli.Help;
 public sealed class HelpSystemOptions
 {
     /// <summary>
+    /// Gets the aliases for the help 
+    /// </summary>
+    public AliasList OptionAliases
+    {
+        get => [..Symbol.Aliases];
+        set => Symbol = new UnboundSymbol(
+            Symbol.Identifier,
+            value,
+            UnboundSymbolKind.HelpSymbol,
+            UnboundScope.Global,
+            Symbol.HelpTopic);
+    }
+
+    /// <summary>
+    /// Gets or sets the option help topic.
+    /// </summary>
+    public HelpTopic? OptionHelpTopic
+    {
+        get => Symbol.HelpTopic;
+        set => Symbol = new UnboundSymbol(
+            Symbol.Identifier,
+            OptionAliases,
+            Symbol.UnboundKind,
+            Symbol.Scope,
+            value);
+    }
+    
+    /// <summary>
     /// Gets or sets the help option.
     /// </summary>
-    public UnboundSymbol Symbol { get; set; } = new(
+    internal UnboundSymbol Symbol { get; private set; } = new(
         identifier: "Help",
         ["--help", "-?"],
-        SpecialSymbolKind.HelpSymbol,
+        UnboundSymbolKind.HelpSymbol,
+        UnboundScope.Global,
         "Displays help for the current command.");
 
     /// <summary>

@@ -18,11 +18,15 @@ public static class HelpSystem
         using var bufferedConsole = new BufferedConsole(configuration.Console);
         var cliSymbols = GetHelpSymbols(configuration, targetCommand);
         var helpOptions = configuration.HelpOptions;
+        var unboundSymbols = targetCommand
+            .Symbols
+            .Append(helpOptions.Symbol)
+            .ToArray();
         
         var articleInfo = new HelpEventInfo(cliSymbols)
         {
             Command = targetCommand,
-            UnboundOptionSymbols = [helpOptions.Symbol],
+            UnboundSymbols = unboundSymbols,
             HelpProvider = helpOptions.HelpProvider,
             OutputWriter = new OutputWriter(bufferedConsole, configuration.OutputFormatter),
             DirectiveSymbols = configuration.GetDirectives()

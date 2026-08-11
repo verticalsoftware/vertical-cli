@@ -117,7 +117,7 @@ public sealed class XmlHelpProvider : IHelpProvider
         GetNode(SymbolTypeName, $"{symbol.ModelType.FullName}.{symbol.BindingName}");
     
     private XPathNavigator? GetUnboundSymbolNode(UnboundSymbol symbol) => 
-        GetNode(SymbolTypeName, $"@Unbound.{symbol.Identifier}");
+        GetNode(SymbolTypeName, $"(Unbound).{symbol.Identifier}");
 
     private XPathNavigator? GetDirectiveNode(IDirectiveSymbol directive) => 
         GetNode(DirectiveTypeName, directive.Identifier);

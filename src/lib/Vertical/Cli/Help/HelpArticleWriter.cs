@@ -42,7 +42,7 @@ public class HelpArticleWriter
 
     private static void WriteOptionsSection(HelpEventInfo eventInfo)
     {
-        var symbols = eventInfo.NamedSymbols;
+        var boundSymbols = eventInfo.NamedSymbols;
         
         var writer = eventInfo.OutputWriter;
         var provider = eventInfo.HelpProvider;
@@ -50,9 +50,9 @@ public class HelpArticleWriter
         
         writer.WriteLine("Options:", DisplayElement.Heading);
 
-        var elements = symbols
+        var elements = boundSymbols
             .Select(symbol => OptionSymbolElement.Create(provider, symbol))
-            .Concat(eventInfo.UnboundOptionSymbols.Select(symbol => OptionSymbolElement.Create(provider, symbol)));
+            .Concat(eventInfo.UnboundSymbols.Select(symbol => OptionSymbolElement.Create(provider, symbol)));
         
         writer.WriteTable(elements, lineBounds);
         writer.WriteLine();

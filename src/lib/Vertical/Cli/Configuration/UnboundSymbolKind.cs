@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines special kinds for unbound symbols.
 /// </summary>
-public enum SpecialSymbolKind
+public enum UnboundSymbolKind
 {
     /// <summary>
     /// Indicates a non special symbol.

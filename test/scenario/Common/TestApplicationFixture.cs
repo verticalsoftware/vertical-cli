@@ -2,6 +2,7 @@
 using Microsoft.Testing.Platform.Logging;
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Conversion;
+using Vertical.Cli.Help;
 using Vertical.Cli.IO;
 using Vertical.Cli.Validation;
 
@@ -18,6 +19,12 @@ public sealed class TestApplicationFixture
         services.AddSingleton<Handlers.ExtractHandler>();
         
         var rootCommand = new RootCommand("archive", HelpResources.Root);
+        rootCommand.AddUnboundOption(
+            "Version",
+            ["--version"],
+            UnboundScope.Global,
+            (_,_) => Task.CompletedTask,
+            "Displays version information.");
         
         var createCommand = new SubCommand("create", HelpResources.CreateCommand);
         createCommand.SetHandler<ICreateCommandOptions, Handlers.CreateHandler>();

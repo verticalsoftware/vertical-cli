@@ -22,6 +22,7 @@ Options:
   --include-metadata            Include source file metadata in the archive.
   --split-size <size[bkmg]>     The maximum allowable size of each split output file.
   --property <key=value>...     An addition metadata  key/value pair to include in the archive.
+  --version                     Displays version information.
   --help, -?                    Displays help for the current command.
 
 Directives:
