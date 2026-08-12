@@ -9,7 +9,7 @@ namespace Vertical.Cli.Invocation;
 /// <summary>
 /// Represents runtime data available to the middleware pipeline.
 /// </summary>
-public sealed class InvocationContext : IDisposable
+public sealed class InvocationContext : IAsyncDisposable
 {
     private readonly RootConfiguration _configuration;
     private readonly CancellationTokenSource _cancelSource = new();
@@ -39,10 +39,12 @@ public sealed class InvocationContext : IDisposable
     /// </summary>
     public OptionsManager ApplicationOptions => _configuration.OptionsManager;
 
-    /// <summary>
-    /// Releases all resources used by this component.
-    /// </summary>
-    public void Dispose() => _cancelSource.Dispose();
+    /// <inheritdoc />
+    public ValueTask DisposeAsync()
+    {
+        _cancelSource.Dispose();
+        return ValueTask.CompletedTask;
+    }
 
     /// <summary>
     /// Gets a token that can be observed for cancellation.

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Vertical.Cli;
+namespace Vertical.Cli.DependencyInjection;
 
 internal sealed class DependencyInjectionOptions
 {

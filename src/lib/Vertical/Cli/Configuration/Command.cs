@@ -177,7 +177,7 @@ public abstract class Command : IHelpSubject
         _callSiteInfo = new CallSiteInfo(
             (context, tokenList) => CallSite.Create(
                 context,
-                () => new HandlerService<TModel>(() => new DelegatedHandler<TModel>(handler)),
+                () => new DelegatedHandler<TModel>(handler),
                 tokenList),
             typeof(TModel));
     }
@@ -195,26 +195,7 @@ public abstract class Command : IHelpSubject
         _callSiteInfo = new CallSiteInfo(
             (context, tokenList) => CallSite.Create(
                 context,
-                () => new HandlerService<TModel>(() => handlerFactory(context)),
-                tokenList),
-            typeof(TModel));
-    }
-    
-    /// <summary>
-    /// Registers a function that provides the <see cref="IHandler{TModel}"/> instance to use for
-    /// servicing the command.
-    /// </summary>
-    /// <param name="handlerServiceFactory">
-    /// A function that returns a service context for a handler.
-    /// </param>
-    /// <typeparam name="TModel">Model type</typeparam>
-    public void SetHandler<TModel>(Func<InvocationContext, HandlerService<TModel>> handlerServiceFactory) 
-        where TModel : class
-    {
-        _callSiteInfo = new CallSiteInfo(
-            (context, tokenList) => CallSite.Create(
-                context,
-                () => handlerServiceFactory(context),
+                () => handlerFactory(context),
                 tokenList),
             typeof(TModel));
     }

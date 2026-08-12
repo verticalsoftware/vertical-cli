@@ -2,7 +2,7 @@
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Invocation;
 
-namespace Vertical.Cli;
+namespace Vertical.Cli.DependencyInjection;
 
 /// <summary>
 /// Defines extensions for <see cref="Command"/>
@@ -28,9 +28,7 @@ public static class CommandExtensions
                 var options = context.ApplicationOptions.GetOptions<DependencyInjectionOptions>();
                 var serviceProvider = options.LazyServiceProvider.Value;
 
-                return new ProviderManagedHandlerService<TModel>(
-                    serviceProvider,
-                    () => handlerResolver(serviceProvider));
+                return handlerResolver(serviceProvider);
             });
         }
 
@@ -49,9 +47,7 @@ public static class CommandExtensions
                 var options = context.ApplicationOptions.GetOptions<DependencyInjectionOptions>();
                 var serviceProvider = options.LazyServiceProvider.Value;
 
-                return new ProviderManagedHandlerService<TModel>(
-                    serviceProvider,
-                    serviceProvider.GetRequiredService<THandler>);
+                return serviceProvider.GetRequiredService<THandler>();
             });
         }
     }

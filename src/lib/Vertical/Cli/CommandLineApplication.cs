@@ -198,7 +198,7 @@ public class CommandLineApplication
     {
         this.AssertConfiguration();
         
-        var context = new InvocationContext(_configuration, args);
+        await using var context = new InvocationContext(_configuration, args);
 
         var middlewarePipeline = _configuration
             .MiddlewareBuilder

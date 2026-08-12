@@ -1,6 +1,6 @@
 ﻿using Vertical.Cli.Invocation;
 
-namespace Vertical.Cli;
+namespace Vertical.Cli.DependencyInjection;
 
 internal class ProviderManagedHandlerService<TModel> : HandlerService<TModel> where TModel : class
 {
