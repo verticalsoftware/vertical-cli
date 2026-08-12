@@ -9,7 +9,7 @@ internal static class CallSite
 {
     public static async Task<int> Create<TModel>(
         InvocationContext context,
-        Func<HandlerServiceContext<TModel>> handlerContextFactory,
+        Func<HandlerService<TModel>> handlerServiceFactory,
         ITokenList tokenList)
         where TModel : class
     {
@@ -48,9 +48,9 @@ internal static class CallSite
         // Run validations
         if (context.AddErrors(ValidationContext.GetErrors(context, symbols, modelInstance)) > 0)
             return -1;
-        
-        await using var handlerContext = handlerContextFactory();
-        var handler = handlerContext.GetHandler();
+
+        await using var handlerService = handlerServiceFactory();
+        var handler = handlerService.GetHandler();
         
         // Return an invokable task
         return await handler.HandleAsync(modelInstance, context.CancellationToken);

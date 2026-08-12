@@ -2,7 +2,9 @@
 
 ## Overview
 
-Command handler implementations can be resolved from a service provider if the application leverages dependency injection. The handler class must implement the `IHandler<TModel>` interface where `TModel` is the type of options object. The application then needs to supply a function that returns an `IServiceProvider` instance. The executing context is supplied to the delegate.
+If an application wants to leverage dependency injection, use the [vertical-cli-dependencyinjection](https://www.nuget.org/packages/vertical-cli/) package.
+
+A class that implements `IHandler<TModel>` can be registered in the framework's service collection (provided as an extension property of `CommandLineApplication`).
 
 ## Example
 
@@ -20,23 +22,18 @@ public class CompressHandler : IHandler<ICompressOptions>
 }
 
 // Setup...
-var serviceCollection = new ServiceCollection();
-serviceCollection.AddSingleton<CompressHandler>();
-
 var rootCommand = new RootCommand("compress");
-rootCommand.SetHandler<CompressHandler>();
+
+// Set the handler to resolve from dependency injection
+rootCommand.SetHandler<ICompressOptions, CompressHandler>();
 
 var app = new CommandLineApplication(rootCommand);
-app.UseServices(context => serviceCollection.BuildServiceProvider(), dispose: true);
+
+// Register the type
+app.Services.AddSingleton<CompressHandler>();
 
 return await app.ConfigureAndRunAsync(args);
 ```
-
-## Lifetime of the service provider
-
-The `UseServices()` method has an optional boolean parameter `dispose`. When set `true`, the framework will try to dispose of the `IServiceProvider` instance, otherwise it remains the application's responsibility.
-
-The service provider factory delegate is called just before invocation of the handler mthod, and if configured, is disposed of immediately after the handling method returns.
 
 ## Passing data within the framework
 

@@ -1,6 +1,5 @@
 ﻿using Vertical.Cli.Conversion;
 using Vertical.Cli.Help;
-using Vertical.Cli.Invocation;
 using Vertical.Cli.IO;
 using Vertical.Cli.Middleware;
 using Vertical.Cli.Utilities;
@@ -49,11 +48,6 @@ public interface IRootConfigurationView : IConversionProvider
     /// Gets the help options.
     /// </summary>
     HelpSystemOptions HelpOptions { get; }
-    
-    /// <summary>
-    /// Gets whether the application has registered a service provider.
-    /// </summary>
-    bool HasClientServiceContext { get; }
 
     /// <summary>
     /// Gets the stream object for a resource annotation.

@@ -29,7 +29,3 @@ Model type Vertical.Cli.ConfigurationAssertionTests.IModel:
   Property Vertical.Cli.ConfigurationAssertionTests.IModel.MultipleBindings  bound multiple times:
     option --multiple-bindings
     (static value)
-
-Service configuration:
-  Application has no service provider configured. The following handlers cannot be resolved:
-    'app create' -> IHandler<Vertical.Cli.ConfigurationAssertionTests.IModel>

@@ -14,7 +14,7 @@ public class AssertionTests
         rootCommand.AddSubCommand(sub1);
 
         var sub2 = new SubCommand("create");
-        sub2.SetHandler<IModel, ModelHandler>();
+        sub2.SetHandler<IModel>((_,_) => Task.FromResult(0));
         rootCommand.AddSubCommand(sub2);
 
         var app = new CommandLineApplication(rootCommand);

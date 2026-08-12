@@ -111,8 +111,6 @@ public sealed class InvocationContext : IDisposable
         return Errors.Count;
     }
 
-    internal ServiceContext ServiceContext => _configuration.ServiceContext;
-
     /// <summary>
     /// Signals cancellation on the internal source.
     /// </summary>

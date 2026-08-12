@@ -1,5 +1,4 @@
 ﻿using Vertical.Cli.Help;
-using Vertical.Cli.Invocation;
 using Vertical.Cli.IO;
 using Vertical.Cli.Middleware;
 using Vertical.Cli.Utilities;
@@ -62,9 +61,6 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
     public HelpSystemOptions HelpOptions { get; set; } = new();
 
     /// <inheritdoc />
-    public bool HasClientServiceContext => ServiceContext.ServiceProviderFactory is not null;
-
-    /// <inheritdoc />
     public Stream GetAnnotationResourceStream(string resource) => AnnotationStreamProvider(resource);
 
     /// <inheritdoc />
@@ -78,9 +74,7 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
         _collectionConverters.ContainsKey((elementType, collectionType));
 
     public Func<string, Stream> AnnotationStreamProvider { get; set; } = File.OpenRead;
-
-    public ServiceContext ServiceContext { get; set; } = ServiceContext.Default;
-
+    
     public void AddArgumentConverter<TValue>(Converter<string, TValue> converter)
     {
         _argumentConverters.Add(typeof(TValue), converter ?? throw new ArgumentNullException(nameof(converter)));
@@ -89,8 +83,9 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
     public void AddCollectionConverter<TElement, TCollection>(Converter<IEnumerable<TElement>, TCollection> converter)
         where TCollection : IEnumerable<TElement>
     {
-        _collectionConverters[(typeof(TElement), typeof(TCollection))] = converter ?? 
-                                                                         throw new ArgumentNullException(nameof(converter));
+        _collectionConverters[(typeof(TElement), typeof(TCollection))] =
+            converter ??
+            throw new ArgumentNullException(nameof(converter));
     }
 
     /// <inheritdoc />

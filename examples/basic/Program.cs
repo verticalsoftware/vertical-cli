@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using BasicDemo;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Vertical.Cli;
 using Vertical.Cli.Configuration;
@@ -21,7 +20,7 @@ rootCommand.AddUnboundOption(
     });
 
 var createCommand = new SubCommand("create");
-createCommand.SetHandler<ICreateCommandOptions, CreateHandler>();
+createCommand.SetHandler<ICreateCommandOptions>((_, _) => Task.FromResult(0));
 rootCommand.AddSubCommand(createCommand);
 
 var app = new CommandLineApplication(rootCommand);
@@ -74,20 +73,6 @@ app.ConfigureParser<ICreateCommandOptions>(builder => builder
 app.AddArgumentConverter(KeyValuePairConverter.Instance);
 app.AddCollectionConverter((IEnumerable<KeyValuePair<string, string>> values) => new Dictionary<string, string>(values));
     
-var services = new ServiceCollection().AddSingleton<CreateHandler>();
-app.UseServices(context =>
-{
-    var logLevel = context.ApplicationOptions.GetOptions<LoggingOptions>().LogLevel;
-    return services
-        .AddLogging(builder => builder
-            .AddConsole(console =>
-            {
-                console.LogToStandardErrorThreshold = logLevel;
-            })
-            .SetMinimumLevel(logLevel))
-        .BuildServiceProvider();
-});
-
 app.ConfigureHelp(options =>
 {
     var path = Path.Combine("HelpResources", $"{CultureInfo.CurrentCulture.Name}.xml");

@@ -7,7 +7,6 @@ internal static class BuilderFactory
     public static IAssertionBuilder[] CreateBuilders() =>
     [
         new AmbiguousArgumentOrdinalPositionsBuilder(),
-        new CallSiteServiceContextBuilder(),
         new DeadEndCommandsBuilder(),
         new DuplicateAliasesBuilder(),
         new InvalidVariadicArgumentsBuilder(),

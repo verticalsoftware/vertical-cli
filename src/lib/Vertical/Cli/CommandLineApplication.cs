@@ -145,28 +145,6 @@ public class CommandLineApplication
     }
 
     /// <summary>
-    /// Informs the framework of the application's service provider. When set, command handlers
-    /// can be resolved using dependency injection.
-    /// </summary>
-    /// <param name="serviceProviderFactory">
-    /// A method that creates or provides a reference to the application's <see cref="IServiceProvider"/>.
-    /// </param>
-    /// <param name="dispose">
-    /// When set <c>true</c>, the framework will manage the lifecycle of the service provider.
-    /// </param>
-    /// <returns></returns>
-    public CommandLineApplication UseServices(Func<InvocationContext, IServiceProvider> serviceProviderFactory, bool dispose = true)
-    {
-        _configuration.ServiceContext = new ServiceContext
-        {
-            ServiceProviderFactory = serviceProviderFactory,
-            Dispose = dispose
-        };
-
-        return this;
-    }
-
-    /// <summary>
     /// Registers the given object as the console abstraction.
     /// </summary>
     /// <param name="console">The console abstraction.</param>
@@ -199,6 +177,16 @@ public class CommandLineApplication
         ArgumentNullException.ThrowIfNull(configure);
         _configuration.OptionsManager.Configure(configure);
         return this;
+    }
+
+    /// <summary>
+    /// Gets a reference to an options object.
+    /// </summary>
+    /// <typeparam name="TOptions">Creatable options type.</typeparam>
+    /// <returns>A reference to the single options instance.</returns>
+    public TOptions GetOptions<TOptions>() where TOptions : class, new()
+    {
+        return _configuration.OptionsManager.GetOptions<TOptions>();
     }
 
     /// <summary>

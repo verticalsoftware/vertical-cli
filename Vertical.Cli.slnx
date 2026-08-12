@@ -4,15 +4,23 @@
     <Project Path="examples/basic/BasicDemo.csproj" />
   </Folder>
   <Folder Name="/src/" />
+  <Folder Name="/src/dep-injection/">
+    <Project Path="src/dep-injection/Vertical.Cli.DependencyInjection.csproj" />
+  </Folder>
   <Folder Name="/src/generator/">
     <Project Path="src/generator/Vertical.Cli.SourceGenerator.csproj" />
   </Folder>
   <Folder Name="/src/lib/">
     <Project Path="src/lib/Vertical.Cli.csproj" />
   </Folder>
-  <Folder Name="/test/" />
+  <Folder Name="/test/">
+    <File Path="test/Directory.Build.props" />
+  </Folder>
   <Folder Name="/test/assertions/">
     <Project Path="test/assertions/Vertical.Cli.ConfigurationAssertionTests.csproj" />
+  </Folder>
+  <Folder Name="/test/dep-injection-unit/">
+    <Project Path="test/dep-injection-unit/Vertical.Cli.DependencyInjection.UnitTests.csproj" />
   </Folder>
   <Folder Name="/test/scenario/">
     <Project Path="test/scenario/Vertical.Cli.ScenarioTests.csproj" />

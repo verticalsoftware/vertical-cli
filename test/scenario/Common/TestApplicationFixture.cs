@@ -1,9 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Testing.Platform.Logging;
+﻿using Microsoft.Testing.Platform.Logging;
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Conversion;
-using Vertical.Cli.Help;
-using Vertical.Cli.IO;
 using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.ScenarioTests.Common;
@@ -12,11 +9,7 @@ public sealed class TestApplicationFixture
 {
     public TestApplicationFixture()
     {
-        var services = new ServiceCollection();
         var console = new TestConsole();
-        services.AddSingleton<IConsole>(console);
-        services.AddSingleton<Handlers.CreateHandler>();
-        services.AddSingleton<Handlers.ExtractHandler>();
         
         var rootCommand = new RootCommand("archive", HelpResources.Root);
         rootCommand.AddUnboundOption(
@@ -27,11 +20,11 @@ public sealed class TestApplicationFixture
             "Displays version information.");
         
         var createCommand = new SubCommand("create", HelpResources.CreateCommand);
-        createCommand.SetHandler<ICreateCommandOptions, Handlers.CreateHandler>();
+        createCommand.SetHandler(context => new Handlers.CreateHandler(context.Configuration.Console));
         rootCommand.AddSubCommand(createCommand);
 
         var extractCommand = new SubCommand("extract", HelpResources.ExtractCommand);
-        extractCommand.SetHandler<IExtractCommandOptions, Handlers.ExtractHandler>();
+        extractCommand.SetHandler(context => new Handlers.ExtractHandler(context.Configuration.Console));
         rootCommand.AddSubCommand(extractCommand);
 
         var app = new CommandLineApplication(rootCommand);
@@ -104,7 +97,6 @@ public sealed class TestApplicationFixture
         app.AddArgumentConverter(Converters.Enum<LogLevel>());
         app.AddCollectionConverter((IEnumerable<KeyValuePair<string, string>> values) =>
             new Dictionary<string, string>(values));
-        app.UseServices(_ => services.BuildServiceProvider());
         app.UseConsole(console);
 
         Application = app;

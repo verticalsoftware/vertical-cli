@@ -12,7 +12,7 @@ public abstract class Command : IHelpSubject
 {
     private delegate Task<int> CallSiteFactory(InvocationContext context, ITokenList tokenList);
 
-    private record CallSiteInfo(CallSiteFactory SiteFactory, Type ModelType, bool RequiresServices);
+    private record CallSiteInfo(CallSiteFactory SiteFactory, Type ModelType);
     private readonly List<Command> _subCommands = [];
     private readonly List<UnboundCommandSymbol> _definedSymbols = [];
     private CallSiteInfo? _callSiteInfo;
@@ -31,8 +31,6 @@ public abstract class Command : IHelpSubject
             ? throw Exceptions.CallSiteNotSupported(this)
             : _callSiteInfo.SiteFactory(context, tokenList);
     }
-
-    internal bool RequiresServices => true == _callSiteInfo?.RequiresServices;
 
     /// <summary>
     /// Gets the model type for the set handler.
@@ -179,45 +177,45 @@ public abstract class Command : IHelpSubject
         _callSiteInfo = new CallSiteInfo(
             (context, tokenList) => CallSite.Create(
                 context,
-                () => HandlerServiceContext.Create(context, handler), tokenList),
-            typeof(TModel),
-            RequiresServices: false);
+                () => new HandlerService<TModel>(() => new DelegatedHandler<TModel>(handler)),
+                tokenList),
+            typeof(TModel));
     }
 
     /// <summary>
-    /// Registers a method that provides the instance of <see cref="IHandler{TModel}"/> that will perform
-    /// the application function when control flow is routed to this command. 
+    /// Registers a function that provides the <see cref="IHandler{TModel}"/> instance to use for
+    /// servicing the command.
     /// </summary>
-    /// <param name="serviceResolver">
-    /// A method that provides the command handler instance.
+    /// <param name="handlerFactory">
+    /// A function that returns a handler instance.
     /// </param>
     /// <typeparam name="TModel">Model type</typeparam>
-    public void SetHandler<TModel>(Func<IServiceProvider?, IHandler<TModel>> serviceResolver) where TModel : class
+    public void SetHandler<TModel>(Func<InvocationContext, IHandler<TModel>> handlerFactory) where TModel : class
     {
         _callSiteInfo = new CallSiteInfo(
             (context, tokenList) => CallSite.Create(
                 context,
-                () => HandlerServiceContext.Create(context, serviceResolver), tokenList),
-            typeof(TModel),
-            RequiresServices: false);
+                () => new HandlerService<TModel>(() => handlerFactory(context)),
+                tokenList),
+            typeof(TModel));
     }
-
+    
     /// <summary>
-    /// Registers a method that seeks an instance of <see cref="IHandler{TModel}"/> from the application's
-    /// service provider that will perform the application function when control flow is routed to this
-    /// command. 
+    /// Registers a function that provides the <see cref="IHandler{TModel}"/> instance to use for
+    /// servicing the command.
     /// </summary>
-    /// <typeparam name="TModel">The model type</typeparam>
-    /// <typeparam name="THandler">The handler implementation type</typeparam>
-    public void SetHandler<TModel, THandler>() 
-        where TModel : class 
-        where THandler : class, IHandler<TModel>
+    /// <param name="handlerServiceFactory">
+    /// A function that returns a service context for a handler.
+    /// </param>
+    /// <typeparam name="TModel">Model type</typeparam>
+    public void SetHandler<TModel>(Func<InvocationContext, HandlerService<TModel>> handlerServiceFactory) 
+        where TModel : class
     {
         _callSiteInfo = new CallSiteInfo(
             (context, tokenList) => CallSite.Create(
                 context,
-                () => HandlerServiceContext.Create<TModel, THandler>(context), tokenList),
-            typeof(TModel),
-            RequiresServices: true);
+                () => handlerServiceFactory(context),
+                tokenList),
+            typeof(TModel));
     }
 }
