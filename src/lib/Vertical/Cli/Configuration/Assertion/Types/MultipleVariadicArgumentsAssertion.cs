@@ -6,7 +6,7 @@
 public sealed class MultipleVariadicArgumentsAssertion : ConfigurationAssertion 
 {
     /// <inheritdoc />
-    public MultipleVariadicArgumentsAssertion(Command command, CliSymbol[] symbols)
+    public MultipleVariadicArgumentsAssertion(Command command, ICliSymbol[] symbols)
     {
         Command = command;
         Symbols = symbols;
@@ -20,7 +20,7 @@ public sealed class MultipleVariadicArgumentsAssertion : ConfigurationAssertion
     /// <summary>
     /// Gets the variadic symbols.
     /// </summary>
-    public CliSymbol[] Symbols { get; private set; }
+    public ICliSymbol[] Symbols { get; private set; }
 
     /// <inheritdoc />
     public override string GroupingKey => KeyHelpers.Create(Command);
@@ -34,6 +34,6 @@ public sealed class MultipleVariadicArgumentsAssertion : ConfigurationAssertion
     /// <inheritdoc />
     public override IEnumerable<string> GetIssueDetail()
     {
-        return Symbols.Select(symbol => $"Argument -> {symbol.BindingName} ({(symbol.Arity.IsVariadic ? "variadic" : "fixed")})");
+        return Symbols.Select(symbol => $"Argument -> {symbol.DisplayName} ({(symbol.Arity.IsVariadic ? "variadic" : "fixed")})");
     }
 }

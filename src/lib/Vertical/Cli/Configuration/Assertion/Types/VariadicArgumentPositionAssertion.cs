@@ -7,7 +7,7 @@
 public sealed class VariadicArgumentPositionAssertion : ConfigurationAssertion
 {
     /// <inheritdoc />
-    internal VariadicArgumentPositionAssertion(Command command, CliSymbol[] symbols)
+    internal VariadicArgumentPositionAssertion(Command command, ICliSymbol[] symbols)
     {
         Command = command;
         Symbols = symbols;
@@ -22,7 +22,7 @@ public sealed class VariadicArgumentPositionAssertion : ConfigurationAssertion
     /// <summary>
     /// Gets the position arguments of the command.
     /// </summary>
-    public CliSymbol[] Symbols { get; }
+    public ICliSymbol[] Symbols { get; }
 
     /// <inheritdoc />
     public override string GroupingKey => KeyHelpers.Create(Command);

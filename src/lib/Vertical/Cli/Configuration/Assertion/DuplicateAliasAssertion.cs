@@ -7,7 +7,7 @@ namespace Vertical.Cli.Configuration.Assertion;
 /// </summary>
 public sealed class DuplicateAliasAssertion : ConfigurationAssertion
 {
-    internal DuplicateAliasAssertion(Command command, string alias, CliSymbol[] symbols)
+    internal DuplicateAliasAssertion(Command command, string alias, ICliSymbol[] symbols)
     {
         Command = command;
         Alias = alias;
@@ -27,7 +27,7 @@ public sealed class DuplicateAliasAssertion : ConfigurationAssertion
     /// <summary>
     /// Gets the symbols that share the alias.
     /// </summary>
-    public CliSymbol[] Symbols { get; }
+    public ICliSymbol[] Symbols { get; }
 
     /// <inheritdoc />
     public override string GroupingKey => KeyHelpers.Create(Command);

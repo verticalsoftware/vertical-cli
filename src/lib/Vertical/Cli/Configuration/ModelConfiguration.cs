@@ -9,13 +9,17 @@ namespace Vertical.Cli.Configuration;
 public sealed class ModelConfiguration
 {
     private readonly List<IBindingSource> _bindingSources = new(32);
-    private readonly Dictionary<string, CliSymbol> _aliasTracker = [];
-    private readonly Dictionary<int, CliSymbol> _argumentTracker = [];
     private Delegate? _binder;
 
-    internal ModelConfiguration()
+    internal ModelConfiguration(Type modelType)
     {
+        ModelType = modelType;
     }
+
+    /// <summary>
+    /// Gets the model type.
+    /// </summary>
+    public Type ModelType { get; }
 
     /// <summary>
     /// Gets the binding sources.

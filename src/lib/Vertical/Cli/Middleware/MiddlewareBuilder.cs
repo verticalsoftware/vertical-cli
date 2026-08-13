@@ -20,7 +20,7 @@ public sealed class MiddlewareBuilder
         HandleConsoleCancellationMiddleware.InvokeAsync
     ];
 
-    internal MiddlewareBuilder(List<MiddlewareDelegate> middleware)
+    private MiddlewareBuilder(List<MiddlewareDelegate> middleware)
     {
         _middleware = middleware;
     }

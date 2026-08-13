@@ -28,7 +28,7 @@ jobs:
       - name: Pack core libraries
         run: |
           dotnet pack src/lib -c Release --no-restore -p:ContinuousIntegrationBuild=true -o ./pack
-          dotnet pack src/dep-injection -c Release --no-restore -p:ContinuousIntegrationBuil=true -o ./pack
+          dotnet pack src/dependency-injection -c Release --no-restore -p:ContinuousIntegrationBuil=true -o ./pack
       - name: Retain latest package build
         uses: actions/upload-artifact@v4
         with:

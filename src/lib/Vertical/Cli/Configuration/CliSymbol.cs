@@ -118,7 +118,7 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
     /// <summary>
     /// Gets an identifier for this symbol.
     /// </summary>
-    public string Identifier => Kind == SymbolKind.Option
+    public string DisplayName => Kind == SymbolKind.Option
         ? string.Join(", ", Aliases)
         : BindingName;
     

@@ -23,12 +23,16 @@ public static class CommandExtensions
         public void SetHandler<TModel>(Func<IServiceProvider, IHandler<TModel>> handlerResolver)
             where TModel : class
         {
-            command.SetHandler(context =>
+            command.SetHandlerProvider(context =>
             {
                 var options = context.ApplicationOptions.GetOptions<DependencyInjectionOptions>();
-                var serviceProvider = options.LazyServiceProvider.Value;
+                var serviceProvider = options
+                    .ServiceCollection
+                    .BuildServiceProvider();
 
-                return handlerResolver(serviceProvider);
+                return new ManagedHandlerServiceProvider<TModel>(
+                    serviceProvider,
+                    () => handlerResolver(serviceProvider));
             });
         }
 
@@ -42,12 +46,16 @@ public static class CommandExtensions
             where TModel : class
             where THandler : class, IHandler<TModel>
         {
-            command.SetHandler(context =>
+            command.SetHandlerProvider(context =>
             {
                 var options = context.ApplicationOptions.GetOptions<DependencyInjectionOptions>();
-                var serviceProvider = options.LazyServiceProvider.Value;
+                var serviceProvider = options
+                    .ServiceCollection
+                    .BuildServiceProvider();
 
-                return serviceProvider.GetRequiredService<THandler>();
+                return new ManagedHandlerServiceProvider<TModel>(
+                    serviceProvider,
+                    serviceProvider.GetRequiredService<THandler>);
             });
         }
     }

@@ -62,6 +62,9 @@ public class UnboundSymbol : ICliSymbol
     public string? GetParameterName() => null;
 
     /// <inheritdoc />
+    public string DisplayName => string.Join(", ", Aliases);
+
+    /// <inheritdoc />
     public SymbolKind Kind => SymbolKind.Option;
 
     /// <inheritdoc />

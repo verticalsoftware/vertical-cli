@@ -9,7 +9,7 @@ namespace Vertical.Cli.Configuration.Assertion;
 public sealed class AssertionContext
 {
     private readonly Dictionary<Type, ModelConfiguration> _cachedModelConfigurations = [];
-    private readonly Dictionary<Command, ILookup<SymbolKind, CliSymbol>> _cachedSymbols = [];
+    private readonly Dictionary<Command, ILookup<SymbolKind, ICliSymbol>> _cachedSymbols = [];
     
     internal AssertionContext(CommandLineApplication application)
     {
@@ -64,15 +64,16 @@ public sealed class AssertionContext
     /// </summary>
     /// <param name="command">The command to get position arguments of.</param>
     /// <returns>Enumeration of <see cref="CliSymbol"/></returns>
-    public IEnumerable<CliSymbol> GetPositionArguments(Command command) => 
-        GetSymbolLookup(command)[SymbolKind.PositionArgument];
+    public IEnumerable<CliSymbol> GetPositionArguments(Command command) =>
+        GetSymbolLookup(command)[SymbolKind.PositionArgument]
+            .Cast<CliSymbol>();
 
     /// <summary>
     /// Gets named symbols (options, switches)
     /// </summary>
     /// <param name="command">The command to get named symbols for.</param>
     /// <returns>Enumeration of <see cref="CliSymbol"/></returns>
-    public IEnumerable<CliSymbol> GetNamedSymbols(Command command)
+    public IEnumerable<ICliSymbol> GetNamedSymbols(Command command)
     {
         var symbols = GetSymbolLookup(command);
         return symbols[SymbolKind.Option].Concat(symbols[SymbolKind.Switch]);
@@ -83,19 +84,20 @@ public sealed class AssertionContext
     /// </summary>
     /// <param name="command">The command instance.</param>
     /// <returns>An enumeration of <see cref="CliSymbol"/> objects.</returns>
-    public IEnumerable<CliSymbol> GetSymbols(Command command)
+    public IEnumerable<ICliSymbol> GetSymbols(Command command)
     {
         var symbols = GetSymbolLookup(command);
         return symbols.SelectMany(grouping => grouping);
     }
 
-    private ILookup<SymbolKind, CliSymbol> GetSymbolLookup(Command command)
+    private ILookup<SymbolKind, ICliSymbol> GetSymbolLookup(Command command)
     {
         return _cachedSymbols.GetOrAdd(
             command,
             () => GetModelConfiguration(command.ModelType!)
                 .BindingSources
                 .OfType<CliSymbol>()
+                .Cast<ICliSymbol>()
                 .ToLookup(symbol => symbol.Kind));
     }
 

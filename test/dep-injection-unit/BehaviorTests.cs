@@ -7,7 +7,7 @@ namespace Vertical.Cli.DependencyInjection.UnitTests;
 
 public class BehaviorTests
 {
-    public record Options {}
+    public record Options;
 
     public class Handler : IHandler<Options>
     {

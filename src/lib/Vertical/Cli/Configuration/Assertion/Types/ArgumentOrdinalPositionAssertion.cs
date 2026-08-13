@@ -28,7 +28,7 @@ public sealed class ArgumentOrdinalPositionAssertion : ConfigurationAssertion
     /// <inheritdoc />
     public override string GetIssueDescription()
     {
-        return "One or more position arguments have ambiguous ordinal position assignments";
+        return "Position arguments have ambiguous ordinal assignments:";
     }
 
     /// <inheritdoc />

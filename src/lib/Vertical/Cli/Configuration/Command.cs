@@ -174,10 +174,12 @@ public abstract class Command : IHelpSubject
     /// <typeparam name="TModel">Model type the handler expects.</typeparam>
     public void SetHandler<TModel>(Func<TModel, CancellationToken, Task<int>> handler) where TModel : class
     {
+        ArgumentNullException.ThrowIfNull(handler);
+        
         _callSiteInfo = new CallSiteInfo(
             (context, tokenList) => CallSite.Create(
                 context,
-                () => new DelegatedHandler<TModel>(handler),
+                () => new HandlerServiceProvider<TModel>(() => new DelegatedHandler<TModel>(handler)),
                 tokenList),
             typeof(TModel));
     }
@@ -192,10 +194,31 @@ public abstract class Command : IHelpSubject
     /// <typeparam name="TModel">Model type</typeparam>
     public void SetHandler<TModel>(Func<InvocationContext, IHandler<TModel>> handlerFactory) where TModel : class
     {
+        ArgumentNullException.ThrowIfNull(handlerFactory);
+        
         _callSiteInfo = new CallSiteInfo(
             (context, tokenList) => CallSite.Create(
                 context,
-                () => handlerFactory(context),
+                () => new HandlerServiceProvider<TModel>(() => handlerFactory(context)),
+                tokenList),
+            typeof(TModel));
+    }
+
+    /// <summary>
+    /// Registers a function that provides the <see cref="HandlerServiceProvider{TModel}"/> to use when
+    /// the call site requests the handler instance.
+    /// </summary>
+    /// <param name="providerFactory">A function that returns the provider.</param>
+    /// <typeparam name="TModel">Model type</typeparam>
+    public void SetHandlerProvider<TModel>(Func<InvocationContext, HandlerServiceProvider<TModel>> providerFactory)
+        where TModel : class
+    {
+        ArgumentNullException.ThrowIfNull(providerFactory);
+
+        _callSiteInfo = new CallSiteInfo(
+            (context, tokenList) => CallSite.Create(
+                context,
+                () => providerFactory(context),
                 tokenList),
             typeof(TModel));
     }

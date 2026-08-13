@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\dep-injection\Vertical.Cli.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\src\dependency-injection\Vertical.Cli.DependencyInjection.csproj" />
   </ItemGroup>
   
 </Project>

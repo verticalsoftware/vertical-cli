@@ -7,35 +7,38 @@ namespace Vertical.Cli.Configuration.Assertion;
 /// </summary>
 public static class ConfigurationAssertionExtensions
 {
-    /// <summary>
-    /// Returns any assertions detected in the configuration of the given application.
-    /// </summary>
     /// <param name="app">The application instance.</param>
-    /// <returns>A collection of zero or more assertions.</returns>
-    public static IReadOnlyCollection<ConfigurationAssertion> GetConfigurationAssertions(this CommandLineApplication app)
+    extension(CommandLineApplication app)
     {
-        var context = new AssertionContext(app);
-        
-        foreach (var builder in BuilderFactory.CreateBuilders())
+        /// <summary>
+        /// Returns any assertions detected in the configuration of the given application.
+        /// </summary>
+        /// <returns>A collection of zero or more assertions.</returns>
+        public IReadOnlyCollection<ConfigurationAssertion> GetConfigurationAssertions()
         {
-            builder.Build(context);
+            var context = new AssertionContext(app);
+            var builders = AssertionFramework.GetBuilders();
+        
+            foreach (var builder in builders)
+            {
+                builder.Build(context);
+            }
+
+            return context.Assertions;
         }
 
-        return context.Assertions;
-    }
+        /// <summary>
+        /// Throws an exception if configuration assertions are found.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">One or more assertions found.</exception>
+        public void AssertConfiguration()
+        {
+            var assertions = app.GetConfigurationAssertions();
 
-    /// <summary>
-    /// Throws an exception if configuration assertions are found.
-    /// </summary>
-    /// <param name="app">The application instance.</param>
-    /// <exception cref="InvalidOperationException">One or more assertions found.</exception>
-    public static void AssertConfiguration(this CommandLineApplication app)
-    {
-        var assertions = app.GetConfigurationAssertions();
+            if (assertions.Count == 0)
+                return;
 
-        if (assertions.Count == 0)
-            return;
-
-        throw new InvalidOperationException(ConfigurationAssertion.GetAssertionsAsText(assertions));
+            throw new InvalidOperationException(ConfigurationAssertion.GetAssertionsAsText(assertions));
+        }
     }
 }

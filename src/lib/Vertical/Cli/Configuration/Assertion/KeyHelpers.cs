@@ -2,8 +2,6 @@
 
 internal static class KeyHelpers
 {
-    public const string Services = "Service configuration";
-
     public const string Conversion = "Conversion services";
 
     public const string Binding = "Binding configuration";

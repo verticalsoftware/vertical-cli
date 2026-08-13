@@ -2,7 +2,6 @@
 using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
 using Vertical.Cli.Parsing;
-using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Configuration;
 
@@ -59,15 +58,13 @@ public sealed class DirectiveSymbol : IDirectiveSymbol
     HelpTopic? IHelpSubject.HelpTopic => HelpTopic;
 
     /// <inheritdoc />
+    public string DisplayName => $"[{Identifier}]";
+
+    /// <inheritdoc />
     public SymbolKind Kind => SymbolKind.Directive;
 
     /// <inheritdoc />
     public Arity Arity => default;
-
-    /// <inheritdoc />
-    public void Validate(ValidationContext context)
-    {
-    }
 
     /// <inheritdoc />
     public async Task HandleAsync(InvocationContext context, ArgumentToken token)
@@ -106,7 +103,7 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
     public ParameterArity? ParameterArity { get; }
 
     /// <inheritdoc />
-    public Type? ParameterType => typeof(TValue);
+    public Type ParameterType => typeof(TValue);
 
     /// <summary>
     /// Gets the default provider.
@@ -128,7 +125,7 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
     public string GetListIdentifier() => Identifier;
 
     /// <inheritdoc />
-    public string? GetParameterName() => HelpTopic?.ParameterSyntax ?? "value";
+    public string GetParameterName() => HelpTopic?.ParameterSyntax ?? "value";
 
     HelpTopic? IHelpSubject.HelpTopic => HelpTopic;
 
@@ -183,6 +180,9 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
             return false;
         }
     }
+
+    /// <inheritdoc />
+    public string DisplayName => $"[{Identifier}]";
 
     /// <inheritdoc />
     public SymbolKind Kind => SymbolKind.Directive;

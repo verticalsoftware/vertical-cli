@@ -1,4 +1,6 @@
-﻿using Vertical.Cli.Help;
+﻿using Vertical.Cli.Configuration.Assertion;
+using Vertical.Cli.Configuration.Assertion.Builders;
+using Vertical.Cli.Help;
 using Vertical.Cli.IO;
 using Vertical.Cli.Middleware;
 using Vertical.Cli.Utilities;
@@ -33,7 +35,7 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
         return modelType
             .GetInterfacesAndSelf()
             .Aggregate(
-                new ModelConfiguration(),
+                new ModelConfiguration(modelType),
                 (config, type) =>
                 {
                     foreach (var builder in builderLookup[type])

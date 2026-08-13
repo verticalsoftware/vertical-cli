@@ -9,6 +9,12 @@ namespace Vertical.Cli.Configuration;
 public interface ICliSymbol : IHelpSubject
 {
     /// <summary>
+    /// Gets a name for display in diagnostics and other output. Does not include
+    /// the symbol type.
+    /// </summary>
+    string DisplayName { get; }
+    
+    /// <summary>
     /// Gets the symbol kind.
     /// </summary>
     SymbolKind Kind { get; }
