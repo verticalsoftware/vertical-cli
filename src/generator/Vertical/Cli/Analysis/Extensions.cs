@@ -13,8 +13,6 @@ public static class Extensions
     
     extension(ITypeSymbol typeSymbol)
     {
-        public bool IsRecordOrInterface => typeSymbol.IsRecord || typeSymbol.TypeKind == TypeKind.Interface;
-
         public string FullMetadataName => typeSymbol.ContainingNamespace is not null
             ? $"{typeSymbol.ContainingNamespace.ToDisplayString()}.{typeSymbol.MetadataName}"
             : typeSymbol.MetadataName;
@@ -38,13 +36,6 @@ public static class Extensions
             IsNullableType: true,
             SingleTypeArgument.IsParsableType: true
         };
-
-        public bool IsEnumerableType => typeSymbol
-            .AllInterfaces
-            .Any(interfaceSymbol => interfaceSymbol is
-            {
-                OriginalDefinition.FullMetadataName: "System.Collections.Generic.IEnumerable`1"
-            });
 
         public ITypeSymbol? SingleTypeArgument => typeSymbol is INamedTypeSymbol
             {

@@ -15,8 +15,8 @@ public class CommandLineApplicationExtensionsGenerator : IIncrementalGenerator
                 predicate: static (_, _) => true,
                 transform: static (context, _) => context.TargetSymbol switch
                 {
-                    INamedTypeSymbol { IsRecordOrInterface: true } type => type,
-                    IParameterSymbol { Type: { IsRecordOrInterface: true } parameterType } => parameterType,
+                    INamedTypeSymbol { TypeKind: TypeKind.Interface } type => type,
+                    IParameterSymbol { Type: { TypeKind: TypeKind.Interface } parameterType } => parameterType,
                     _ => null
                 })
             .Where(result => result is not null);
