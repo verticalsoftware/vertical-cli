@@ -1,4 +1,5 @@
 ﻿using NSubstitute;
+using Shouldly;
 using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.UnitTests.Validation;
@@ -26,5 +27,19 @@ public class CollectionExtensionTests
         var eventInfo = ValidationHelpers.Create<string, string[]>(["pink", "green", "blue"]);
         eventInfo.EachValue(value => value.MustBeOneOf(["red", "green", "blue"]));
         eventInfo.Received().Error(Arg.Any<string>());
+    }
+
+    [Fact]
+    public void EachValue_Forwards_Value_Context()
+    {
+        var eventInfo = new ValidationEventInfo<object, string, string[]>(
+            null!,
+            null!,
+            null!,
+            ["red", "green", "blue"]);
+
+        var queue = new Queue<string>(["red", "green", "blue"]);
+
+        eventInfo.EachValue(valueContext => valueContext.Value.ShouldBe(queue.Dequeue()));
     }
 }

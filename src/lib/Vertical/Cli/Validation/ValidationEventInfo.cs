@@ -74,10 +74,10 @@ public sealed class ValidationEventInfo<TModel, TElement, TCollection> :
     /// <inheritdoc />
     internal ValidationEventInfo(
         ValidationContext context,
-        CliSymbol<TModel, TCollection> symbol,
+        IValidatable subject,
         TModel model,
         TCollection value)
-        : base(context, symbol, model, value)
+        : base(context, subject, model, value)
     {
     }
 
