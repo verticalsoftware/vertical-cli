@@ -2,12 +2,15 @@
 
 Develop CLI applications using a rich argument binding framework.
 
+![NuGet Version](https://img.shields.io/nuget/vpre/vertical-cli?label=vertical-cli)
+![NuGet Version](https://img.shields.io/nuget/vpre/vertical-cli-dependencyinjection?label=vertical-cli-dependencyinjection)
+
 ## Features
 
 - Parses position arguments and GNU style short and long from options.
 - Binds string arguments to strongly typed application option models.
 - Performs value conversion, collection creation, and model composition using a source generator.
-- Supports application directives and response file annotations.
+- Supports application directives, ad-hoc options, and response file annotations.
 - Supports hierarchical command structures.
 - Provides a customizable help system.
 - Offers optional integration with the application's services for command handler resolution.
