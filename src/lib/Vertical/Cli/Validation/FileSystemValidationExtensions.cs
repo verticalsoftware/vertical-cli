@@ -1,8 +1,11 @@
-﻿namespace Vertical.Cli.Validation;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Vertical.Cli.Validation;
 
 /// <summary>
 /// Defines validation functions for file system objects.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class FileSystemValidationExtensions
 {
     extension<TModel>(IValidationEventInfo<TModel, FileInfo> eventInfo) where TModel : class
