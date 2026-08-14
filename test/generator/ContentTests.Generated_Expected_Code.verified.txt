@@ -123,6 +123,7 @@ public static class CommandLineApplicationExtensions
       app.AddCollectionConverter<global::System.String, global::System.Collections.Generic.Stack<global::System.String>>(values => new global::System.Collections.Generic.Stack<global::System.String>(values));
       app.AddCollectionConverter<global::System.String, global::System.Collections.Generic.Queue<global::System.String>>(values => new global::System.Collections.Generic.Queue<global::System.String>(values));
       app.AddArgumentConverter(global::Vertical.Cli.Conversion.Converters.Parsable<global::System.Boolean>());
+      app.AddArgumentConverter(global::Vertical.Cli.Conversion.Converters.Parsable<global::System.Double>());
       app.ConfigureParser<global::SourceGeneratorContext.IModel>(builder => builder.SetBinder(IModelImpl_<ClassId>.Bind));
       app.ConfigureParser<global::SourceGeneratorContext.IParameterModel>(builder => builder.SetBinder(IParameterModelImpl_<ClassId>.Bind));
    }

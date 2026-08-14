@@ -10,8 +10,10 @@ public static class TestSource
         using System.IO;
         using System.Threading;
         using System.Threading.Tasks;
+        using Vertical.Cli;
         using Vertical.Cli.Binding;
         using Vertical.Cli.Configuration;
+        using Vertical.Cli.Conversion;
         
         namespace SourceGeneratorContext;
         
@@ -62,6 +64,11 @@ public static class TestSource
                 command.SetHandler<IParameterModel>((
                     [GeneratedBinding] IParameterModel _,
                     CancellationToken __) => Task.FromResult(0));
+                    
+                var app = new CommandLineApplication(command);
+                app.HandleParameterizedDirective<double>(
+                    "directive",
+                    ([GeneratedConversion] _) => Task.CompletedTask);
             }
         }
         """;
