@@ -1,0 +1,2 @@
+﻿Binding configuration:
+  No binder defined for model Vertical.Cli.ConfigurationAssertionTests.IModel

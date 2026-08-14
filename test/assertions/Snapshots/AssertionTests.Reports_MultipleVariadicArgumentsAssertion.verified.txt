@@ -1,0 +1,4 @@
+﻿Command 'app create':
+  Invalid ordinal position of variadic argument (must be last).
+    <IModel, String[]:Options> PositionArgument @0 (variadic)
+    <IModel, String[]:Options2> PositionArgument @1 (fixed)

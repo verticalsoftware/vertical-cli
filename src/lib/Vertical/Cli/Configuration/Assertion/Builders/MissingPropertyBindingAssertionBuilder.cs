@@ -2,7 +2,7 @@
 
 namespace Vertical.Cli.Configuration.Assertion.Builders;
 
-internal sealed class MissingPropertyBindingsBuilder : IAssertionBuilder
+internal sealed class MissingPropertyBindingAssertionBuilder : IAssertionBuilder
 {
     /// <inheritdoc />
     public void Build(AssertionContext context)

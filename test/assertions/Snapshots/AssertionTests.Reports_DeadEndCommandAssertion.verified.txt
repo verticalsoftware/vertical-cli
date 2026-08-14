@@ -1,0 +1,2 @@
+﻿Command 'app create':
+  No handler set/no sub-commands are configured (path is a dead-end).

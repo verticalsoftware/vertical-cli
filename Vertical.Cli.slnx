@@ -22,6 +22,9 @@
   <Folder Name="/test/dep-injection-unit/">
     <Project Path="test/dep-injection-unit/Vertical.Cli.DependencyInjection.UnitTests.csproj" />
   </Folder>
+  <Folder Name="/test/generator/">
+    <Project Path="test/generator/Vertical.Cli.SourceGenerator.Tests.csproj" />
+  </Folder>
   <Folder Name="/test/scenario/">
     <Project Path="test/scenario/Vertical.Cli.ScenarioTests.csproj" />
   </Folder>

@@ -1,6 +1,8 @@
-﻿namespace Vertical.Cli.Configuration.Assertion.Builders;
+﻿using Vertical.Cli.Configuration.Assertion.Types;
 
-internal sealed class DuplicateAliasesBuilder : IAssertionBuilder
+namespace Vertical.Cli.Configuration.Assertion.Builders;
+
+internal sealed class DuplicateAliasAssertionBuilder : IAssertionBuilder
 {
     /// <inheritdoc />
     public void Build(AssertionContext context)
@@ -14,6 +16,7 @@ internal sealed class DuplicateAliasesBuilder : IAssertionBuilder
     private static void ValidateUniqueAliases(AssertionContext context, Command command)
     {
         var options = context.GetNamedSymbols(command);
+        
         context
             .Assertions
             .AddRange(options

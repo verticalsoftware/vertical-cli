@@ -2,7 +2,7 @@
 
 namespace Vertical.Cli.Configuration.Assertion.Builders;
 
-internal sealed class UniqueCommandNamesBuilder : IAssertionBuilder
+internal sealed class DuplicateCommandNameAssertionBuilder : IAssertionBuilder
 {
     /// <inheritdoc />
     public void Build(AssertionContext context)

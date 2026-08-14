@@ -43,6 +43,6 @@ public sealed class DuplicatePropertyBindingAssertion : ConfigurationAssertion
     /// <inheritdoc />
     public override IEnumerable<string> GetIssueDetail()
     {
-        return BindingSources.Select(source => $"{source}");
+        return BindingSources.Select(AssertionDescriptor.Create);
     }
 }

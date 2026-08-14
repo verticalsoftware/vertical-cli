@@ -2,7 +2,7 @@
 
 namespace Vertical.Cli.Configuration.Assertion.Builders;
 
-internal sealed class MultiplePropertyBindingsBuilder : IAssertionBuilder
+internal sealed class DuplicatePropertyBindingAssertionBuilder : IAssertionBuilder
 {
     /// <inheritdoc />
     public void Build(AssertionContext context)

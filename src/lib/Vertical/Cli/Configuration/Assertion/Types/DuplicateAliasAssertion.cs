@@ -1,6 +1,4 @@
-﻿using Vertical.Cli.Configuration.Assertion.Types;
-
-namespace Vertical.Cli.Configuration.Assertion;
+﻿namespace Vertical.Cli.Configuration.Assertion.Types;
 
 /// <summary>
 /// Indicates two or more options or switches share an alias.
@@ -41,6 +39,6 @@ public sealed class DuplicateAliasAssertion : ConfigurationAssertion
     /// <inheritdoc />
     public override IEnumerable<string> GetIssueDetail()
     {
-        return Symbols.Select(symbol => $"{symbol.Kind} {string.Join(", ", symbol.Aliases)}");
+        return Symbols.Select(AssertionDescriptor.Create);
     }
 }

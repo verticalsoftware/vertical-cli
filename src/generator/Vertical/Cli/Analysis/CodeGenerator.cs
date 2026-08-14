@@ -43,6 +43,13 @@ public class CodeGenerator
     {
         foreach (var property in typeModel.PropertySymbols)
         {
+            var symbol = property.Type;
+            var x = symbol.Kind;
+            var x2 = symbol.GetType().FullName;
+            var x3 = symbol.MetadataName;
+            var x4 = symbol.ContainingNamespace?.ToDisplayString();
+            var x5 = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            
             writer.WriteLine($"public required {property.Type.GlobalName} {property.Name} {{ get; init; }}");
         }
 
@@ -123,24 +130,17 @@ public class CodeGenerator
 
         foreach (var type in conversionTypes)
         {
-            if (ConversionExpressionFactory.TryCreate(type) is not { } expressionInfo)
+            if (!visitedArgumentTypes.Add(type))
                 continue;
-
-            switch (expressionInfo)
+            
+            if (ConversionExpression.TryCreateScalarExpression(type) is { } scalarExpression)
             {
-                case ArgumentConversionCall argCall when visitedArgumentTypes.Add(argCall.TargetType):
-                    writer.WriteLine($"app.AddArgumentConverter({argCall.ConverterExpression});");
-                    break;
-                
-                case CollectionConversionCall collectionCall:
-                    if (collectionCall.ArgumentConversionCall is not null && visitedArgumentTypes.Add(collectionCall.ElementType))
-                    {
-                        writer.WriteLine($"app.AddArgumentConverter({collectionCall.ArgumentConversionCall.ConverterExpression});");
-                    }
+                writer.WriteLine($"app.AddArgumentConverter({scalarExpression});");
+            }
 
-                    var typeCsv = $"{collectionCall.ElementType.GlobalName}, {collectionCall.CollectionType.GlobalName}";
-                    writer.WriteLine($"app.AddCollectionConverter<{typeCsv}>({collectionCall.CollectionCreationExpression});");
-                    break;
+            if (ConversionExpression.TryCreateCollectionExpression(type) is { } collectionExpression)
+            {
+                writer.WriteLine($"app.AddCollectionConverter<{collectionExpression.ElementType.GlobalName}, {collectionExpression.CollectionType.GlobalName}>({collectionExpression.Expression});");
             }
         }
     }

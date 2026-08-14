@@ -1,4 +1,6 @@
-﻿namespace Vertical.Cli.Configuration.Assertion.Types;
+﻿using Vertical.Cli.Diagnostics;
+
+namespace Vertical.Cli.Configuration.Assertion.Types;
 
 /// <summary>
 /// Indicates a command aggregate model has a variadic argument that is not in the last
@@ -36,6 +38,8 @@ public sealed class VariadicArgumentPositionAssertion : ConfigurationAssertion
     /// <inheritdoc />
     public override IEnumerable<string> GetIssueDetail()
     {
-        return Symbols.Select(symbol => $"{symbol} ({(symbol.Arity.IsVariadic ? "variadic" : "fixed")})");
+        return Symbols.Select(
+            symbol => 
+                $"{AssertionDescriptor.Create(symbol)} ({(symbol.Arity.IsVariadic ? "variadic" : "fixed")})");
     }
 }

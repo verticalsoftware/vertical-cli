@@ -82,12 +82,6 @@ public sealed class TestApplicationFixture
                 helpTopic: HelpResources.ExtractOutputPathOption)
         );
 
-        // app.HandleUnboundSymbolWithParameter<LogLevel>(
-        //     UnboundSymbolKind.Directive,
-        //     ["log-level"],
-        //     _ => Task.CompletedTask,
-        //     helpTopic: HelpResources.LogLevelDirective);
-
         app.HandleParameterizedDirective<LogLevel>(
             "log-level",
             _ => Task.CompletedTask,

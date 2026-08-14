@@ -1,0 +1,4 @@
+﻿Model type Vertical.Cli.ConfigurationAssertionTests.IModel:
+  Property Vertical.Cli.ConfigurationAssertionTests.IModel.Option  bound multiple times:
+    <IModel, String:Option> Option --option1
+    <IModel, String:Option> Option --option2

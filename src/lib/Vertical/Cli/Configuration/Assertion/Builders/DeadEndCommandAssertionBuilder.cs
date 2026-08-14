@@ -2,7 +2,7 @@
 
 namespace Vertical.Cli.Configuration.Assertion.Builders;
 
-internal sealed class DeadEndCommandsBuilder : IAssertionBuilder
+internal sealed class DeadEndCommandAssertionBuilder : IAssertionBuilder
 {
     /// <inheritdoc />
     public void Build(AssertionContext context)

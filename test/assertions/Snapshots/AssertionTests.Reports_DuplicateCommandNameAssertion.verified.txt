@@ -1,0 +1,4 @@
+﻿Command 'app':
+  Sub command 'create' used across multiple sub command:
+    CallSite: Vertical.Cli.ConfigurationAssertionTests.IModel, sub commands: 0
+    CallSite: Vertical.Cli.ConfigurationAssertionTests.IModel, sub commands: 0

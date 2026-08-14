@@ -8,10 +8,8 @@ public static class Extensions
         new(
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
             typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
-            genericsOptions:
-            SymbolDisplayGenericsOptions.IncludeTypeParameters,
-            miscellaneousOptions:
-            SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+            genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+            miscellaneousOptions: SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
     
     extension(ITypeSymbol typeSymbol)
     {

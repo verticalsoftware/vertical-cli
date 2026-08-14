@@ -1,35 +1,28 @@
-﻿using System.Collections.Concurrent;
-using Vertical.Cli.Configuration.Assertion.Builders;
+﻿using Vertical.Cli.Configuration.Assertion.Builders;
 
 namespace Vertical.Cli.Configuration.Assertion;
 
 /// <summary>
 /// Defines the configuration assertion framework.
 /// </summary>
-public static class AssertionFramework
+internal static class AssertionFramework
 {
-    private static readonly ConcurrentStack<IAssertionBuilder> _assertionBuilderStack = new(
+    private static readonly IAssertionBuilder[] _assertionBuilderStack =
     [
         new AmbiguousArgumentOrdinalPositionsBuilder(),
-        new DeadEndCommandsBuilder(),
-        new DuplicateAliasesBuilder(),
-        new InvalidVariadicArgumentsBuilder(),
-        new MissingConvertersBuilder(),
-        new MissingModelBindersBuilder(),
-        new MissingPropertyBindingsBuilder(),
-        new MultiplePropertyBindingsBuilder(),
-        new UniqueCommandNamesBuilder()
-    ]);
+        new DeadEndCommandAssertionBuilder(),
+        new DuplicateAliasAssertionBuilder(),
+        new DuplicateCommandNameAssertionBuilder(),
+        new DuplicatePropertyBindingAssertionBuilder(),
+        new MissingConverterAssertionBuilder(),
+        new MissingModelBinderAssertionBuilder(),
+        new MissingPropertyBindingAssertionBuilder(),
+        new MultipleVariadicArgumentsAssertionBuilder(),
+        new VariadicArgumentPositionAssertionBuilder()
+    ];
 
     /// <summary>
     /// Gets the assertion builders.
     /// </summary>
     public static IAssertionBuilder[] GetBuilders() => _assertionBuilderStack.ToArray();
-
-    /// <summary>
-    /// Registers an assertion builder.
-    /// </summary>
-    /// <param name="builder">The builder to add.</param>
-    public static void AddBuilder(IAssertionBuilder builder) => _assertionBuilderStack.Push(
-        builder ?? throw new ArgumentNullException(nameof(builder)));
 }

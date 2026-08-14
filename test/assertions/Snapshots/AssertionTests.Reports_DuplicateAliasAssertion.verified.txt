@@ -1,0 +1,4 @@
+﻿Command 'app create':
+  Alias '--option' used across multiple symbols:
+    <IModel, String:Option> Option --option
+    <IModel, String[]:Options> Option --option

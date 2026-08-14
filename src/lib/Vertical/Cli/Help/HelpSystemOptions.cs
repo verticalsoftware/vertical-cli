@@ -36,7 +36,7 @@ public sealed class HelpSystemOptions
     }
     
     /// <summary>
-    /// Gets or sets the help option.
+    /// Gets the help option (internal managed).
     /// </summary>
     internal UnboundSymbol Symbol { get; private set; } = new(
         identifier: "Help",

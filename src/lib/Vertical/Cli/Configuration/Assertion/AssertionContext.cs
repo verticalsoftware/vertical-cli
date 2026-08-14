@@ -98,6 +98,8 @@ public sealed class AssertionContext
                 .BindingSources
                 .OfType<CliSymbol>()
                 .Cast<ICliSymbol>()
+                .Concat(command.Symbols)
+                .Append(Configuration.HelpOptions.Symbol)
                 .ToLookup(symbol => symbol.Kind));
     }
 

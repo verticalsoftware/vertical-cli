@@ -60,7 +60,7 @@
         Displays version information for the application.
     </topic>
     
-    <topic type="directive" id="log-level" parameter-name="severity">
+    <topic type="symbol" id="(Directive).log-level" parameter-name="severity">
         Verbosity of output logging (trace, debug, or info).
     </topic>
 </help>

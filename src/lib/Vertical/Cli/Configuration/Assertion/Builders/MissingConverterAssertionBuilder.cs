@@ -3,7 +3,7 @@ using Vertical.Cli.Configuration.Assertion.Types;
 
 namespace Vertical.Cli.Configuration.Assertion.Builders;
 
-internal sealed class MissingConvertersBuilder : IAssertionBuilder
+internal sealed class MissingConverterAssertionBuilder : IAssertionBuilder
 {
     /// <inheritdoc />
     public void Build(AssertionContext context)
@@ -39,16 +39,6 @@ internal sealed class MissingConvertersBuilder : IAssertionBuilder
             
             context.Assertions.Add(new MissingArgumentConverterAssertion(propertyType));
         }
-    }
-
-    private static bool HasConverter(AssertionContext context, Type type)
-    {
-        var provider = context.Configuration;
-
-        return
-            (TryGetCollectionType(type, out var elementType) && provider.HasCollectionConverter(elementType, type))
-            ||
-            provider.HasArgumentConverter(type);
     }
 
     private static bool TryGetCollectionType(Type type, [NotNullWhen(true)] out Type? elementType)

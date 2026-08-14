@@ -45,6 +45,11 @@ public sealed class AliasList : IEnumerable<string>
             ? _values.ToArray()
             : [ArgumentSyntax.CreateGnuAlias(templateName)];
     }
+
+    /// <summary>
+    /// Creates an alias list with a single value.
+    /// </summary>
+    public static implicit operator AliasList(string alias) => [alias];
     
     /// <inheritdoc />
     public IEnumerator<string> GetEnumerator() => _values.GetEnumerator();

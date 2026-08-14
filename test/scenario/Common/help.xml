@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<help>
+    <topic type="command" id="archive">
+        <remarks>Creates and extracts compressed, encrypted archive files.</remarks>
+        <sections>
+            <section title="Section 1">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</section>
+            <section title="Section 2">Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.</section>
+        </sections>
+    </topic>
+    <topic type="command" id="archive extract">
+        <remarks>Extracts an archive file or set.</remarks>
+    </topic>
+    <topic type="command" id="archive create">
+        <remarks>Creates an archive set from one or more input files.</remarks>
+    </topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ISharedOptions.CompressionType" parameter-name="type">Compression type to use, one of gzip or brotli.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ISharedOptions.EncryptionType" parameter-name="aes|rsa">Encryption type to use to protect the files. If AES is used, the &lt;KEY&gt; references a symmetric key. If RSA is used, &lt;KEY&gt; references the recipient's public key.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ISharedOptions.Timeout">The maximum timespan for the operation to run, specific in hh:mm:ss.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ISharedOptions.ComputeSha">Compute and display the SHA-1 hashes for each output file.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ISharedOptions.Overwrite">Overwrite any existing output files with the same name.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ISharedOptions.SecretKey" parameter-name="key">The symmetric key or the recipient's public key used to encrypt the archive.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.IExtractOptions.InputFile" parameter-name="path">Path to the first input file created with the compress command.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.IExtractOptions.OutputPath" parameter-name="path">Directory into which the extracted file(s) should be written (defaults to the current working directory).</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ICreateOptions.InputFiles" parameter-name="path">One or more input files to include in the archive.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ICreateOptions.OutputFile">Path and name of the compressed output file. For archives that are split into multiple files, the given path will be used as the name of the first file. Subsequent files will have a sequential numbering scheme applied to their names.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ICreateOptions.IncludeMetadata">Include source file metadata in the archive.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ICreateOptions.OutputFileSplitSize" parameter-name="size[bkmg]">The maximum allowable size of each split output file.</topic>
+    <topic type="symbol" id="Vertical.Cli.ScenarioTests.Common.ICreateOptions.Properties" parameter-name="key=value">An addition metadata  key/value pair to include in the archive.</topic>
+    <topic type="symbol" id="(Unbound).Version">Displays version information.</topic>
+</help>
