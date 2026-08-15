@@ -10,9 +10,6 @@ public sealed class XmlHelpProvider : IHelpProvider
 {
     private readonly Lazy<(XPathDocument Document, XPathNavigator Navigator)> _lazyResources;
     
-    private const string CommandTypeName = "command";
-    private const string SymbolTypeName = "symbol";
-    private const string DirectiveTypeName = "directive";
     private const string ParameterNameAttribute = "parameter-name";
 
     /// <summary>
@@ -38,10 +35,10 @@ public sealed class XmlHelpProvider : IHelpProvider
     {
         return subject switch
         {
-            Command command => GetCommandNode(command)?.SelectSingleNode("remarks")?.Value,
-            CliSymbol symbol => GetSymbolNode(symbol)?.Value,
-            IDirectiveSymbol directive => GetDirectiveNode(directive)?.Value,
-            UnboundSymbol unbound => GetUnboundSymbolNode(unbound)?.Value,
+            Command command => GetNode(command)?.SelectSingleNode("remarks")?.Value,
+            CliSymbol symbol => GetNode(symbol)?.Value,
+            IDirectiveSymbol directive => GetNode(directive)?.Value,
+            UnboundSymbol unbound => GetNode(unbound)?.Value,
             _ => null
         } ?? subject.GetRemarks();
     }
@@ -54,7 +51,7 @@ public sealed class XmlHelpProvider : IHelpProvider
         
         IEnumerable<ExtendedRemarksSection> GetResult()
         {
-            var sectionNodesIterator = GetCommandNode(command)?
+            var sectionNodesIterator = GetNode(command)?
                 .SelectSingleNode("sections")?
                 .SelectChildren(XPathNodeType.Element);
 
@@ -84,7 +81,7 @@ public sealed class XmlHelpProvider : IHelpProvider
         return subject switch
         {
             CliSymbol { Kind: SymbolKind.PositionArgument } argument  => 
-                GetSymbolNode(argument)?.GetAttribute(ParameterNameAttribute, string.Empty)
+                GetNode(argument)?.GetAttribute(ParameterNameAttribute, string.Empty)
                 ??  argument.GetListIdentifier(),
             
             _ => subject.GetListIdentifier()
@@ -97,28 +94,17 @@ public sealed class XmlHelpProvider : IHelpProvider
         return subject switch
         {
             CliSymbol { Kind: SymbolKind.Option } option =>
-                GetSymbolNode(option)?.GetAttribute(ParameterNameAttribute, namespaceURI: string.Empty)
+                GetNode(option)?.GetAttribute(ParameterNameAttribute, namespaceURI: string.Empty)
                 ?? option.GetParameterName(),
             
             _ => subject.GetParameterName()
         };
     }
 
-    private XPathNavigator? GetNode(string type, string id)
+    private XPathNavigator? GetNode(IHelpSubject subject)
     {
-        var path = $"/help/topic[@type='{type}' and @id='{id}']";
+        var key = subject.HelpTopicKey;
+        var path = $"/help/topic[@type='{key.TypeId}' and @id='{key.Topic}']";
         return Navigator.SelectSingleNode(path);
     }
-
-    private XPathNavigator? GetCommandNode(Command command) => 
-        GetNode(CommandTypeName, command.Path);
-    
-    private XPathNavigator? GetSymbolNode(CliSymbol symbol) => 
-        GetNode(SymbolTypeName, $"{symbol.ModelType.FullName}.{symbol.BindingName}");
-    
-    private XPathNavigator? GetUnboundSymbolNode(UnboundSymbol symbol) => 
-        GetNode(SymbolTypeName, $"(Unbound).{symbol.Identifier}");
-
-    private XPathNavigator? GetDirectiveNode(IDirectiveSymbol directive) => 
-        GetNode(SymbolTypeName, $"(Directive).{directive.Identifier}");
 }

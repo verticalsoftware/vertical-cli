@@ -94,6 +94,9 @@ public abstract class Command : IHelpSubject
     public CommandHelpTopic? HelpTopic { get; }
 
     /// <inheritdoc />
+    public HelpTopicKey HelpTopicKey => new("command", Path);
+
+    /// <inheritdoc />
     public string? GetRemarks() => HelpTopic?.Remarks;
 
     /// <inheritdoc />

@@ -43,6 +43,9 @@ public sealed class DirectiveSymbol : IDirectiveSymbol
     public HelpTopic? HelpTopic { get; }
 
     /// <inheritdoc />
+    public HelpTopicKey HelpTopicKey => new("symbol", $"(Directive).{Identifier}");
+
+    /// <inheritdoc />
     public string? GetRemarks() => HelpTopic?.Remarks;
 
     /// <inheritdoc />
@@ -114,6 +117,9 @@ public sealed class ParameterizedDirectiveSymbol<TValue> : IDirectiveSymbol
     /// Gets the help topic.
     /// </summary>
     public SymbolHelpTopic? HelpTopic { get; }
+
+    /// <inheritdoc />
+    public HelpTopicKey HelpTopicKey => new("symbol", $"(Directive).{Identifier}");
 
     /// <inheritdoc />
     public string? GetRemarks() => HelpTopic?.Remarks;

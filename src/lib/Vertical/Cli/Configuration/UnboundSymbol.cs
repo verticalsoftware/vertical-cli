@@ -50,6 +50,9 @@ public class UnboundSymbol : ICliSymbol
     public HelpTopic? HelpTopic { get; init; }
 
     /// <inheritdoc />
+    public HelpTopicKey HelpTopicKey => new("symbol", $"(Unbound).{Identifier}");
+
+    /// <inheritdoc />
     public string? GetRemarks() => HelpTopic?.Remarks;
 
     /// <inheritdoc />

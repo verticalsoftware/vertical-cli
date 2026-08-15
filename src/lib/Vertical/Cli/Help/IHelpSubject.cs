@@ -11,6 +11,11 @@ public interface IHelpSubject
     HelpTopic? HelpTopic { get; }
     
     /// <summary>
+    /// Gets the help topic key for this instance.
+    /// </summary>
+    HelpTopicKey HelpTopicKey { get; }
+    
+    /// <summary>
     /// Gets helps remarks for the subject.
     /// </summary>
     /// <returns>String, or <c>null</c> if there are no remarks.</returns>

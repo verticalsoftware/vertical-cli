@@ -75,6 +75,9 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
     /// </summary>
     public HelpTopic? HelpTopic { get; }
 
+    /// <inheritdoc />
+    public HelpTopicKey HelpTopicKey => new("symbol", $"{ModelType.FullName}.{BindingName}");
+
     private SymbolHelpTopic? SymbolHelpTopic => HelpTopic as SymbolHelpTopic;
 
     /// <inheritdoc />
