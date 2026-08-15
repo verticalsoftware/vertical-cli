@@ -32,11 +32,11 @@ public sealed class TestApplicationFixture
         app.ConfigureParser<ISharedOptions>(builder => builder
             .ParseOption(x => x.CompressionType,
                 ["-c", "--compression"],
-                defaultProvider: () => CompressionType.GZip,
+                useDefault: () => CompressionType.GZip,
                 helpTopic: HelpResources.CompressionTypeOption)
             .ParseOption(x => x.EncryptionType,
                 ["-e", "--encrypt"],
-                defaultProvider: () => EncryptionType.RSA,
+                useDefault: () => EncryptionType.RSA,
                 helpTopic: HelpResources.EncryptionTypeOption)
             .ParseOption(x => x.Timeout, 
                 helpTopic: HelpResources.TimeoutOption,
@@ -61,7 +61,7 @@ public sealed class TestApplicationFixture
             .ParseSwitch(x => x.IncludeMetadata, helpTopic: HelpResources.IncludeMetadataSwitch)
             .ParseOption(x => x.OutputFileSplitSize,
                 ["--split-size"],
-                defaultProvider: () => new FileSize(250, "m"),
+                useDefault: () => new FileSize(250, "m"),
                 helpTopic: HelpResources.OutputFileSplitSizeOption)
             .ParseRepeatableOption<KeyValuePair<string, string>, Dictionary<string, string>>(
                 x => x.Properties,
@@ -78,7 +78,7 @@ public sealed class TestApplicationFixture
             .ParseOption(
                 x => x.OutputPath,
                 ["--out"],
-                defaultProvider: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
+                useDefault: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
                 helpTopic: HelpResources.ExtractOutputPathOption)
         );
 

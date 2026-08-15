@@ -14,7 +14,7 @@ public class DirectiveTests
         command.SetHandler<object>((_, _) => Task.FromResult(0));
 
         var app = new CommandLineApplication(command);
-        app.ConfigureParser<object>(builder => builder.SetBinder(_ => new object()));
+        app.ConfigureModel<object>(builder => builder.SetBinder(_ => new object()));
         app.HandleDirective(
             "test",
             eventInfo =>
@@ -34,7 +34,7 @@ public class DirectiveTests
         command.SetHandler<object>((_, _) => Task.FromResult(0));
 
         var app = new CommandLineApplication(command);
-        app.ConfigureParser<object>(builder => builder.SetBinder(_ => new object()));
+        app.ConfigureModel<object>(builder => builder.SetBinder(_ => new object()));
         app.HandleParameterizedDirective<string>(
             "test",
             eventInfo =>

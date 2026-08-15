@@ -43,13 +43,6 @@ public class CodeGenerator
     {
         foreach (var property in typeModel.PropertySymbols)
         {
-            var symbol = property.Type;
-            var x = symbol.Kind;
-            var x2 = symbol.GetType().FullName;
-            var x3 = symbol.MetadataName;
-            var x4 = symbol.ContainingNamespace?.ToDisplayString();
-            var x5 = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-            
             writer.WriteLine($"public required {property.Type.GlobalName} {property.Name} {{ get; init; }}");
         }
 
@@ -113,7 +106,7 @@ public class CodeGenerator
     {
         foreach (var typeModel in typeModels)
         {
-            writer.WriteLine($"app.ConfigureParser<{typeModel.TypeSymbol.GlobalName}>(builder => builder.SetBinder({typeModel.GeneratedTypeName}.Bind));");
+            writer.WriteLine($"app.ConfigureModel<{typeModel.TypeSymbol.GlobalName}>(builder => builder.SetBinder({typeModel.GeneratedTypeName}.Bind));");
         }
     }
 

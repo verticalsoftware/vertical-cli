@@ -37,7 +37,7 @@ public class HandlerServiceContextTests
         });
 
         var app = new CommandLineApplication(command);
-        app.ConfigureParser<IModel>(builder => builder.SetBinder(_ => new Model()));
+        app.ConfigureModel<IModel>(builder => builder.SetBinder(_ => new Model()));
         _ = await app.RunAsync([]);
         called.ShouldBeTrue();
     }
@@ -50,7 +50,7 @@ public class HandlerServiceContextTests
         command.SetHandler(_ => handler);
 
         var app = new CommandLineApplication(command);
-        app.ConfigureParser<IModel>(builder => builder.SetBinder(_ => new Model()));
+        app.ConfigureModel<IModel>(builder => builder.SetBinder(_ => new Model()));
         _ = await app.RunAsync([]);
         handler.Called.ShouldBeTrue();
     }

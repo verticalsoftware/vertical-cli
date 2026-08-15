@@ -11,7 +11,8 @@ namespace Vertical.Cli.Configuration;
 /// Used to fluently configure a model type.
 /// </summary>
 /// <typeparam name="TModel">The model class that represents an application's arguments.</typeparam>
-public sealed class ModelBuilder<TModel> where TModel : class
+public sealed class ModelBuilder<TModel> : IParserBuilder<TModel>, IModelBuilder<TModel>
+    where TModel : class
 {
     internal ModelConfiguration Configuration { get; }
 
@@ -28,7 +29,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// The expected position of the argument in relation to other position arguments.
     /// </param>
     /// <param name="required">A flag indicating whether a value for the argument is required.</param>
-    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
     /// <param name="validate">A delegate that performs data validation checks.</param>
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TValue">The value type</typeparam>
@@ -37,7 +38,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Expression<Func<TModel, TValue>> expression,
         int ordinalPosition,
         bool required = false,
-        Func<TValue>? defaultProvider = null,
+        Func<TValue>? useDefault = null,
         Action<IValidationEventInfo<TModel, TValue>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
@@ -47,7 +48,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
             ordinalPosition,
             aliases: [],
             arity: required ? Arity.One : Arity.ZeroOrOne,
-            defaultProvider,
+            useDefault,
             helpTopic,
             ValidationHelpers.TryCreateValidationAction(validate),
             self => new ScalarPropertyBinder<TModel, TValue>(self)));
@@ -63,7 +64,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// The expected position of the argument in relation to other position arguments.
     /// </param>
     /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
     /// <param name="validate">A delegate that performs data validation checks.</param>
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TElement">The value type</typeparam>
@@ -72,7 +73,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Expression<Func<TModel, TElement[]>> expression,
         int ordinalPosition,
         Arity? arity = null,
-        Func<TElement[]>? defaultProvider = null,
+        Func<TElement[]>? useDefault = null,
         Action<IValidationEventInfo<TModel, TElement, TElement[]>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
@@ -82,7 +83,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
             ordinalPosition,
             aliases: [],
             arity: arity ?? Arity.ZeroOrMore,
-            defaultProvider,
+            useDefault,
             helpTopic,
             ValidationHelpers.TryCreateValidationAction(validate),
             self => new CollectionPropertyBinder<TModel, TElement, TElement[]>(self)));
@@ -98,7 +99,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// The expected position of the argument in relation to other position arguments.
     /// </param>
     /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
     /// <param name="validate">A delegate that performs data validation checks.</param>
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TElement">The value type</typeparam>
@@ -108,7 +109,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Expression<Func<TModel, TCollection>> expression,
         int ordinalPosition,
         Arity? arity = null,
-        Func<TCollection>? defaultProvider = null,
+        Func<TCollection>? useDefault = null,
         Action<IValidationEventInfo<TModel, TElement, TCollection>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
         where TCollection : IEnumerable<TElement>
@@ -119,7 +120,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
             ordinalPosition,
             aliases: [],
             arity: arity ?? Arity.ZeroOrMore,
-            defaultProvider,
+            useDefault,
             helpTopic,
             ValidationHelpers.TryCreateValidationAction(validate),
             self => new CollectionPropertyBinder<TModel, TElement, TCollection>(self)));
@@ -136,7 +137,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// property name.
     /// </param>
     /// <param name="required">A flag indicating whether a value for the argument is required.</param>
-    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
     /// <param name="validate">A delegate that performs data validation checks.</param>
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TValue">The value type</typeparam>
@@ -145,7 +146,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Expression<Func<TModel, TValue>> expression,
         AliasList? aliases = null,
         bool required = false,
-        Func<TValue>? defaultProvider = null,
+        Func<TValue>? useDefault = null,
         Action<IValidationEventInfo<TModel, TValue>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
@@ -157,7 +158,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
             ordinalPosition: null,
             (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
             required ? Arity.One : Arity.ZeroOrOne,
-            defaultProvider,
+            useDefault,
             helpTopic,
             ValidationHelpers.TryCreateValidationAction(validate),
             self => new ScalarPropertyBinder<TModel, TValue>(self)));
@@ -174,7 +175,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// property name.
     /// </param>
     /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
     /// <param name="validate">A delegate that performs data validation checks.</param>
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TElement">The value type</typeparam>
@@ -183,7 +184,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Expression<Func<TModel, TElement[]>> expression,
         AliasList? aliases = null,
         Arity? arity = null,
-        Func<TElement[]>? defaultProvider = null,
+        Func<TElement[]>? useDefault = null,
         Action<IValidationEventInfo<TModel, TElement, TElement[]>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
     {
@@ -195,7 +196,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
             ordinalPosition: null,
             (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
             arity ?? Arity.ZeroOrMore,
-            defaultProvider,
+            useDefault,
             helpTopic,
             ValidationHelpers.TryCreateValidationAction(validate),
             self => new CollectionPropertyBinder<TModel, TElement, TElement[]>(self)));
@@ -212,7 +213,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
     /// property name.
     /// </param>
     /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-    /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+    /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
     /// <param name="validate">A delegate that performs data validation checks.</param>
     /// <param name="helpTopic">The help topic associated with the argument.</param>
     /// <typeparam name="TElement">The value type</typeparam>
@@ -222,7 +223,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Expression<Func<TModel, TCollection>> expression,
         AliasList? aliases = null,
         Arity? arity = null,
-        Func<TCollection>? defaultProvider = null,
+        Func<TCollection>? useDefault = null,
         Action<IValidationEventInfo<TModel, TCollection>>? validate = null,
         SymbolHelpTopic? helpTopic = null)
         where TCollection : IEnumerable<TElement>
@@ -235,14 +236,14 @@ public sealed class ModelBuilder<TModel> where TModel : class
             ordinalPosition: null,
             (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
             arity ?? Arity.ZeroOrMore,
-            defaultProvider,
+            useDefault,
             helpTopic,
             ValidationHelpers.TryCreateValidationAction(validate),
             self => new CollectionPropertyBinder<TModel, TElement, TCollection>(self)));
 
         return this;
     }
-    
+
     /// <summary>
     /// Associates a boolean model property to a switch input.
     /// </summary>
@@ -258,7 +259,7 @@ public sealed class ModelBuilder<TModel> where TModel : class
         Expression<Func<TModel, bool>> expression,
         AliasList? aliases = null,
         Action<IValidationEventInfo<TModel, bool>>? validate = null,
-        SymbolHelpTopic? helpTopic = null)
+        HelpTopic? helpTopic = null)
     {
         var bindingName = expression.BindingName;
         

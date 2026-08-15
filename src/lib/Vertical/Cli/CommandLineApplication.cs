@@ -57,11 +57,23 @@ public class CommandLineApplication
     }
 
     /// <summary>
+    /// Registers an action that configures model bindings.
+    /// </summary>
+    /// <param name="configure">An action that manipulates the provided <see cref="ModelBuilder{TModel}"/>.</param>
+    /// <typeparam name="TModel">Model type being configured.</typeparam>
+    public CommandLineApplication ConfigureModel<TModel>(Action<IModelBuilder<TModel>> configure)
+        where TModel : class
+    {
+        _configuration.AddModelBuilder(configure);
+        return this;
+    }
+
+    /// <summary>
     /// Registers an action that configures the parser for a model type.
     /// </summary>
     /// <param name="configure">An action that manipulates the provided <see cref="ModelBuilder{TModel}"/>.</param>
     /// <typeparam name="TModel">Model type being configured.</typeparam>
-    public CommandLineApplication ConfigureParser<TModel>(Action<ModelBuilder<TModel>> configure) 
+    public CommandLineApplication ConfigureParser<TModel>(Action<IParserBuilder<TModel>> configure) 
         where TModel : class
     {
         _configuration.AddModelBuilder(configure);

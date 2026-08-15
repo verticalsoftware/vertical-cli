@@ -50,7 +50,7 @@ internal static class CallSite
             return -1;
 
         await using var handlerServiceProvider = handlerProvider();
-        var handler = handlerServiceProvider.GetInstance();
+        var handler = handlerServiceProvider.Instance;
         
         // Return an invokable task
         return await handler.HandleAsync(modelInstance, context.CancellationToken);

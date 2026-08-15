@@ -20,7 +20,7 @@ public static class CommandExtensions
         /// the given service provider.
         /// </param>
         /// <typeparam name="TModel">Model type.</typeparam>
-        public void SetHandler<TModel>(Func<IServiceProvider, IHandler<TModel>> handlerResolver)
+        public void SetHandlerService<TModel>(Func<IServiceProvider, IHandler<TModel>> handlerResolver)
             where TModel : class
         {
             command.SetHandlerProvider(context =>
@@ -42,7 +42,7 @@ public static class CommandExtensions
         /// </summary>
         /// <typeparam name="TModel">Model type</typeparam>
         /// <typeparam name="THandler">Handler implementation type</typeparam>
-        public void SetHandler<TModel, THandler>()
+        public void SetHandlerService<TModel, THandler>()
             where TModel : class
             where THandler : class, IHandler<TModel>
         {

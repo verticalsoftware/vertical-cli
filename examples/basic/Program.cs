@@ -34,7 +34,7 @@ app.HandleParameterizedDirective<LogLevel>(
     });
 
 app.ConfigureParser<ICompressionOptions>(builder => builder
-    .ParseOption(x => x.CompressionType, ["--alg"], defaultProvider: () => CompressionType.GZip));
+    .ParseOption(x => x.CompressionType, ["--alg"], useDefault: () => CompressionType.GZip));
 
 app.ConfigureParser<IEncryptionOptions>(builder => builder
     .ParseOption(x => x.EncryptionType, ["-e", "--encrypt"])
@@ -52,18 +52,18 @@ app.ConfigureParser<ICreateCommandOptions>(builder => builder
     .ParseRepeatableOption(
         x => x.ScanDirectories,
         ["--scan"],
-        defaultProvider: () => [new DirectoryInfo(Directory.GetCurrentDirectory())],
+        useDefault: () => [new DirectoryInfo(Directory.GetCurrentDirectory())],
         validate: collection => collection.EachValue(value => value.MustExist()))
     .ParseOption(
         x => x.OutputDirectory,
         ["--out"],
-        defaultProvider: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
+        useDefault: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
         validate: path => path.MustExist())
     .ParseRepeatableArgument(x => x.Patterns, ordinalPosition: 0, arity: Arity.OneOrMore)
     .ParseOption(
         x => x.SplitSize,
         ["--split"],
-        defaultProvider: () => SplitSize.Parse("250k", null))
+        useDefault: () => SplitSize.Parse("250k", null))
     .ParseSwitch(x => x.NoManifest)
     .ParseRepeatableOption<KeyValuePair<string, string>, Dictionary<string, string>>(
         x => x.Metadata,

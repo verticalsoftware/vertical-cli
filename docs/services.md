@@ -1,52 +1,53 @@
-# Application Data & Services
+﻿# Using services
 
-## Overview
+### Overview
 
-If an application wants to leverage dependency injection, use the [vertical-cli-dependencyinjection](https://www.nuget.org/packages/vertical-cli/) package.
+The [vertical-cli-dependencyinjection](https://www.nuget.org/packages/vertical-cli-dependencyinjection/) extends the functionality of the base library with dependency injection support. Several notable things are introduced by the package:
 
-A class that implements `IHandler<TModel>` can be registered in the framework's service collection (provided as an extension property of `CommandLineApplication`).
+- The `CommandLineApplication` class gets an extension property named `Services` which defines an `IServiceCollection`. Applications register their services to this collection.
+- The `Command` class gets two extension `SetHandlerService` methods that can be used to instruct the framework to resolve `IHandler<TModel>` implementations for commands from a service provider.
+- The `InvocationContext` class gets a `BuildServiceProvider()` extension method.
 
-## Example
+### Using services for command handlers
+
+An application can define a class that implements `IHandler<TModel>` to perform command functions. Using a class opens the instance to injection of application services. Using services for command functions requires the handler implementations to be registered in the service colection, and the command's handler set to resolve from the service provider. The following example illustrates this concept:
 
 ```csharp
-// Handler...
-public class CompressHandler : IHandler<ICompressOptions>
+// Define the model
+interface IOptions
 {
-    public async Task<int> HandleAsync(
-        [GeneratedBinding] ICompressOptions options,
-        CancellationToken cancellationToken)
+    /* Properties */
+}
+
+// Define a handling class
+sealed class MyAppHandler(/* inject services */) : IHandler<IOptions>
+{
+    public async Task HandleAsync(IOptions options, CancellationToken cancellationToken)
     {
-        // Do the work asynchronously, return an exit code
+        // Perform work and return an exit code
         return 0;
     }
 }
 
-// Setup...
-var rootCommand = new RootCommand("compress");
+// Configuration
+var rootCommand = new RootCommand("app");
 
-// Set the handler to resolve from dependency injection
-rootCommand.SetHandler<ICompressOptions, CompressHandler>();
+// Set the handler to resolve from the service provider
+rootCommand.SetHandlerService<IOptions, MyAppHandler>();
 
 var app = new CommandLineApplication(rootCommand);
+var services = app.Services;
 
-// Register the type
-app.Services.AddSingleton<CompressHandler>();
+// Register the handler type
+services.AddSingleton<MyAppHandler>();
 
-return await app.ConfigureAndRunAsync(args);
+// Register other applications services...
+services.AddLogging();
+
+app.Configure();
+return await app.RunAsync(args);
 ```
 
-## Passing data within the framework
-
-Sometimes it is necessary for application data to be available to various integration points of the framework. A simple options system is available in the configuration and then at certain integration points.
-
-An application leverage this capability using a constructor-less class with writeable properties. The options API has three methods:
-
-- `Confiure<TOptions>(Action<TOptions>)` - the framework provides a singleton instance of `TOptions` for access.
-- `GetOptions<TOptions>()` - returns the singleton options instance.
-- `Contains(Type)` - returns whether the options manager has already created an instance of the type.
-
-Application data is available within the following integrations:
-- Configuration using the `CommandLineApplication` instance
-- Provided during [directive handling](./directives.md)
-- Provided in the `InvocationContext` object during a [middleware](./middleware.md) hook
-- Provided during property and model [binding](./binding.md)
+> ℹ️ Note
+> 
+> The framework manages the lifetime of its service provider.

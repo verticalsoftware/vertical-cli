@@ -19,7 +19,7 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
         int? ordinalPosition,
         string[] aliases,
         Arity arity,
-        SymbolHelpTopic? helpTopic)
+        HelpTopic? helpTopic)
     {
         Kind = kind;
         PropertyInfo = propertyInfo;
@@ -73,7 +73,9 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
     /// <summary>
     /// Gets the help topic associated with the symbol.
     /// </summary>
-    public SymbolHelpTopic? HelpTopic { get; }
+    public HelpTopic? HelpTopic { get; }
+
+    private SymbolHelpTopic? SymbolHelpTopic => HelpTopic as SymbolHelpTopic;
 
     /// <inheritdoc />
     public string? GetRemarks() => HelpTopic?.Remarks;
@@ -85,7 +87,7 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
     public string GetListIdentifier() => Kind switch
     {
         SymbolKind.Option or SymbolKind.Switch => string.Join(", ", Aliases),
-        SymbolKind.PositionArgument => HelpTopic?.ParameterSyntax ?? BindingName,
+        SymbolKind.PositionArgument => SymbolHelpTopic?.ParameterSyntax ?? BindingName,
         _ => throw new InvalidOperationException($"Cannot return identifier for {Kind}.")
     };
 
@@ -93,12 +95,10 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
     public string? GetParameterName() => Kind switch
     {
         SymbolKind.PositionArgument => GetListIdentifier(),
-        SymbolKind.Option => HelpTopic?.ParameterSyntax ?? BindingName.ToKebabCase(),
+        SymbolKind.Option => SymbolHelpTopic?.ParameterSyntax ?? BindingName.ToKebabCase(),
         SymbolKind.Switch => null,
         _ => throw new InvalidOperationException($"Cannot return parameter name for {Kind}.")
     };
-
-    HelpTopic? IHelpSubject.HelpTopic => HelpTopic;
 
     /// <summary>
     /// Calls the configured validation for the symbol.
@@ -148,7 +148,7 @@ public sealed class CliSymbol<TModel, TValue> : CliSymbol where TModel : class
         string[] aliases,
         Arity arity,
         Func<TValue>? defaultProvider,
-        SymbolHelpTopic? helpTopic,
+        HelpTopic? helpTopic,
         Action<CliSymbol, ValidationContext>? validate,
         Func<CliSymbol<TModel, TValue>, PropertyBinder> binderFactory)
         : base(kind, expression.PropertyInfo, ordinalPosition, aliases, arity, helpTopic)

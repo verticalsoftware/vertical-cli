@@ -16,7 +16,7 @@ public sealed class DirectiveSymbol : IDirectiveSymbol
         string identifier,
         ParameterArity? parameterArity,
         Func<DirectiveEventInfo, Task> handler,
-        SymbolHelpTopic? helpTopic)
+        HelpTopic? helpTopic)
     {
         Identifier = identifier;
         ParameterArity = parameterArity;
@@ -40,7 +40,7 @@ public sealed class DirectiveSymbol : IDirectiveSymbol
     /// <summary>
     /// Gets the help topic.
     /// </summary>
-    public SymbolHelpTopic? HelpTopic { get; }
+    public HelpTopic? HelpTopic { get; }
 
     /// <inheritdoc />
     public string? GetRemarks() => HelpTopic?.Remarks;

@@ -6,7 +6,7 @@
 /// <typeparam name="TModel">Handler model type</typeparam>
 public class HandlerServiceProvider<TModel> : IAsyncDisposable where TModel : class
 {
-    private readonly Func<IHandler<TModel>> _handlerFactory;
+    private readonly Lazy<IHandler<TModel>> _lazyHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HandlerServiceProvider{TModel}"/> class.
@@ -14,14 +14,14 @@ public class HandlerServiceProvider<TModel> : IAsyncDisposable where TModel : cl
     /// <param name="handlerFactory">A factory function for the handler type.</param>
     public HandlerServiceProvider(Func<IHandler<TModel>> handlerFactory)
     {
-        _handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
+        _lazyHandler = new Lazy<IHandler<TModel>>(handlerFactory);
     }
 
     /// <summary>
     /// Gets a handler instance.
     /// </summary>
     /// <returns><see cref="IHandler{TModel}"/></returns>
-    public IHandler<TModel> GetInstance() => _handlerFactory();
+    public IHandler<TModel> Instance => _lazyHandler.Value;
 
     /// <inheritdoc />
     public virtual ValueTask DisposeAsync()

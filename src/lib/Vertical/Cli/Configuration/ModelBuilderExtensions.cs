@@ -22,7 +22,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -31,7 +31,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, IEnumerable<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<IEnumerable<TElement>>? defaultProvider = null,
+            Func<IEnumerable<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, IEnumerable<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -41,7 +41,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, IEnumerable<TElement>>(self)));
@@ -57,7 +57,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -66,7 +66,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ICollection<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<ICollection<TElement>>? defaultProvider = null,
+            Func<ICollection<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, ICollection<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -76,7 +76,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ICollection<TElement>>(self)));
@@ -92,7 +92,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -101,7 +101,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, IReadOnlyCollection<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<IReadOnlyCollection<TElement>>? defaultProvider = null,
+            Func<IReadOnlyCollection<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, IReadOnlyCollection<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -111,7 +111,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, IReadOnlyCollection<TElement>>(self)));
@@ -127,7 +127,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -136,7 +136,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, IList<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<IList<TElement>>? defaultProvider = null,
+            Func<IList<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, IList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -146,7 +146,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, IList<TElement>>(self)));
@@ -162,7 +162,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -171,7 +171,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, IReadOnlyList<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<IReadOnlyList<TElement>>? defaultProvider = null,
+            Func<IReadOnlyList<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, IReadOnlyList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -181,7 +181,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, IReadOnlyList<TElement>>(self)));
@@ -197,7 +197,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -206,7 +206,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, List<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<List<TElement>>? defaultProvider = null,
+            Func<List<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, List<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -216,7 +216,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, List<TElement>>(self)));
@@ -232,7 +232,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -241,7 +241,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, LinkedList<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<LinkedList<TElement>>? defaultProvider = null,
+            Func<LinkedList<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, LinkedList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -251,7 +251,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, LinkedList<TElement>>(self)));
@@ -267,7 +267,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -276,7 +276,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ISet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<ISet<TElement>>? defaultProvider = null,
+            Func<ISet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, ISet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -286,7 +286,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ISet<TElement>>(self)));
@@ -302,7 +302,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -311,7 +311,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, IReadOnlySet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<IReadOnlySet<TElement>>? defaultProvider = null,
+            Func<IReadOnlySet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, IReadOnlySet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -321,7 +321,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, IReadOnlySet<TElement>>(self)));
@@ -337,7 +337,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -346,7 +346,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, HashSet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<HashSet<TElement>>? defaultProvider = null,
+            Func<HashSet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, HashSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -356,7 +356,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, HashSet<TElement>>(self)));
@@ -372,7 +372,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -381,7 +381,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, SortedSet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<SortedSet<TElement>>? defaultProvider = null,
+            Func<SortedSet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, SortedSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -391,7 +391,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, SortedSet<TElement>>(self)));
@@ -407,7 +407,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -416,7 +416,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableArray<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<ImmutableArray<TElement>>? defaultProvider = null,
+            Func<ImmutableArray<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, ImmutableArray<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -426,7 +426,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableArray<TElement>>(self)));
@@ -442,7 +442,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -451,7 +451,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableList<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<ImmutableList<TElement>>? defaultProvider = null,
+            Func<ImmutableList<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, ImmutableList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -461,7 +461,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableList<TElement>>(self)));
@@ -477,7 +477,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -486,7 +486,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableHashSet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<ImmutableHashSet<TElement>>? defaultProvider = null,
+            Func<ImmutableHashSet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, ImmutableHashSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -496,7 +496,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableHashSet<TElement>>(self)));
@@ -512,7 +512,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -521,7 +521,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableSortedSet<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<ImmutableSortedSet<TElement>>? defaultProvider = null,
+            Func<ImmutableSortedSet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, ImmutableSortedSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -531,7 +531,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableSortedSet<TElement>>(self)));
@@ -547,7 +547,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -556,7 +556,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableStack<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<ImmutableStack<TElement>>? defaultProvider = null,
+            Func<ImmutableStack<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, ImmutableStack<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -566,7 +566,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableStack<TElement>>(self)));
@@ -582,7 +582,7 @@ public static class ModelBuilderExtensions
         /// The expected position of the argument in relation to other position arguments.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -591,7 +591,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableQueue<TElement>>> expression,
             int ordinalPosition,
             Arity? arity = null,
-            Func<ImmutableQueue<TElement>>? defaultProvider = null,
+            Func<ImmutableQueue<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, TElement, ImmutableQueue<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -601,7 +601,7 @@ public static class ModelBuilderExtensions
                 ordinalPosition,
                 aliases: [],
                 arity: arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableQueue<TElement>>(self)));
@@ -618,7 +618,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -627,7 +627,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, IEnumerable<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<IEnumerable<TElement>>? defaultProvider = null,
+            Func<IEnumerable<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, IEnumerable<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -639,7 +639,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, IEnumerable<TElement>>(self)));
@@ -656,7 +656,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -665,7 +665,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ICollection<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<ICollection<TElement>>? defaultProvider = null,
+            Func<ICollection<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, ICollection<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -677,7 +677,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ICollection<TElement>>(self)));
@@ -694,7 +694,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -703,7 +703,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, IReadOnlyCollection<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<IReadOnlyCollection<TElement>>? defaultProvider = null,
+            Func<IReadOnlyCollection<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, IReadOnlyCollection<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -715,7 +715,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, IReadOnlyCollection<TElement>>(self)));
@@ -732,7 +732,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -741,7 +741,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, IList<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<IList<TElement>>? defaultProvider = null,
+            Func<IList<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, IList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -753,7 +753,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, IList<TElement>>(self)));
@@ -770,7 +770,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -779,7 +779,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, IReadOnlyList<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<IReadOnlyList<TElement>>? defaultProvider = null,
+            Func<IReadOnlyList<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, IReadOnlyList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -791,7 +791,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, IReadOnlyList<TElement>>(self)));
@@ -808,7 +808,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -817,7 +817,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, List<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<List<TElement>>? defaultProvider = null,
+            Func<List<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, List<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -829,7 +829,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, List<TElement>>(self)));
@@ -846,7 +846,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -855,7 +855,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, LinkedList<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<LinkedList<TElement>>? defaultProvider = null,
+            Func<LinkedList<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, LinkedList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -867,7 +867,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, LinkedList<TElement>>(self)));
@@ -884,7 +884,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -893,7 +893,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ISet<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<ISet<TElement>>? defaultProvider = null,
+            Func<ISet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, ISet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -905,7 +905,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ISet<TElement>>(self)));
@@ -922,7 +922,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -931,7 +931,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, IReadOnlySet<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<IReadOnlySet<TElement>>? defaultProvider = null,
+            Func<IReadOnlySet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, IReadOnlySet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -943,7 +943,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, IReadOnlySet<TElement>>(self)));
@@ -960,7 +960,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -969,7 +969,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, HashSet<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<HashSet<TElement>>? defaultProvider = null,
+            Func<HashSet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, HashSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -981,7 +981,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, HashSet<TElement>>(self)));
@@ -998,7 +998,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -1007,7 +1007,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, SortedSet<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<SortedSet<TElement>>? defaultProvider = null,
+            Func<SortedSet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, SortedSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -1019,7 +1019,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, SortedSet<TElement>>(self)));
@@ -1036,7 +1036,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -1045,7 +1045,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableArray<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<ImmutableArray<TElement>>? defaultProvider = null,
+            Func<ImmutableArray<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, ImmutableArray<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -1057,7 +1057,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableArray<TElement>>(self)));
@@ -1074,7 +1074,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -1083,7 +1083,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableList<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<ImmutableList<TElement>>? defaultProvider = null,
+            Func<ImmutableList<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, ImmutableList<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -1095,7 +1095,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableList<TElement>>(self)));
@@ -1112,7 +1112,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -1121,7 +1121,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableHashSet<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<ImmutableHashSet<TElement>>? defaultProvider = null,
+            Func<ImmutableHashSet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, ImmutableHashSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -1133,7 +1133,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableHashSet<TElement>>(self)));
@@ -1150,7 +1150,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -1159,7 +1159,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableSortedSet<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<ImmutableSortedSet<TElement>>? defaultProvider = null,
+            Func<ImmutableSortedSet<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, ImmutableSortedSet<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -1171,7 +1171,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableSortedSet<TElement>>(self)));
@@ -1188,7 +1188,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -1197,7 +1197,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableStack<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<ImmutableStack<TElement>>? defaultProvider = null,
+            Func<ImmutableStack<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, ImmutableStack<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -1209,7 +1209,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableStack<TElement>>(self)));
@@ -1226,7 +1226,7 @@ public static class ModelBuilderExtensions
         /// property name.
         /// </param>
         /// <param name="arity">A value that expresses the minimum and maximum uses of the argument.</param>
-        /// <param name="defaultProvider">A method that provides the value used if input isn't provided.</param>
+        /// <param name="useDefault">A method that provides the value used if input isn't provided.</param>
         /// <param name="validate">A delegate that performs data validation checks.</param>
         /// <param name="helpTopic">The help topic associated with the argument.</param>
         /// <typeparam name="TElement">The value type</typeparam>
@@ -1235,7 +1235,7 @@ public static class ModelBuilderExtensions
             Expression<Func<TModel, ImmutableQueue<TElement>>> expression,
             AliasList? aliases = null,
             Arity? arity = null,
-            Func<ImmutableQueue<TElement>>? defaultProvider = null,
+            Func<ImmutableQueue<TElement>>? useDefault = null,
             Action<IValidationEventInfo<TModel, ImmutableQueue<TElement>>>? validate = null,
             SymbolHelpTopic? helpTopic = null)
         {
@@ -1247,7 +1247,7 @@ public static class ModelBuilderExtensions
                 0,
                 (aliases ?? AliasList.Empty).GetValuesOrDefault(bindingName),
                 arity ?? Arity.ZeroOrMore,
-                defaultProvider,
+                useDefault,
                 helpTopic,
                 ValidationHelpers.TryCreateValidationAction(validate),
                 self => new CollectionPropertyBinder<TModel, TElement, ImmutableQueue<TElement>>(self)));

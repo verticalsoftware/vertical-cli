@@ -1,107 +1,93 @@
-# The help system
+﻿# Help System
 
-## Overview
+### Overview
 
-Guidance on the application's options can be displayed to the user using the built in help system. By default, if the user enters `--help or -?` after the application name (with or without a sub command), the list of arguments and options will be displayed contextually to the active command. Descriptions of the applications commands, options, and symbols can be configured to bring more meaning to the output.
+By default, contextual help for the selected command will be displayed when the parser detects `--help` or `-?`. Application's can provide help topics for commands and all defined input symbols.
 
-### Adding help topics in code
+### Define help topics in code
 
-Commands, options, arguments, switches, and directives can be configured with a `HelpTopic` instance when they are defined. The following data can be used with a help topic:
+The methods of `IParserBuilder<TModel>` let an application attach help content when symbols are defined. The type of content varies between subjects. Below is a summary of the types of help topics:
 
-|Type|Help topic|
-|---|---|
-|Commands|General remarks plus zero or more extended remarks.
-|Arguments and options|General remarks plus a customized parameter name. By default, the help system will  use the binding property name.|
-|Directives|General remarks plus a customized parameter name (defaults to `value`).
-
-The following example configures help for a command and an option.
+- `HelpTopic` - contain general remarks for switches
+- `SymbolHelpTopic` - contain remarks and an optional custom parameter name for options, arguments, or directives. Custom parameter names are display in the option or argument list instead of the default names.
+- `CommandHelpTopic` - contain general and extended sectional remarks
 
 ```csharp
+// Attach help to a command
 var command = new RootCommand(
-    "fcopy",
-    new CommandHelpTopic(
-        "Copy a file.",
+    name: "compress",
+    helpTopic: new CommandHelpTopic(
+        remarks: "Compresses a file",
+        extendedRemarks: 
         [
-            new CommandExtendedRemarks("Overview", "remarks..."),
-            new CommandExtendedRemarks("Compression", "remarks...")
-        ]
-    ));
+            new ExtendedRemarksSection(
+                title: "Algorithms", 
+                remarks: "Supports gzip, brotli, etc."),
+            new ExtendedRemarksSection(
+                title: "Encyrption", 
+                remarks: "Supports AES or RSA."),
+        ]));
 
-app.ConfigureParser<IOptions>(builder =>
-    
-    // Use a string for a help topic
-    builder.ParseArgument(
-        x => x.InputFile,
-        ordinalPosition: 0,
-        helpTopic: "Path to the input file.")
-
-    // Customize a parameter name for an option
-    builder.ParseOption(
-        x => x.OutputFile,
+// Attach help to an option
+app.ConfigureParser<IOptions>(parser => parser
+    .AddOption(
+        x => x.Properties,
+        aliases: "--prop",
         helpTopic: new SymbolHelpTopic(
-            "Path to the output file",
-            parameterName: "path"))
-);                
+            remarks: "A key/value pair property", 
+            parameterName: "key=value")))
 ```
 
-### Adding help outside of code using XML
+### Decoupling help content from code 
 
-Applications may want to decouple help content from code. One way this can be accomplished is by using a help file structured as `xml`. A minimal example is shown below that illustrates the simple structure of the xml file.
+In larger applications, it may be more maintainable to define help content in a file. The help system has support for `xml` files, but applications can implement their own provider. Using an `xml` file requires configuring the help system as shown in the following example:
+
+```csharp
+var xmlHelpProvider = new XmlHelpProvider(() => File.OpenRead("help.xml"));
+app.ConfigureHelp(options => options.HelpProvider = xmlHelpProvider);
+```
+
+The following illustrates the schema of an `xml` help resource file:
 
 ```xml
-<?xml version="1.0 encoding="utf-8"?>
-<help>    
-    
-    <!-- Define help for a command. `id` is the qualified path name -->
-    <topic type="command" id="app">
-        <remarks>Provide the command's short description.</remarks>
+<?xml version="1.0" encoding="utf-8" ?>
+<help>
+    <topic type="command" id="<path>">
+        <remarks>Remarks...</remarks>
         <sections>
-            <section title="Section 1">
-                Provide section remarks...
-            </section
+            <section title="Section 1 title">
+                section 1 remarks...
+            </section>
+            <section title="Section 2 title">
+                section 2 remarks
+            </section>
         </sections>
     </topic>
-
-    <!-- Define help for an option, argument, or switch (parameter-name optional)-->
-    <topic type="symbol" id="MyApplication.MyModelType.PropertyName" parameter-name="custom-name">
-        Provide symbol remarks...
+    
+    <topic type="symbol" id="<fully-qualified-property>" parameter-name="<parameter-name>">
+        Remarks... 
     </topic>
-
-    <!-- Define help for a directive (parameter-name optional)-->
-    <topic type="directive" id="name" parameter-name="custom-name">
-        Provide directive remarks...
+    
+    <topic type="symbol" id="(Unbound).<Identifier>">
+        Remarks...
+    </topic>
+    
+    <topic type="symbol" id="(Directive).<identiier>>" parameter-name="parameter-name">
+        Remarks...
     </topic>
 </help>
 ```
 
-### Providing help using a different provider
+Attributes in the sample `xml`:
 
-The library defines the `IHelpProvider` interface which returns content strings that should be displayed by the help system. Application's can implement these to support custom resource formats. Review the existing implementation of `DefaultHelpProvider` as a starting point, where methods of that type can be overriden.
+|Name|Description|
+|---|---|
+|`<path>`|The space separated path of the command, e.g. `dotnet nuget push`.|
+|`<title>`|The title of a command's extended remarks section.|
+|`<fully-qualified-property>`|A case-accurate property name, qualified with it's class type, e.g. `MyApplication.IConnectionOptions.UserName`.|
+|`<parameter-name>`|A custom parameter name for options, arguments, and directive symbols.|
+|`<identifier>`|The identifier used to create a directive or unbound option.|
 
-Inform the framework of a custom provider by configuring the help system options:
+### Implementing a custom help provider
 
-```csharp
-app.ConfigureHelp(options => 
-{
-    // Set custom aliases for the help option:
-    options.OptionAliases = ["--help", "-?"];
-
-    // Customize the remarks for the help option:
-    options.OptionRemarks = "Display help for this command.";
-
-    // Set the xml provider (or the application's own type)
-    options.HelpProvider = new XmlHelpProvider(() => File.OpenRead("help.xml"));
-}
-);
-```
-
-Lastly, an application can completely overtake the help system by sub-classing the `HelpArticleWriter` class and overriding the `WriteContent` method. 
-
-### General content guidelines
-
-Content guidelines:
-- Command `id` attributes are the qualified path name for the command. For a root command, this is the application name defined in the `RootCommand` constructor. For sub commands, it is a path string composed of parent command names and the sub command name separated by spaces, e.g., `dotnet nuget push`.
-- Option and switch id attributes are the fully qualified model interface type name and the property name.
-- All id attributes are case-sensitive.
-- Do not enclose custom parameter names with anchoring characters like `[]` or `<>`. The help system adds these automatically using the semantics of the symbol type.
-- Do not justify the words in a remarks element. The formatter will wrap and align the content responsively to the output display width.
+Refer to the [IHelpProvider](https://github.com/verticalsoftware/vertical-cli/blob/main/src/lib/Vertical/Cli/Help/IHelpProvider.cs) and [DefaultHelpProvider](https://github.com/verticalsoftware/vertical-cli/blob/main/src/lib/Vertical/Cli/Help/DefaultHelpProvider.cs) for the API and the default implementation.
