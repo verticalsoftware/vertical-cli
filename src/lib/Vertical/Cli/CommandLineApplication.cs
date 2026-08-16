@@ -109,54 +109,6 @@ public class CommandLineApplication
     }
 
     /// <summary>
-    /// Registers an asynchronous directive handler.
-    /// </summary>
-    /// <param name="identifier">The identifier for the directive.</param>
-    /// <param name="handler">An asynchronous handler that is invoked when a token is matched.</param>
-    /// <param name="helpTopic">Optional help topic to associate with the directive.</param>
-    /// <returns>A reference to this instance.</returns>
-    public CommandLineApplication HandleDirective(
-        string identifier,
-        Func<DirectiveEventInfo, Task> handler,
-        SymbolHelpTopic? helpTopic = null)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(identifier);
-        ArgumentNullException.ThrowIfNull(handler);
-        
-        var directive = new DirectiveSymbol(identifier, parameterArity: null, handler, helpTopic);
-        _configuration.AddDirectiveSymbol(directive);
-        return this;
-    }
-
-    /// <summary>
-    /// Registers an asynchronous directive handler.
-    /// </summary>
-    /// <param name="identifier">The identifier for the directive.</param>
-    /// <param name="handler">An asynchronous handler that is invoked when a token is matched.</param>
-    /// <param name="defaultProvider">A function that returns a default value.</param>
-    /// <param name="helpTopic">Optional help topic to associate with the directive.</param>
-    /// <returns>A reference to this instance.</returns>
-    public CommandLineApplication HandleParameterizedDirective<TValue>(
-        string identifier,
-        Func<DirectiveEventInfo<TValue>, Task> handler,
-        Func<TValue>? defaultProvider = null,
-        SymbolHelpTopic? helpTopic = null)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(identifier);
-        ArgumentNullException.ThrowIfNull(handler);
-
-        var directive = new ParameterizedDirectiveSymbol<TValue>(
-            identifier,
-            defaultProvider != null ? ParameterArity.ZeroOrOne : ParameterArity.One,
-            handler, 
-            defaultProvider, 
-            helpTopic);
-            
-        _configuration.AddDirectiveSymbol(directive);
-        return this;
-    }
-
-    /// <summary>
     /// Registers the given object as the console abstraction.
     /// </summary>
     /// <param name="console">The console abstraction.</param>

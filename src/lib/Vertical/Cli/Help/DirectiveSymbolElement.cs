@@ -33,7 +33,7 @@ internal sealed class DirectiveSymbolElement : IListElement
         writer.Write(']', DisplayElement.ListIdentifier);
     }
 
-    public static DirectiveSymbolElement Create(IHelpProvider provider, IDirectiveSymbol directive)
+    public static DirectiveSymbolElement Create(IHelpProvider provider, ICliSymbol directive)
     {
         var identifier = provider.GetIdentifier(directive);
         var parameterName = provider.GetParameterName(directive);

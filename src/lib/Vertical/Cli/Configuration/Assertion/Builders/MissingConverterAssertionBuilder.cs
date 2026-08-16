@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Vertical.Cli.Configuration.Assertion.Types;
+using Vertical.Cli.Middleware;
 
 namespace Vertical.Cli.Configuration.Assertion.Builders;
 
@@ -16,6 +17,7 @@ internal sealed class MissingConverterAssertionBuilder : IAssertionBuilder
                 .Select(source => source.ValueType))
             .Concat(context
                 .Directives
+                .Cast<MiddlewareSymbol>()
                 .Select(directive => directive.ParameterType)
                 .Where(type => type is not null)
                 .Cast<Type>())

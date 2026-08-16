@@ -67,7 +67,7 @@ public class CommandLineApplicationExtensionsGenerator : IIncrementalGenerator
         {
             INamedTypeSymbol
             {
-                FullMetadataName: NamingConvention.DirectiveEventInfoMetadataName,
+                FullMetadataName: NamingConvention.ParameterizedMiddlewareDirectiveInfoName,
                 TypeArguments.Length: 1
             } eventInfoSymbol => eventInfoSymbol.TypeArguments[0],
             _ => null

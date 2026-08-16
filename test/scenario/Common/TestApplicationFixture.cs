@@ -12,12 +12,6 @@ public sealed class TestApplicationFixture
         var console = new TestConsole();
         
         var rootCommand = new RootCommand("archive", HelpResources.Root);
-        rootCommand.AddUnboundOption(
-            "Version",
-            ["--version"],
-            UnboundScope.Global,
-            (_,_) => Task.CompletedTask,
-            "Displays version information.");
         
         var createCommand = new SubCommand("create", HelpResources.CreateCommand);
         createCommand.SetHandler(context => new Handlers.CreateHandler(context.Configuration.Console));
@@ -28,6 +22,13 @@ public sealed class TestApplicationFixture
         rootCommand.AddSubCommand(extractCommand);
 
         var app = new CommandLineApplication(rootCommand);
+
+        app.ConfigureMiddleware(middleware => middleware
+            .AddSwitch(
+                "Version",
+                "--version",
+                _ => Task.FromResult<int?>(0),
+                "Display version information."));
         
         app.ConfigureParser<ISharedOptions>(builder => builder
             .ParseOption(x => x.CompressionType,
@@ -82,10 +83,11 @@ public sealed class TestApplicationFixture
                 helpTopic: HelpResources.ExtractOutputPathOption)
         );
 
-        app.HandleParameterizedDirective<LogLevel>(
-            "log-level",
-            _ => Task.CompletedTask,
-            helpTopic: HelpResources.LogLevelDirective);
+        app.ConfigureMiddleware(middleware => middleware
+            .AddDirective<LogLevel>(
+                "log-level",
+                _ => Task.CompletedTask,
+                helpTopic: HelpResources.LogLevelDirective));
 
         app.AddArgumentConverter(KeyValuePairConverter.Convert);
         app.AddArgumentConverter(Converters.Enum<LogLevel>());

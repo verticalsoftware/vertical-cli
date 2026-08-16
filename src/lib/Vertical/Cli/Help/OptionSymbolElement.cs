@@ -63,10 +63,13 @@ internal class OptionSymbolElement : IListElement
             : "  ";
         var identifier = provider.GetIdentifier(option);
         var parameterName = provider.GetParameterName(option);
-        var (leftEnclosure, rightEnclosure) = option is CliSymbol { Kind: SymbolKind.Option }
-            ? (" <", ">")
-            : (string.Empty, string.Empty);
-        var aritySyntax = option.Arity.Maximum.GetValueOrDefault(2) > 1
+        var (leftEnclosure, rightEnclosure) = option.ParameterArity switch
+        {
+            ParameterArity.ZeroOrOne => (" [", "]"),
+            ParameterArity.One => (" <", ">"),
+            _ => (string.Empty, string.Empty)
+        };
+        var variadicSyntax = option.Arity.Maximum is null
             ? "..."
             : string.Empty;
         var remarks = provider.GetRemarks(option) ?? string.Empty;
@@ -75,14 +78,14 @@ internal class OptionSymbolElement : IListElement
                              leftEnclosure.Length +
                              (parameterName?.Length ?? 0) +
                              rightEnclosure.Length +
-                             aritySyntax.Length;
+                             variadicSyntax.Length;
 
         return new OptionSymbolElement(arityAnnotation,
             identifier,
             leftEnclosure,
             rightEnclosure,
             parameterName,
-            aritySyntax,
+            variadicSyntax,
             remarks,
             computedLength);
     }

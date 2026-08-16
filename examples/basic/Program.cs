@@ -8,16 +8,6 @@ using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
 
 var rootCommand = new RootCommand("arcv");
-rootCommand.AddUnboundOption(
-    "Version",
-    ["--version"],
-    UnboundScope.Global,
-    (context, _) =>
-    {
-        Console.WriteLine("BasicDemo v1.0");
-        context.Result = 0;
-        return Task.CompletedTask;
-    });
 
 var createCommand = new SubCommand("create");
 createCommand.SetHandler<ICreateCommandOptions>((_, _) => Task.FromResult(0));
@@ -25,13 +15,23 @@ rootCommand.AddSubCommand(createCommand);
 
 var app = new CommandLineApplication(rootCommand);
 
-app.HandleParameterizedDirective<LogLevel>(
-    "log-level",
-    ([GeneratedConversion] eventInfo) =>
-    {
-        eventInfo.ApplicationOptions.Configure<LoggingOptions>(options => options.LogLevel = eventInfo.Value);
-        return Task.CompletedTask;
-    });
+app.ConfigureMiddleware(middleware => middleware
+    .AddSwitch(
+        "Version",
+        "--version",
+        _ =>
+        {
+            Console.WriteLine("BasicDemo v1.0");
+            return Task.FromResult<int?>(0);
+        })
+    .AddDirective<LogLevel>(
+        "log-level",
+        ([GeneratedConversion] eventInfo) =>
+        {
+            eventInfo.Context.ApplicationOptions.Configure<LoggingOptions>(options =>
+                options.LogLevel = eventInfo.Value);
+            return Task.CompletedTask;
+        }));
 
 app.ConfigureParser<ICompressionOptions>(builder => builder
     .ParseOption(x => x.CompressionType, ["--alg"], useDefault: () => CompressionType.GZip));

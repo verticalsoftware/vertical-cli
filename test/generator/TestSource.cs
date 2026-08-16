@@ -66,9 +66,10 @@ public static class TestSource
                     CancellationToken __) => Task.FromResult(0));
                     
                 var app = new CommandLineApplication(command);
-                app.HandleParameterizedDirective<double>(
-                    "directive",
-                    ([GeneratedConversion] _) => Task.CompletedTask);
+                app.ConfigureMiddleware(middleware => middleware
+                    .AddDirective<double>(
+                        "directive",
+                        ([GeneratedConversion] _) => Task.CompletedTask));
             }
         }
         """;

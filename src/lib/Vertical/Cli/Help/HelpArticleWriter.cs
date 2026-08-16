@@ -50,9 +50,7 @@ public class HelpArticleWriter
         
         writer.WriteLine("Options:", DisplayElement.Heading);
 
-        var elements = boundSymbols
-            .Select(symbol => OptionSymbolElement.Create(provider, symbol))
-            .Concat(eventInfo.UnboundSymbols.Select(symbol => OptionSymbolElement.Create(provider, symbol)));
+        var elements = boundSymbols.Select(symbol => OptionSymbolElement.Create(provider, symbol));
         
         writer.WriteTable(elements, lineBounds);
         writer.WriteLine();
@@ -141,7 +139,7 @@ public class HelpArticleWriter
         writer.WriteWhiteSpace(IndentSpaces);
         writer.Write(eventInfo.Command.Path, DisplayElement.CommandName);
         writer.WriteWhiteSpace();
-        writer.WriteLine(string.Join(" | ", eventInfo.Help.Aliases), DisplayElement.ParameterSyntax);
+        writer.WriteLine(string.Join(" | ", eventInfo.HelpSymbol.Aliases), DisplayElement.ParameterSyntax);
     }
 
     private static void WriteUsageSubCommandSyntax(OutputWriter writer, Command command)

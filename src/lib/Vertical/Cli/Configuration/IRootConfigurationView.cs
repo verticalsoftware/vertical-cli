@@ -58,10 +58,10 @@ public interface IRootConfigurationView : IConversionProvider
     Stream GetAnnotationResourceStream(string resource);
 
     /// <summary>
-    /// Gets the directives registered by the application.
+    /// Gets the configured middleware symbols.
     /// </summary>
-    /// <returns>A collection of directives.</returns>
-    IReadOnlyList<IDirectiveSymbol> GetDirectives();
+    /// <returns></returns>
+    IReadOnlyList<MiddlewareSymbol> GetMiddlewareSymbols();
 
     /// <summary>
     /// Determines whether a converter for the given type has been registered.

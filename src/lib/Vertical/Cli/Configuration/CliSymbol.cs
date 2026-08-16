@@ -34,6 +34,9 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
     /// </summary>
     public SymbolKind Kind { get; }
 
+    /// <inheritdoc />
+    public SystemKind SystemKind => SystemKind.None;
+
     /// <summary>
     /// Gets the binding property info.
     /// </summary>
@@ -102,6 +105,9 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
         SymbolKind.Switch => null,
         _ => throw new InvalidOperationException($"Cannot return parameter name for {Kind}.")
     };
+
+    /// <inheritdoc />
+    public abstract ParameterArity? ParameterArity { get; }
 
     /// <summary>
     /// Calls the configured validation for the symbol.
@@ -172,6 +178,13 @@ public sealed class CliSymbol<TModel, TValue> : CliSymbol where TModel : class
 
     /// <inheritdoc />
     public override PropertyBinder CreatePropertyBinder() => _binderFactory(this);
+
+    /// <inheritdoc />
+    public override ParameterArity? ParameterArity => this switch
+    {
+        { Kind: SymbolKind.Switch } => null,
+        _ => Configuration.ParameterArity.One
+    };
 
     /// <inheritdoc />
     public override void Validate(ValidationContext context) => _validate?.Invoke(this, context);

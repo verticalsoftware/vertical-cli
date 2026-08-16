@@ -18,8 +18,8 @@ Options:
 * --secret <key>               The symmetric key or the recipient's public key used to encrypt the archive.
   --out <path>                 Directory into which the extracted file(s) should be written (defaults to the
                                current working directory).
-  --version                    Displays version information.
-  --help, -?                   Displays help for the current command.
+  --version                    Display version information.
+  --help, -?                   Display help for the current command.
 
 Directives:
   [log-level=<level>]     Configures verbosity of output logging. <level> = trace|debug|information|warning

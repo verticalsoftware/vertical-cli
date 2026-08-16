@@ -22,7 +22,10 @@ public static class AssertionDescriptor
             CliSymbol { Kind: SymbolKind.PositionArgument } bound =>
                 $"<{bound.ModelType.Name}, {bound.ValueType.Name}:{bound.BindingName}> {bound.Kind} @{bound.OrdinalPosition}",
             
-            UnboundSymbol unbound => $"(Unbound {unbound.Scope} {unbound.UnboundKind}) {string.Join(", ", unbound.Aliases)}",
+            ICliSymbol { Kind: SymbolKind.Directive } directive => 
+                $"Directive {string.Join(", ", directive.Aliases)}",
+            
+            ICliSymbol { Kind: SymbolKind.Switch } mwSwitch => $"Middleware switch {string.Join(", ", mwSwitch.Aliases)}",
             
             IBindingSource binding => $"({symbol.GetType().Name} <{binding.ModelType.Name}, {binding.ValueType.Name}:{binding.BindingName}>)",
             

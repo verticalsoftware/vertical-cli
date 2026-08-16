@@ -20,6 +20,11 @@ public interface ICliSymbol : IHelpSubject
     SymbolKind Kind { get; }
     
     /// <summary>
+    /// Gets the system kind.
+    /// </summary>
+    SystemKind SystemKind { get; }
+    
+    /// <summary>
     /// Gets the symbol or parameter arity.
     /// </summary>
     Arity Arity { get; }

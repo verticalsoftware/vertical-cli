@@ -5,10 +5,10 @@
 /// </summary>
 public sealed class HelpTopicKey
 {
-    internal HelpTopicKey(string typeId, string topic)
+    internal HelpTopicKey(string typeId, string topicId)
     {
         TypeId = typeId;
-        Topic = topic;
+        TopicId = topicId;
     }
 
     /// <summary>
@@ -19,8 +19,8 @@ public sealed class HelpTopicKey
     /// <summary>
     /// Gets the topic id.
     /// </summary>
-    public string Topic { get; }
+    public string TopicId { get; }
 
     /// <inheritdoc />
-    public override string ToString() => $"{TypeId} = '{Topic}'";
+    public override string ToString() => $"{TypeId} = '{TopicId}'";
 }

@@ -28,27 +28,6 @@ public partial class ParseResult
     /// </summary>
     public IEnumerable<UnresolvedTokenError> GetUnresolvedTokenErrors() => UnresolvedTokens
         .Select(token => new UnresolvedTokenError(token));
-    
-    /// <summary>
-    /// Tries to get a scalar argument value.
-    /// </summary>
-    /// <param name="bindingName">The binding name the value is associated with the value.</param>
-    /// <param name="value">
-    /// When the method returns, the value found for the binding name, or <c>null</c> when a value
-    /// was not found.
-    /// </param>
-    /// <returns><c>true</c> if <paramref name="value"/> was assigned a non null string value.</returns>
-    public bool TryGetArgumentValue(string bindingName, [MaybeNullWhen(false)] out string value)
-    {
-        foreach (var entry in _bindingLookup[bindingName])
-        {
-            value = entry;
-            return true;
-        }
-
-        value = null;
-        return false;
-    }
 
     /// <summary>
     /// Gets all values associated with the given binding name.

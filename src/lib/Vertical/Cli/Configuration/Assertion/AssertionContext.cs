@@ -16,13 +16,17 @@ public sealed class AssertionContext
         Application = application;
         Commands = BuildCommands();
         CallSites = Commands.Where(command => command.CanCreateCallSite).ToArray();
-        Directives = application.GetConfiguration().GetDirectives();
+        Directives = application
+            .GetConfiguration()
+            .GetMiddlewareSymbols()
+            .Where(symbol => symbol.Kind == SymbolKind.Directive)
+            .ToArray();
     }
 
     /// <summary>
     /// Gets the configuration's directives.
     /// </summary>
-    public IReadOnlyList<IDirectiveSymbol> Directives { get; set; }
+    public IReadOnlyList<ICliSymbol> Directives { get; set; }
 
     /// <summary>
     /// Gets the command call sites.
@@ -65,7 +69,7 @@ public sealed class AssertionContext
     /// <param name="command">The command to get position arguments of.</param>
     /// <returns>Enumeration of <see cref="CliSymbol"/></returns>
     public IEnumerable<CliSymbol> GetPositionArguments(Command command) =>
-        GetSymbolLookup(command)[SymbolKind.PositionArgument]
+        GetSymbolLookup(Configuration, command)[SymbolKind.PositionArgument]
             .Cast<CliSymbol>();
 
     /// <summary>
@@ -75,7 +79,7 @@ public sealed class AssertionContext
     /// <returns>Enumeration of <see cref="CliSymbol"/></returns>
     public IEnumerable<ICliSymbol> GetNamedSymbols(Command command)
     {
-        var symbols = GetSymbolLookup(command);
+        var symbols = GetSymbolLookup(Configuration, command);
         return symbols[SymbolKind.Option].Concat(symbols[SymbolKind.Switch]);
     }
 
@@ -86,11 +90,13 @@ public sealed class AssertionContext
     /// <returns>An enumeration of <see cref="CliSymbol"/> objects.</returns>
     public IEnumerable<ICliSymbol> GetSymbols(Command command)
     {
-        var symbols = GetSymbolLookup(command);
+        var symbols = GetSymbolLookup(Configuration, command);
         return symbols.SelectMany(grouping => grouping);
     }
 
-    private ILookup<SymbolKind, ICliSymbol> GetSymbolLookup(Command command)
+    private ILookup<SymbolKind, ICliSymbol> GetSymbolLookup(
+        IRootConfigurationView configuration,
+        Command command)
     {
         return _cachedSymbols.GetOrAdd(
             command,
@@ -98,8 +104,8 @@ public sealed class AssertionContext
                 .BindingSources
                 .OfType<CliSymbol>()
                 .Cast<ICliSymbol>()
-                .Concat(command.Symbols)
-                .Append(Configuration.HelpOptions.Symbol)
+                .Concat(configuration.GetMiddlewareSymbols())
+                .Append(Configuration.HelpOptions.CreateHelpSwitch())
                 .ToLookup(symbol => symbol.Kind));
     }
 

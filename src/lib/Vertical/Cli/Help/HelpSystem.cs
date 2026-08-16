@@ -1,5 +1,6 @@
 ﻿using Vertical.Cli.Configuration;
 using Vertical.Cli.IO;
+using Vertical.Cli.Middleware;
 
 namespace Vertical.Cli.Help;
 
@@ -16,36 +17,39 @@ public static class HelpSystem
     public static void WriteArticle(IRootConfigurationView configuration, Command targetCommand)
     {
         using var bufferedConsole = new BufferedConsole(configuration.Console);
-        var cliSymbols = GetHelpSymbols(configuration, targetCommand);
         var helpOptions = configuration.HelpOptions;
-        var unboundSymbols = targetCommand
-            .Symbols
-            .Append(helpOptions.Symbol)
-            .ToArray();
         
-        var articleInfo = new HelpEventInfo(cliSymbols)
+        var articleInfo = new HelpEventInfo(GetSymbols(configuration, targetCommand))
         {
             Command = targetCommand,
-            UnboundSymbols = unboundSymbols,
             HelpProvider = helpOptions.HelpProvider,
             OutputWriter = new OutputWriter(bufferedConsole, configuration.OutputFormatter),
-            DirectiveSymbols = configuration.GetDirectives()
         };
 
         helpOptions.ArticleWriter.WriteContent(articleInfo);
         bufferedConsole.Flush();
     }
-    
-    private static CliSymbol[] GetHelpSymbols(IRootConfigurationView configuration, Command command)
-    {
-        if (command.ModelType is null)
-            return [];
 
-        var modelConfiguration = configuration.GetModelConfiguration(command.ModelType);
-        
-        return modelConfiguration
-            .BindingSources
-            .OfType<CliSymbol>()
-            .ToArray();
+    private static IEnumerable<ICliSymbol> GetSymbols(
+        IRootConfigurationView configuration, 
+        Command command)
+    {
+        var helpOptions = configuration.HelpOptions;
+
+        if (command.ModelType is { } selectedModel)
+        {
+            var modelConfiguration = configuration.GetModelConfiguration(selectedModel);
+            foreach (var symbol in modelConfiguration.BindingSources.OfType<CliSymbol>())
+            {
+                yield return symbol;
+            }
+        }
+
+        foreach (var symbol in configuration.GetMiddlewareSymbols())
+        {
+            yield return symbol;
+        }
+
+        yield return helpOptions.CreateHelpSwitch();
     }
 }

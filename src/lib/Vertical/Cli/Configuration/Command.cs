@@ -14,7 +14,6 @@ public abstract class Command : IHelpSubject
 
     private record CallSiteInfo(CallSiteFactory SiteFactory, Type ModelType);
     private readonly List<Command> _subCommands = [];
-    private readonly List<UnboundCommandSymbol> _definedSymbols = [];
     private CallSiteInfo? _callSiteInfo;
 
     internal Command(string name, CommandHelpTopic? helpTopic)
@@ -61,24 +60,6 @@ public abstract class Command : IHelpSubject
     }
 
     /// <summary>
-    /// Gets the unbound symbols defined for this instance.
-    /// </summary>
-    public IReadOnlyCollection<UnboundCommandSymbol> DefinedSymbols => _definedSymbols;
-
-    /// <summary>
-    /// Gets global scoped unbound symbols inherited by this instance.
-    /// </summary>
-    public IEnumerable<UnboundCommandSymbol> InheritedSymbols => GetAncestors()
-        .SelectMany(command => command.DefinedSymbols)
-        .Where(symbol => symbol.Scope == UnboundScope.Global);
-
-    /// <summary>
-    /// Gets all symbols defined by this instance or inherited from parent commands.
-    /// </summary>
-    public IEnumerable<UnboundCommandSymbol> Symbols => DefinedSymbols
-        .Concat(InheritedSymbols);
-
-    /// <summary>
     /// Gets the sub commands of this instance.
     /// </summary>
     public IReadOnlyCollection<Command> SubCommands => _subCommands;
@@ -107,6 +88,9 @@ public abstract class Command : IHelpSubject
 
     /// <inheritdoc />
     public string? GetParameterName() => null;
+
+    /// <inheritdoc />
+    public ParameterArity? ParameterArity => null;
 
     HelpTopic? IHelpSubject.HelpTopic => HelpTopic;
     
@@ -144,27 +128,6 @@ public abstract class Command : IHelpSubject
                 yield return command;
             }    
         }
-    }
-
-    /// <summary>
-    /// Adds an unbound option symbol.
-    /// </summary>
-    /// <param name="identifier">The identifier of the symbol relevant to help providers.</param>
-    /// <param name="aliases">Aliases to associate to the option.</param>
-    /// <param name="scope">The scope of the symbol.</param>
-    /// <param name="handler">An asynchronous method that reacts when the symbol is specified.</param>
-    /// <param name="helpTopic">The help topic to associate with the symbol</param>
-    public void AddUnboundOption(
-        string identifier,
-        AliasList aliases,
-        UnboundScope scope,
-        Func<InvocationContext, Command, Task> handler,
-        HelpTopic? helpTopic = null)
-    {
-        ArgumentNullException.ThrowIfNull(handler);
-        
-        var symbol = new UnboundCommandSymbol(identifier, aliases, scope, handler, helpTopic);
-        _definedSymbols.Add(symbol);
     }
 
     /// <summary>

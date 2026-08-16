@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
+using Vertical.Cli.Conversion;
 using Vertical.Cli.Diagnostics;
 
 namespace Vertical.Cli.Binding;
@@ -23,24 +24,15 @@ public static class BindingExtensions
             string argument) 
             where TModel : class
         {
-            var converter = bindingInfo.ConversionProvider.GetArgumentConverter<TValue>();
 
-            try
-            {
-                var value = converter(argument);
-                return new BindingResult<TValue>(symbol.BindingName, value);
-            }
-            catch (Exception exception)
-            {
-                var error = ArgumentConversionError.Create(
-                    symbol, 
-                    typeof(TValue), 
+            var conversionResult = bindingInfo
+                .ConversionProvider
+                .TryConvertArgument<TValue>(
+                    symbol,
                     argument,
-                    bindingInfo.HelpProvider,
-                    exception);
-                
-                return new BindingResult<TValue>(symbol.BindingName, default!, error);
-            }
+                    bindingInfo.ErrorList);
+
+            return new BindingResult<TValue>(symbol.BindingName, conversionResult.Value, conversionResult.Error);
         }
 
         /// <summary>
@@ -58,42 +50,17 @@ public static class BindingExtensions
             where TModel : class
             where TCollection : IEnumerable<TElement>
         {
-            var conversionProvider = bindingInfo.ConversionProvider;
-            var argumentConverter = conversionProvider.GetArgumentConverter<TElement>();
-            var collectionConverter = conversionProvider.GetCollectionConverter<TElement, TCollection>();
-            var argumentArray = arguments.ToArray();
-            var valueList = new List<TElement>(argumentArray.Length);
-            List<CommandLineError>? errors = null;
+            var conversionResult = bindingInfo
+                .ConversionProvider
+                .TryConvertCollection<TElement, TCollection>(
+                    symbol,
+                    arguments,
+                    bindingInfo.ErrorList);
 
-            foreach (var argument in argumentArray)
-            {
-                try
-                {
-                    valueList.Add(argumentConverter(argument));
-                }
-                catch (Exception exception)
-                {
-                    var error = ArgumentConversionError.Create(
-                        symbol, 
-                        typeof(TElement), 
-                        argument,
-                        bindingInfo.HelpProvider,
-                        exception);
-                    
-                    (errors ??= []).Add(error);
-                }
-            }
-
-            if (errors?.Count > 0)
-            {
-                return new BindingResult<TCollection>(
-                    symbol.BindingName,
-                    default!,
-                    new AggregateCommandLineError(errors));
-            }
-
-            var collection = collectionConverter(valueList);
-            return new BindingResult<TCollection>(symbol.BindingName, collection);
+            return new BindingResult<TCollection>(
+                symbol.BindingName,
+                conversionResult.Value,
+                conversionResult.Error);
         }
     }
 

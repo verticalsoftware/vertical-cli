@@ -1,4 +1,6 @@
-﻿namespace Vertical.Cli.Help;
+﻿using Vertical.Cli.Configuration;
+
+namespace Vertical.Cli.Help;
 
 /// <summary>
 /// Defines an interface for objects that can define help content.
@@ -38,4 +40,9 @@ public interface IHelpSubject
     /// </summary>
     /// <returns>Parameter name of <c>null</c>.</returns>
     string? GetParameterName();
+    
+    /// <summary>
+    /// Gets the parameter arity for the subject.
+    /// </summary>
+    ParameterArity? ParameterArity { get; }
 }

@@ -15,13 +15,14 @@ public class DirectiveTests
 
         var app = new CommandLineApplication(command);
         app.ConfigureModel<object>(builder => builder.SetBinder(_ => new object()));
-        app.HandleDirective(
-            "test",
-            eventInfo =>
-            {
-                eventInfo.Context.OutputWriter.WriteLine("directive invoked");
-                return Task.CompletedTask;
-            });
+        app.ConfigureMiddleware(middleware => middleware
+            .AddDirective(
+                "test",
+                eventInfo =>
+                {
+                    eventInfo.OutputWriter.WriteLine("directive invoked");
+                    return Task.CompletedTask;
+                }));
 
         var result = await TestApplicationFixture.GetOutputAsync(app, ["[test]"]);
         result.ShouldStartWith("directive invoked");
@@ -35,13 +36,14 @@ public class DirectiveTests
 
         var app = new CommandLineApplication(command);
         app.ConfigureModel<object>(builder => builder.SetBinder(_ => new object()));
-        app.HandleParameterizedDirective<string>(
-            "test",
-            eventInfo =>
-            {
-                eventInfo.Context.OutputWriter.WriteLine($"directive invoked with arg '{eventInfo.Value}'");
-                return Task.CompletedTask;
-            });
+        app.ConfigureMiddleware(middleware => middleware
+            .AddDirective<string>(
+                "test",
+                eventInfo =>
+                {
+                    eventInfo.Context.OutputWriter.WriteLine($"directive invoked with arg '{eventInfo.Value}'");
+                    return Task.CompletedTask;
+                }));
 
         app.AddArgumentConverter(Converters.Default);
 

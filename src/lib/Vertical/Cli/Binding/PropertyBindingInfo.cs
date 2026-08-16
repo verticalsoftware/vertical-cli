@@ -1,6 +1,8 @@
 ﻿using Vertical.Cli.Configuration;
 using Vertical.Cli.Conversion;
+using Vertical.Cli.Diagnostics;
 using Vertical.Cli.Help;
+using Vertical.Cli.Invocation;
 using Vertical.Cli.Parsing;
 
 namespace Vertical.Cli.Binding;
@@ -10,11 +12,13 @@ namespace Vertical.Cli.Binding;
 /// </summary>
 public sealed class PropertyBindingInfo
 {
+    private readonly InvocationContext _context;
     private readonly IRootConfigurationView _configuration;
 
-    internal PropertyBindingInfo(IRootConfigurationView configuration)
+    internal PropertyBindingInfo(InvocationContext context)
     {
-        _configuration = configuration;
+        _context = context;
+        _configuration = _context.Configuration;
     }
 
     /// <summary>
@@ -25,13 +29,18 @@ public sealed class PropertyBindingInfo
     /// <summary>
     /// Gets the help provider.
     /// </summary>
-    public IHelpProvider HelpProvider => _configuration.HelpOptions.HelpProvider;
+    internal IHelpProvider HelpProvider => _configuration.HelpOptions.HelpProvider;
+
+    /// <summary>
+    /// Gets the error list.
+    /// </summary>
+    internal List<CommandLineError> ErrorList => _context.Errors;
 
     /// <summary>
     /// Gets the parse result.
     /// </summary>
     public required ParseResult ParseResult { get; init; }
-
+    
     /// <summary>
     /// Gets application defined options.
     /// </summary>

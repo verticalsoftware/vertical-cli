@@ -6,7 +6,7 @@
 public enum ParameterArity
 {
     /// <summary>
-    /// Indicates a parameter value is optional.
+    /// Indicates a parameter value is optional (provided by a default value).
     /// </summary>
     ZeroOrOne,
     

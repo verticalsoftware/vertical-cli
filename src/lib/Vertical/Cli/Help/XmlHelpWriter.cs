@@ -38,7 +38,7 @@ public static class XmlHelpWriter
         
         WriteCommands(writer, commands);
         WriteBoundSymbols(writer, commands, application);
-        WriteUnboundSymbols(writer, commands);
+        WriteMiddlewareSymbols(writer, application);
         
         writer.WriteEndElement();
     }
@@ -65,11 +65,13 @@ public static class XmlHelpWriter
         }
     }
 
-    private static void WriteUnboundSymbols(XmlWriter writer, Command[] commands)
+    private static void WriteMiddlewareSymbols(XmlWriter writer, CommandLineApplication application)
     {
-        var unboundSymbols = commands.SelectMany(command => command.DefinedSymbols);
-
-        foreach (var symbol in unboundSymbols)
+        var symbols = application
+            .GetConfiguration()
+            .GetMiddlewareSymbols();
+        
+        foreach (var symbol in symbols)
         {
             WriteSymbolTopic(writer, symbol);
         }
@@ -80,17 +82,9 @@ public static class XmlHelpWriter
         if (symbol.HelpTopic is not { } helpTopic) return;
         
         writer.WriteStartElement("topic");
-
-        var id = symbol switch
-        {
-            CliSymbol bound => $"{bound.ModelType.FullName}.{bound.BindingName}",
-            IDirectiveSymbol directive => $"(Directive).{directive.Identifier}",
-            UnboundSymbol unbound => $"(Unbound).{unbound.Identifier}",
-            _ => throw new NotSupportedException($"symbol {symbol} not supported for xml help")
-        };
         
-        writer.WriteAttributeString("type", "symbol");
-        writer.WriteAttributeString("id", id);
+        writer.WriteAttributeString("type", symbol.HelpTopicKey.TypeId);
+        writer.WriteAttributeString("id", symbol.HelpTopicKey.TopicId);
         
         if (helpTopic is SymbolHelpTopic { ParameterSyntax: { Length: > 0 } parameterName })
         {

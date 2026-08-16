@@ -1,4 +1,8 @@
-﻿namespace Vertical.Cli.Conversion;
+﻿using System.Diagnostics.CodeAnalysis;
+using Vertical.Cli.Configuration;
+using Vertical.Cli.Diagnostics;
+
+namespace Vertical.Cli.Conversion;
 
 /// <summary>
 /// Manages a collection of value converter services.
@@ -19,5 +23,16 @@ public interface IConversionProvider
     /// <typeparam name="TCollection">Collection type</typeparam>
     /// <returns></returns>
     Converter<IEnumerable<TElement>, TCollection> GetCollectionConverter<TElement, TCollection>()
+        where TCollection : IEnumerable<TElement>;
+
+    ConversionResult<TValue> TryConvertArgument<TValue>(
+        ICliSymbol symbol,
+        string argumentValue,
+        List<CommandLineError> errorList);
+
+    ConversionResult<TCollection> TryConvertCollection<TElement, TCollection>(
+        ICliSymbol symbol,
+        IEnumerable<string> argumentValues,
+        List<CommandLineError> errorList)
         where TCollection : IEnumerable<TElement>;
 }

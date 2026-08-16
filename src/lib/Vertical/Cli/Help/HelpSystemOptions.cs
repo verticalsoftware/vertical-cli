@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
+using Vertical.Cli.Middleware;
 
 namespace Vertical.Cli.Help;
 
@@ -10,40 +11,12 @@ public sealed class HelpSystemOptions
     /// <summary>
     /// Gets the aliases for the help 
     /// </summary>
-    public AliasList OptionAliases
-    {
-        get => [..Symbol.Aliases];
-        set => Symbol = new UnboundSymbol(
-            Symbol.Identifier,
-            value,
-            UnboundSymbolKind.HelpSymbol,
-            UnboundScope.Global,
-            Symbol.HelpTopic);
-    }
+    public AliasList SymbolAliases { get; set; } = ["--help", "-?"];
 
     /// <summary>
     /// Gets or sets the option help topic.
     /// </summary>
-    public HelpTopic? OptionHelpTopic
-    {
-        get => Symbol.HelpTopic;
-        set => Symbol = new UnboundSymbol(
-            Symbol.Identifier,
-            OptionAliases,
-            Symbol.UnboundKind,
-            Symbol.Scope,
-            value);
-    }
-    
-    /// <summary>
-    /// Gets the help option (internal managed).
-    /// </summary>
-    internal UnboundSymbol Symbol { get; private set; } = new(
-        identifier: "Help",
-        ["--help", "-?"],
-        UnboundSymbolKind.HelpSymbol,
-        UnboundScope.Global,
-        "Displays help for the current command.");
+    public HelpTopic? SymbolHelpTopic { get; set; } = "Display help for the current command.";
 
     /// <summary>
     /// Gets or sets the article writer instance.
@@ -54,4 +27,14 @@ public sealed class HelpSystemOptions
     /// Gets or sets the help provider.
     /// </summary>
     public IHelpProvider HelpProvider { get; set; } = new DefaultHelpProvider();
+
+    internal MiddlewareSwitch CreateHelpSwitch()
+    {
+        return new MiddlewareSwitch(
+                "Help",
+                SymbolAliases.GetValues(),
+                _ => Task.FromResult<int?>(0),
+                SymbolHelpTopic)
+            { SystemKind = SystemKind.Help };
+    }
 }

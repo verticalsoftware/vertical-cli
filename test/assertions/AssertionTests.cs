@@ -15,7 +15,6 @@ public class AssertionTests
         var root = new RootCommand("app");
         var subCommand = new SubCommand("create");
         subCommand.SetHandler<IModel>((_,_) => Task.FromResult(0));
-        subCommand.AddUnboundOption("Version", "--version", UnboundScope.Global, (_,_) => Task.CompletedTask);
         root.AddSubCommand(subCommand);
 
         var subCommand2 = new SubCommand("remove");
@@ -23,6 +22,11 @@ public class AssertionTests
         root.AddSubCommand(subCommand2);                    
 
         var app = new CommandLineApplication(root);
+        app.ConfigureMiddleware(middleware => middleware
+            .AddSwitch(
+                "Version",
+                "--version",
+                _ => Task.FromResult<int?>(0)));
         app.ConfigureParser<IModel>(parser => parser
             .ParseOption(x => x.Option)
             .ParseRepeatableArgument(x => x.Options, ordinalPosition: 0, arity: Arity.One)
@@ -40,10 +44,14 @@ public class AssertionTests
         var root = new RootCommand("app");
         var subCommand = new SubCommand("create");
         subCommand.SetHandler<IModel>((_,_) => Task.FromResult(0));
-        subCommand.AddUnboundOption("Version", "--version", UnboundScope.Global, (_,_) => Task.CompletedTask);
         root.AddSubCommand(subCommand);  
 
         var app = new CommandLineApplication(root);
+        app.ConfigureMiddleware(middleware => middleware
+            .AddSwitch(
+                "Version",
+                "--version",
+                _ => Task.FromResult<int?>(0)));
         app.ConfigureParser<IModel>(parser => parser
             .ParseOption(x => x.Option)
             .ParseRepeatableArgument(x => x.Options, ordinalPosition: 0, arity: Arity.One)
@@ -60,10 +68,14 @@ public class AssertionTests
     {
         var root = new RootCommand("app");
         var subCommand = new SubCommand("create");
-        subCommand.AddUnboundOption("Version", "--version", UnboundScope.Global, (_,_) => Task.CompletedTask);
         root.AddSubCommand(subCommand);  
 
         var app = new CommandLineApplication(root);
+        app.ConfigureMiddleware(middleware => middleware
+            .AddSwitch(
+                "Version",
+                "--version",
+                _ => Task.FromResult<int?>(0)));
         app.ConfigureParser<IModel>(parser => parser
             .ParseOption(x => x.Option)
             .ParseRepeatableArgument(x => x.Options, ordinalPosition: 0, arity: Arity.One)
@@ -81,7 +93,6 @@ public class AssertionTests
         var root = new RootCommand("app");
         var subCommand = new SubCommand("create");
         subCommand.SetHandler<IModel>((_,_) => Task.FromResult(0));
-        subCommand.AddUnboundOption("Version", "--version", UnboundScope.Global, (_,_) => Task.CompletedTask);
         root.AddSubCommand(subCommand);
 
         var subCommand2 = new SubCommand("create");
@@ -89,6 +100,11 @@ public class AssertionTests
         root.AddSubCommand(subCommand2);                    
 
         var app = new CommandLineApplication(root);
+        app.ConfigureMiddleware(middleware => middleware
+            .AddSwitch(
+                "Version",
+                "--version",
+                _ => Task.FromResult<int?>(0)));
         app.ConfigureParser<IModel>(parser => parser
             .ParseOption(x => x.Option)
             .ParseRepeatableArgument(x => x.Options, ordinalPosition: 0, arity: Arity.One)
@@ -165,10 +181,14 @@ public class AssertionTests
         var root = new RootCommand("app");
         var subCommand = new SubCommand("create");
         subCommand.SetHandler<IModel>((_,_) => Task.FromResult(0));
-        subCommand.AddUnboundOption("Version", "--version", UnboundScope.Global, (_,_) => Task.CompletedTask);
         root.AddSubCommand(subCommand);                 
 
         var app = new CommandLineApplication(root);
+        app.ConfigureMiddleware(middleware => middleware
+            .AddSwitch(
+                "Version",
+                "--version",
+                _ => Task.FromResult<int?>(0)));
         app.ConfigureParser<IModel>(parser => parser
             .ParseOption(x => x.Option)
             .ParseRepeatableArgument(x => x.Options, ordinalPosition: 0, arity: Arity.One)
@@ -185,10 +205,14 @@ public class AssertionTests
         var root = new RootCommand("app");
         var subCommand = new SubCommand("create");
         subCommand.SetHandler<IModel>((_,_) => Task.FromResult(0));
-        subCommand.AddUnboundOption("Version", "--version", UnboundScope.Global, (_,_) => Task.CompletedTask);
         root.AddSubCommand(subCommand);
         
         var app = new CommandLineApplication(root);
+        app.ConfigureMiddleware(middleware => middleware
+            .AddSwitch(
+                "Version",
+                "--version",
+                _ => Task.FromResult<int?>(0)));
         app.ConfigureParser<IModel>(parser => parser
             .ParseOption(x => x.Option)
             .ParseRepeatableArgument(x => x.Options2, ordinalPosition: 1,  arity: Arity.One)
@@ -205,10 +229,14 @@ public class AssertionTests
         var root = new RootCommand("app");
         var subCommand = new SubCommand("create");
         subCommand.SetHandler<IModel>((_,_) => Task.FromResult(0));
-        subCommand.AddUnboundOption("Version", "--version", UnboundScope.Global, (_,_) => Task.CompletedTask);
         root.AddSubCommand(subCommand); 
 
         var app = new CommandLineApplication(root);
+        app.ConfigureMiddleware(middleware => middleware
+            .AddSwitch(
+                "Version",
+                "--version",
+                _ => Task.FromResult<int?>(0)));
         app.ConfigureParser<IModel>(parser => parser
             .ParseOption(x => x.Option)
             .ParseRepeatableArgument(x => x.Options, ordinalPosition: 0, arity: Arity.OneOrMore)
@@ -227,10 +255,14 @@ public class AssertionTests
         var root = new RootCommand("app");
         var subCommand = new SubCommand("create");
         subCommand.SetHandler<IModel>((_, _) => Task.FromResult(0));
-        subCommand.AddUnboundOption("Version", "--version", UnboundScope.Global, (_, _) => Task.CompletedTask);
         root.AddSubCommand(subCommand);
 
         var app = new CommandLineApplication(root);
+        app.ConfigureMiddleware(middleware => middleware
+            .AddSwitch(
+                "Version",
+                "--version",
+                _ => Task.FromResult<int?>(0)));
         app.ConfigureParser<IModel>(parser => parser
             .ParseOption(x => x.Option)
             .ParseRepeatableOption(x => x.Options, "--option")

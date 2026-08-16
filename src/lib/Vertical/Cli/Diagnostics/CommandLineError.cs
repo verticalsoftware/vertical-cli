@@ -53,7 +53,7 @@ public abstract class CommandLineError
             
             CliSymbol { Kind: SymbolKind.Switch } switchSymbol => $"Switch {FormatAliases(switchSymbol.Aliases)}",
             
-            IDirectiveSymbol directive => $"Directive [{directive.Identifier}]",
+            ICliSymbol { Kind: SymbolKind.Directive } directive => $"Directive [{directive.GetListIdentifier()}]",
             
             _ => throw new NotSupportedException($"Cannot format identifier for {obj}.")
         };

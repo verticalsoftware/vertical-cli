@@ -1,4 +1,5 @@
-﻿using Vertical.Cli.Invocation;
+﻿using Vertical.Cli.Configuration;
+using Vertical.Cli.Invocation;
 
 namespace Vertical.Cli.Middleware.Components;
 
@@ -12,8 +13,13 @@ internal static class HandleDirectiveSymbolHooksMiddleware
 
     private static async Task HandleDirectivesAsync(InvocationContext context)
     {
-        var directives = context.Configuration.GetDirectives();
-        if (directives.Count == 0)
+        var directives = context
+            .Configuration
+            .GetMiddlewareSymbols()
+            .Where(symbol => symbol.Kind == SymbolKind.Directive)
+            .ToArray();
+        
+        if (directives.Length == 0)
             return;
 
         var matches = context

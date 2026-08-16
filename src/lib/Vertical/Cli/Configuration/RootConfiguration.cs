@@ -1,5 +1,5 @@
-﻿using Vertical.Cli.Configuration.Assertion;
-using Vertical.Cli.Configuration.Assertion.Builders;
+﻿using Vertical.Cli.Conversion;
+using Vertical.Cli.Diagnostics;
 using Vertical.Cli.Help;
 using Vertical.Cli.IO;
 using Vertical.Cli.Middleware;
@@ -10,7 +10,6 @@ namespace Vertical.Cli.Configuration;
 internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigurationView
 {
     private readonly List<(Type ModelType, Action<ModelConfiguration> Action)> _modelBuilders = [];
-    private readonly List<IDirectiveSymbol> _directiveSymbols = [];
     private readonly Dictionary<Type, Delegate> _argumentConverters = [];
     private readonly Dictionary<(Type, Type), Delegate> _collectionConverters = [];
     
@@ -24,8 +23,6 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
             typeof(TModel),
             configuration => configure(new ModelBuilder<TModel>(configuration))));
     }
-
-    public void AddDirectiveSymbol(IDirectiveSymbol symbol) => _directiveSymbols.Add(symbol);
 
     /// <inheritdoc />
     public ModelConfiguration GetModelConfiguration(Type modelType)
@@ -66,7 +63,7 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
     public Stream GetAnnotationResourceStream(string resource) => AnnotationStreamProvider(resource);
 
     /// <inheritdoc />
-    public IReadOnlyList<IDirectiveSymbol> GetDirectives() => _directiveSymbols;
+    public IReadOnlyList<MiddlewareSymbol> GetMiddlewareSymbols() => MiddlewareBuilder.Symbols;
 
     /// <inheritdoc />
     public bool HasArgumentConverter(Type type) => _argumentConverters.ContainsKey(type);
@@ -104,5 +101,80 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
         return _collectionConverters.GetValueOrDefault((typeof(TElement), typeof(TCollection)))
                    as Converter<IEnumerable<TElement>, TCollection>
                ?? throw new InvalidOperationException($"Collection converter {typeof(TCollection)} not configured.");
+    }
+
+    /// <inheritdoc />
+    public ConversionResult<TValue> TryConvertArgument<TValue>(
+        ICliSymbol symbol, 
+        string argumentValue,
+        List<CommandLineError> errorList)
+    {
+        var converter = GetArgumentConverter<TValue>();
+        try
+        {
+            return new ConversionResult<TValue>(converter(argumentValue), null);
+        }
+        catch (Exception exception)
+        {
+            var error = ArgumentConversionError.Create(
+                symbol,
+                typeof(TValue),
+                argumentValue,
+                HelpOptions.HelpProvider,
+                exception);
+            
+            errorList.Add(error);
+            return new ConversionResult<TValue>(default!, error);
+        }
+    }
+
+    /// <inheritdoc />
+    public ConversionResult<TCollection> TryConvertCollection<TElement, TCollection>(
+        ICliSymbol symbol,
+        IEnumerable<string> argumentValues,
+        List<CommandLineError> errorList)
+        where TCollection : IEnumerable<TElement>
+    {
+        var argumentConverter = GetArgumentConverter<TElement>();
+        var collectionConverter = GetCollectionConverter<TElement, TCollection>();
+        var results = argumentValues
+            .Select(next =>
+            {
+                try
+                {
+                    return (value: argumentConverter(next), error: default(CommandLineError));
+                }
+                catch (Exception exception)
+                {
+                    var error = ArgumentConversionError.Create(
+                        symbol,
+                        typeof(TElement),
+                        next,
+                        HelpOptions.HelpProvider,
+                        exception);
+
+                    return (default!, error);
+                }
+            })
+            .ToArray();
+
+        var errors = results
+            .Where(result => result.error is not null)
+            .Select(result => result.error)
+            .Cast<CommandLineError>()
+            .ToArray();
+
+        if (errors.Length == 0)
+        {
+            return new ConversionResult<TCollection>(
+                collectionConverter(results.Select(result => result.value)),
+                null);
+        }
+
+        errorList.AddRange(errors);
+        
+        return new ConversionResult<TCollection>(
+            collectionConverter([]),
+            new AggregateCommandLineError(errors));
     }
 }

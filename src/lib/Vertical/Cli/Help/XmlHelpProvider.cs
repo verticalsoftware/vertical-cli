@@ -37,9 +37,7 @@ public sealed class XmlHelpProvider : IHelpProvider
         {
             Command command => GetNode(command)?.SelectSingleNode("remarks")?.Value,
             CliSymbol symbol => GetNode(symbol)?.Value,
-            IDirectiveSymbol directive => GetNode(directive)?.Value,
-            UnboundSymbol unbound => GetNode(unbound)?.Value,
-            _ => null
+            _ => GetNode(subject)?.Value
         } ?? subject.GetRemarks();
     }
 
@@ -104,7 +102,7 @@ public sealed class XmlHelpProvider : IHelpProvider
     private XPathNavigator? GetNode(IHelpSubject subject)
     {
         var key = subject.HelpTopicKey;
-        var path = $"/help/topic[@type='{key.TypeId}' and @id='{key.Topic}']";
+        var path = $"/help/topic[@type='{key.TypeId}' and @id='{key.TopicId}']";
         return Navigator.SelectSingleNode(path);
     }
 }
