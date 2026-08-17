@@ -1,12 +1,11 @@
 ﻿using System.Text.RegularExpressions;
-using Vertical.Cli.Conversion;
 
 namespace Vertical.Cli;
 
 /// <summary>
 /// Defines ancillary configuration methods.
 /// </summary>
-public static partial class CommandLineApplicationExtensions
+public static partial class CommandLineApplicationDictionaryConverterExtensions
 {
     /// <summary>
     /// Adds a conversion convention for string dictionaries.
