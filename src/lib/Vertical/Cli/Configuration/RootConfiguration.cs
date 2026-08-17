@@ -48,7 +48,7 @@ internal sealed class RootConfiguration(RootCommand rootCommand) : IRootConfigur
     public MiddlewareDelegate GetMiddlewarePipeline() => MiddlewareBuilder.BuildPipeline();
 
     /// <inheritdoc />
-    public OptionsManager OptionsManager { get; } = new();
+    public ApplicationData ApplicationData { get; } = new();
 
     /// <inheritdoc />
     public IConsole Console { get; set; } = new SystemConsole();

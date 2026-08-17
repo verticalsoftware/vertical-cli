@@ -32,7 +32,7 @@ public interface IRootConfigurationView : IConversionProvider
     /// <summary>
     /// Gets the options manager.
     /// </summary>
-    OptionsManager OptionsManager { get; }
+    ApplicationData ApplicationData { get; }
     
     /// <summary>
     /// Gets the console implementation.

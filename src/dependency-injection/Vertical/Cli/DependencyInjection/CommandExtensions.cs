@@ -25,10 +25,7 @@ public static class CommandExtensions
         {
             command.SetHandlerProvider(context =>
             {
-                var options = context.ApplicationOptions.GetOptions<DependencyInjectionOptions>();
-                var serviceProvider = options
-                    .ServiceCollection
-                    .BuildServiceProvider();
+                var serviceProvider = context.CreateServiceProvider();
 
                 return new ManagedHandlerServiceProvider<TModel>(
                     serviceProvider,
@@ -48,10 +45,7 @@ public static class CommandExtensions
         {
             command.SetHandlerProvider(context =>
             {
-                var options = context.ApplicationOptions.GetOptions<DependencyInjectionOptions>();
-                var serviceProvider = options
-                    .ServiceCollection
-                    .BuildServiceProvider();
+                var serviceProvider = context.CreateServiceProvider();
 
                 return new ManagedHandlerServiceProvider<TModel>(
                     serviceProvider,

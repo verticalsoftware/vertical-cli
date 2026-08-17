@@ -91,9 +91,9 @@ public sealed class XmlHelpProvider : IHelpProvider
     {
         return subject switch
         {
-            CliSymbol { Kind: SymbolKind.Option } option =>
-                GetNode(option)?.GetAttribute(ParameterNameAttribute, namespaceURI: string.Empty)
-                ?? option.GetParameterName(),
+            { Kind: SymbolKind.Option or SymbolKind.Directive } =>
+                GetNode(subject)?.GetAttribute(ParameterNameAttribute, namespaceURI: string.Empty)
+                ?? subject.GetParameterName(),
             
             _ => subject.GetParameterName()
         };

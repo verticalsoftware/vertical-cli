@@ -5,6 +5,7 @@ using Vertical.Cli.Invocation;
 using Vertical.Cli.IO;
 using Vertical.Cli.Middleware;
 using Vertical.Cli.Middleware.Components;
+using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli;
 
@@ -129,29 +130,11 @@ public class CommandLineApplication
         _configuration.OutputFormatter = outputFormatter ?? throw new ArgumentNullException(nameof(outputFormatter));
         return this;
     }
-    
-    /// <summary>
-    /// Configures an options object.
-    /// </summary>
-    /// <param name="configure">An action that manipulates the object.</param>
-    /// <typeparam name="TOptions">Creatable options type</typeparam>
-    /// <returns>A reference to this instance.</returns>
-    public CommandLineApplication ConfigureOptions<TOptions>(Action<TOptions> configure) where TOptions : class, new()
-    {
-        ArgumentNullException.ThrowIfNull(configure);
-        _configuration.OptionsManager.Configure(configure);
-        return this;
-    }
 
     /// <summary>
-    /// Gets a reference to an options object.
+    /// Gets the application's options manager.
     /// </summary>
-    /// <typeparam name="TOptions">Creatable options type.</typeparam>
-    /// <returns>A reference to the single options instance.</returns>
-    public TOptions GetOptions<TOptions>() where TOptions : class, new()
-    {
-        return _configuration.OptionsManager.GetOptions<TOptions>();
-    }
+    public ApplicationData AppData => _configuration.ApplicationData;
 
     /// <summary>
     /// Parse the application's argument array and 

@@ -25,7 +25,7 @@ public class BehaviorTests
         command.SetHandlerService(provider => provider.GetRequiredService<Handler>());
         
         var app = new CommandLineApplication(command);
-        app.Services.AddSingleton<Handler>();
+        app.ConfigureServices(services => services.AddSingleton<Handler>());
         app.ConfigureModel<Options>(builder => builder.SetBinder(_ => new Options()));
 
         (await app.RunAsync([])).ShouldBe(-1);
@@ -38,7 +38,7 @@ public class BehaviorTests
         command.SetHandlerService<Options, Handler>();
 
         var app = new CommandLineApplication(command);
-        app.Services.AddSingleton<Handler>();
+        app.ConfigureServices(services => services.AddSingleton<Handler>());
         app.ConfigureModel<Options>(builder => builder.SetBinder(_ => new Options()));
 
         (await app.RunAsync([])).ShouldBe(-1);

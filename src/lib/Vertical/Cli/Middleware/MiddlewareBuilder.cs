@@ -15,17 +15,6 @@ public sealed class MiddlewareBuilder
     private readonly HashSet<Type> _delegateTypes = [];
     private readonly List<MiddlewareSymbol> _symbols = [];
 
-    private static List<MiddlewareDelegate> DefaultComponents =>
-    [
-        HandleDirectiveSymbolHooksMiddleware.InvokeAsync,
-        HandleMiddlewareSwitchesMiddleware.InvokeAsync,
-        HelpSystemMiddleware.InvokeAsync,
-        DisplayHelpOptionSuggestionMiddleware.InvokeAsync,
-        DisplayInputErrorsMiddleware.InvokeAsync,
-        InjectResponseFileArgumentsMiddleware.InvokeAsync,
-        HandleConsoleCancellationMiddleware.InvokeAsync
-    ];
-
     private MiddlewareBuilder()
     {
     }
@@ -105,7 +94,7 @@ public sealed class MiddlewareBuilder
     public MiddlewareBuilder AddSwitch(
         string identifier,
         AliasList aliasList,
-        Func<InvocationContext, Task<int?>> handler,
+        Func<InvocationContext, Task> handler,
         HelpTopic? helpTopic = null)
     {
         _symbols.Add(new MiddlewareSwitch(identifier, aliasList.GetValues(), handler, helpTopic));

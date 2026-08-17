@@ -30,6 +30,11 @@ public sealed class InvocationContext : IAsyncDisposable
     public bool IsInRoutableState => Errors.Count == 0 && !Result.HasValue;
 
     /// <summary>
+    /// Gets the console abstraction.
+    /// </summary>
+    public IConsole Console => _configuration.Console;
+
+    /// <summary>
     /// Gets the output writer.
     /// </summary>
     public OutputWriter OutputWriter { get; set; }
@@ -37,7 +42,7 @@ public sealed class InvocationContext : IAsyncDisposable
     /// <summary>
     /// Gets the options manager.
     /// </summary>
-    public OptionsManager ApplicationOptions => _configuration.OptionsManager;
+    public ApplicationData AppData => _configuration.ApplicationData;
 
     /// <inheritdoc />
     public ValueTask DisposeAsync()

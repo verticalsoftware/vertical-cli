@@ -90,14 +90,14 @@ app.ConfigureModel<IOptions>(model => model.MapInputStream(
 
 The source generate handles this, but if an application's needs extend beyond what is provided, it can manually provider a model binding. This is a method that receives a `BindingContext<TModel>` and is expected to return the model instance that is provided to the command.
 
-The following illustrates what the source generator would compose for a simple model. Note that when this method is called, the following actions have been completed:
+The following illustrates what the source generator would compose for a simple model. Note that when the binding delegate is called, the following actions have been completed:
 - User input arguments were parsed and paired with their respective bindings.
 - String arguments have been converted to their expected property types.
 - Arity and other input checks have passed.
-- Application defined validations were successfully resolved.
+- Application defined validations passed.
 
 ```csharp
-// Record is used here since this example is bypassing the source generator.
+// Record can be used here since this example is bypassing the source generator.
 public record ConnectionOptions(
     string Server,
     string Database,

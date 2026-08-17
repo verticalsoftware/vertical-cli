@@ -56,7 +56,7 @@
         One or more metadata keys to include in the manifest file.
     </topic>
     
-    <topic type="symbol" id="(Unbound).Version">
+    <topic type="symbol" id="(Switch).Version">
         Displays version information for the application.
     </topic>
     

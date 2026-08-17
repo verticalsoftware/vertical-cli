@@ -14,10 +14,11 @@ public static class InvocationContextExtensions
     /// <returns><see cref="IServiceProvider"/></returns>
     public static IServiceProvider CreateServiceProvider(this InvocationContext context)
     {
-        var options = context
-            .ApplicationOptions
-            .GetOptions<DependencyInjectionOptions>();
+        var options = context.AppData.Configure<DependencyInjectionOptions>();
+        var serviceCollection = options.ServiceCollection;
 
-        return options.ServiceCollection.BuildServiceProvider();
+        options.ConfigurationAction(context, serviceCollection);
+
+        return serviceCollection.BuildServiceProvider();
     }
 }

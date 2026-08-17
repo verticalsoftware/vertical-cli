@@ -28,7 +28,7 @@ app.ConfigureMiddleware(middleware => middleware
         "log-level",
         ([GeneratedConversion] eventInfo) =>
         {
-            eventInfo.Context.ApplicationOptions.Configure<LoggingOptions>(options =>
+            eventInfo.Context.AppData.Configure<LoggingOptions>(options =>
                 options.LogLevel = eventInfo.Value);
             return Task.CompletedTask;
         }));
@@ -80,4 +80,4 @@ app.ConfigureHelp(options =>
 });
 
 app.Configure();
-return await app.RunAsync(["--version"]);
+return await app.RunAsync(args);

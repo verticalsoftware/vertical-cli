@@ -42,7 +42,7 @@ public sealed class ParameterizedMiddlewareDirective<TValue> : MiddlewareSymbol
         : Configuration.ParameterArity.One;
 
     /// <inheritdoc />
-    public override async Task<int?> HandleAsync(InvocationContext context, ArgumentToken token)
+    public override async Task HandleAsync(InvocationContext context, ArgumentToken token)
     {
         switch (token.Value)
         {
@@ -51,28 +51,28 @@ public sealed class ParameterizedMiddlewareDirective<TValue> : MiddlewareSymbol
                     context,
                     _useDefault());
                 await _handler(infoWithValue);
-                return null;
+                return;
             
             case null:
                 context.AddError(MissingParameterError.Create(this, context.Configuration.HelpOptions.HelpProvider));
-                return -1;
+                return;
             
             default:
                 var conversionResult = context.Configuration.TryConvertArgument<TValue>(
                     this, 
                     token.Value, 
                     context.Errors);
-                
+
                 if (!conversionResult.Success)
-                    return -1;
-                
+                    return;
+
                 if (!Validate(context, conversionResult.Value))
-                    return -1;
+                    return;
 
                 await _handler(new ParameterizedMiddlewareDirectiveInfo<TValue>(
                     context,
                     conversionResult.Value));
-                return null;
+                return;
         }
     }
 

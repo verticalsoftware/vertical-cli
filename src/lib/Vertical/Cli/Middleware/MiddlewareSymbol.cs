@@ -30,7 +30,7 @@ public abstract class MiddlewareSymbol : ICliSymbol
     /// <param name="context">The invocation context.</param>
     /// <param name="token">Token matched to the symbol.</param>
     /// <returns>A task that provides an integer result on completion.</returns>
-    public abstract Task<int?> HandleAsync(InvocationContext context, ArgumentToken token);
+    public abstract Task HandleAsync(InvocationContext context, ArgumentToken token);
     
     /// <inheritdoc />
     public HelpTopic? HelpTopic { get; }
@@ -50,7 +50,11 @@ public abstract class MiddlewareSymbol : ICliSymbol
         : string.Join(", ", Aliases);
 
     /// <inheritdoc />
-    public string? GetParameterName() => (HelpTopic as SymbolHelpTopic)?.ParameterSyntax;
+    public string? GetParameterName() => (HelpTopic as SymbolHelpTopic)?.ParameterSyntax ?? DefaultParameterName;
+
+    private string? DefaultParameterName => Kind == SymbolKind.Directive
+        ? "value"
+        : null;
 
     /// <inheritdoc />
     public virtual ParameterArity? ParameterArity => null;

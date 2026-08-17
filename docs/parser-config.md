@@ -2,7 +2,7 @@
 
 ### Overview
 
-Configuring the parser is the processing of informing it what arguments and options are available to the user of the application, and what properties of the options model the parsed values are mapped to.
+Configuring the parser is the processing of informing it what arguments and options are available to the user and what properties of the options model the parsed values are mapped to.
 
 ### Conventions
 
@@ -12,18 +12,18 @@ The argument parser understands the following conventions:
 - _Switches_ are options that are always represented as the value `true`.
 - _Option/switch groups_ are syntatic shortcuts for users where multiple switches and a single option can be combined into one token. For example, `-abc:red` is treated equivalently as input `-a -b -c red`.
 - _Position arguments_ are parameter values whose semantic meaning is inferred by their positions in the input.
-- _Variadic_ arguments are position arguments that can be repeated one or more times. An application can only define one variadic position argument at most for each unique command path. When used with other position arguments, it must be in the last parsing position.
+- _Variadic_ arguments are position arguments that can be indefinately repeated. An application can only define one variadic position argument at most for each unique command path. When used with other position arguments, it must be in the last parsing position.
 - _Directives_ are symbols that invoke applcation functions outside of the command/model framework. The parser recognizes the following pattern for directives: `\[(?<identifier>\w+)([:=](?<parameter>.+))?\]`.
-- _Annotations_ support response files. When a file path is preceded by the `@` character, the tokens in the file are injected into the input.
+- _Annotations_ are paths to response files. When a file path is preceded by the `@` character, the tokens in the file are injected into the input.
 
 ### Configuration
 
 Options, switches, and position arguments are configured by pairing each with a model property and specifying the following characterstics:
-- _Aliases_ identify options and switches and GNU short/long form identifiers. If omitted, the binding property's name in lower/kebab cased form is used (`UserId` becomes `--user-id`).
-- _Ordinal position_ determines what order the parser evaluates position arguments (required).
-- _Default values_ are used in the absence of user input. Provide a default for optional symbols that map to nullable types (or expected `default(T)!` as the mapped value).
-- _Required_ indicates an argument value must be provided, whether by user input or a default value.
-- _Arity_ defines the expected and allowed number of arguments for a multi-valued symbol. An arity with no maximum count is variadic.
+- _Aliases_ identify options and switches with GNU short/long form identifiers. If omitted, the binding property's name in lower/kebab cased form is used (`UserId` becomes `--user-id`).
+- _Ordinal position_ determines what order the parser evaluates position arguments (required). Each position argument requires a unique ordinal position.
+- _Default values_ are used in the absence of user input. Provide a default for optional symbols that map to non-nullable types (or expect `default(T)!` as the mapped value).
+- _Required_ indicates whether an option with a parameter value or position argument must be provided, whether by user input or a default value.
+- _Arity_ defines the expected and allowed number of uages for a multi-valued option or position argument. An arity with no maximum constraint is variadic.
 - Input values can be _validated_ using contextual evaluation.
 - A _help topic_ provides information to the user for the option or argument.
 
@@ -68,7 +68,7 @@ app.ConfigureParser<IUploadOptions>(parser => parser
 
 The parser will automatically convert and set the following property types:
 - Types that implement `IParsable<T>` or `IParsable<T?>`. This covers `System` primitives and their nullable value-type variants.
-- Enums/nullable enums using case-insensitive matching.
+- `Enum`/`Enum?` valur types parsed using case-insensitive matching.
 - `string`, `FileInfo`, `DirectoryInfo`, and `Uri`.
 
 Additionally, the parser can set the following multi-value property types:
@@ -80,12 +80,12 @@ Additionally, the parser can set the following multi-value property types:
 ### Variadic arugment limitations
 
 When the maxium arity of a multi-valued symbol is undefined, it is considered variadic. The parser places the following constraints on their use:
-- A command model may only have one variadic symbol defined
+- A final command model may only have one variadic symbol defined or inherited.
 - When multiple position arguments are used in conjunction with a variadic argument, the variadic argument must have the highest ordinal position in relation to the other arguments.
 
 ### Custom value conversion
 
-For each model property, the parser ultimately convert a `string` to the expected type. In the case of mutli-valued properties that are backed by arrays or collections, the parser must then convert the value types into collections of value types.
+For each model property, the parser converts a `string` to the expected type. In the case of mutli-valued properties that are backed by arrays or collections, the parser must then convert enumerations of the values into collections of the value type.
 
 For scalar value types, conversion can be implemented on a type in one of two ways:
 - Implement `IParsable<T>` on the scalar type. The source generator will automatically configure the conversion service for the target type.
@@ -110,17 +110,20 @@ interface IOptions
 app.ConfigureParser<IOptions>(parser => parser
     .AddRepeatableOption<
         KeyValuePair<string, string>,
-        IReadOnlyDictionary<string, string>(
+        IReadOnlyDictionary<string, string>>(
             x => x.Properties,
             aliases: "--prop",
             arity: Arity.ZeroOrMore,
-            useDefault: new Dictionary<string, string>(),
-            helpTopic: "A key/value pair property"));
+            helpTopic: "A key/value pair property, e.g. --prop user:sa"));
 
 // Convert from string argument to key/value pair
+var app = new CommandLineApplication(rootCommand);
+
+// Adds parser support for KeyValuePair<string, string>. Alternatively, the
+// regular expression could be wrapped into the collection converter.
 app.AddArgumentConverter(str => 
 {
-    if (Regex.Match(str, @"(?<key>\w+)[:=](?<value>.+") is not { Success: true } match)
+    if (Regex.Match(str, @"(?<key>\w+)[:=](?<value>.+)") is not { Success: true } match)
         throw new ArgumentException("invalid key/value pair format.");
     
     return new KeyValuePair<string, string>(
@@ -128,9 +131,19 @@ app.AddArgumentConverter(str =>
         match.Groups["value"].Value);
 });
 
-// Create dictionary with key/value pairs. Note the collection type
-// must match the interface's property type
+// Create the dictionary with key/value pairs. Note the collection type
+// must match the interface's property type so the converter can be
+// located.
 app.AddCollectionConverter<
     KeyValuePair<string, string>, 
-    IReadOnlyDictionary<string, string>>(keyValuePairs => new Dictionary(keyValuePairs));
+    IReadOnlyDictionary<string, string>>(entries => 
+    {
+        var dictionary = new Dictionary<string, string>();
+        foreach (var kv in entries)
+        {
+            if (dictionary.TryAdd(kv.Key, kv.Valeu)) continue;
+            throw new ArgumentException($"duplicate key '{kv.Key}'.");
+        }
+        return dictionary;
+    };
 ```

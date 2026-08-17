@@ -3,6 +3,9 @@
   <Folder Name="/examples/basic/">
     <Project Path="examples/basic/BasicDemo.csproj" />
   </Folder>
+  <Folder Name="/examples/middleware/">
+    <Project Path="examples/middleware/MiddlewareDemo.csproj" />
+  </Folder>
   <Folder Name="/src/" />
   <Folder Name="/src/dependency-injection/">
     <Project Path="src/dependency-injection/Vertical.Cli.DependencyInjection.csproj" />

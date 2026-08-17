@@ -10,13 +10,13 @@ namespace Vertical.Cli.Middleware;
 /// </summary>
 public sealed class MiddlewareSwitch : MiddlewareSymbol
 {
-    private readonly Func<InvocationContext, Task<int?>> _handler;
+    private readonly Func<InvocationContext, Task> _handler;
 
     /// <inheritdoc />
     public MiddlewareSwitch(
         string identifier, 
         string[] aliases, 
-        Func<InvocationContext, Task<int?>> handler,
+        Func<InvocationContext, Task> handler,
         HelpTopic? helpTopic) 
         : base(SymbolKind.Switch, identifier, aliases, parameterType: null,  helpTopic)
     {
@@ -27,8 +27,8 @@ public sealed class MiddlewareSwitch : MiddlewareSymbol
     }
 
     /// <inheritdoc />
-    public override Task<int?> HandleAsync(InvocationContext context, ArgumentToken _)
+    public override async Task HandleAsync(InvocationContext context, ArgumentToken _)
     {
-        return _handler(context);
+        await _handler(context);
     }
 }

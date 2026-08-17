@@ -4,6 +4,7 @@ using Vertical.Cli.Diagnostics;
 using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
 using Vertical.Cli.Parsing;
+using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Binding;
 
@@ -40,14 +41,11 @@ public sealed class PropertyBindingInfo
     /// Gets the parse result.
     /// </summary>
     public required ParseResult ParseResult { get; init; }
-    
+
     /// <summary>
-    /// Gets application defined options.
+    /// Gets a read view of the application's options.
     /// </summary>
-    /// <typeparam name="TOptions">Options type.</typeparam>
-    /// <returns>The singleton options instance.</returns>
-    public TOptions GetOptions<TOptions>() where TOptions : class, new()  => 
-        _configuration.OptionsManager.GetOptions<TOptions>();
+    public ApplicationData AppData => _configuration.ApplicationData;
     
     /// <summary>
     /// Gets the console abstraction input text reader.

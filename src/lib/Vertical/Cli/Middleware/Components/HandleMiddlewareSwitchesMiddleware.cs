@@ -8,14 +8,16 @@ internal static class HandleMiddlewareSwitchesMiddleware
 {
     public static async Task InvokeAsync(InvocationContext context, Func<InvocationContext, Task> next)
     {
-        await HandleInternalAsync(context);
+        if (await HandleInternalAsync(context))
+            return;
+        
         await next(context);
     }
 
-    private static async Task HandleInternalAsync(InvocationContext context)
+    private static async Task<bool> HandleInternalAsync(InvocationContext context)
     {
         var token = context.TokenList.First;
-        if (token is null) return;
+        if (token is null) return false;
 
         var switches = context
             .Configuration
@@ -23,7 +25,7 @@ internal static class HandleMiddlewareSwitchesMiddleware
             .Where(symbol => symbol.Kind == SymbolKind.Switch)
             .ToArray();
 
-        if (switches.Length == 0) return;
+        if (switches.Length == 0) return false;
 
         for (; token is { Kind: not TokenKind.OptionsTerminator }; token = token.Next)
         {
@@ -34,9 +36,11 @@ internal static class HandleMiddlewareSwitchesMiddleware
             if (matchedSwitch is null)
                 continue;
 
-            var result = await matchedSwitch.HandleAsync(context, token);
-            context.Result = result ?? 0;
-            return;
+            await matchedSwitch.HandleAsync(context, token);
+            context.Result = 0;
+            return true;
         }
+
+        return false;
     }
 }

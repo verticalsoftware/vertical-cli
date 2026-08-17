@@ -4,9 +4,9 @@
 
 The [vertical-cli-dependencyinjection](https://www.nuget.org/packages/vertical-cli-dependencyinjection/) extends the functionality of the base library with dependency injection support. Several notable things are introduced by the package:
 
-- The `CommandLineApplication` class gets an extension property named `Services` which defines an `IServiceCollection`. Applications register their services to this collection.
+- The `CommandLineApplication` class gets an extension method named `ConfigureServices`, which registers a delegate that receives the invocation context and the service collection.
 - The `Command` class gets two extension `SetHandlerService` methods that can be used to instruct the framework to resolve `IHandler<TModel>` implementations for commands from a service provider.
-- The `InvocationContext` class gets a `BuildServiceProvider()` extension method.
+- The `InvocationContext` class gets a `BuildServiceProvider()` extension method. Application's don't need to use this unless they need the service provider in a middleware component.
 
 ### Using services for command handlers
 
@@ -36,13 +36,15 @@ var rootCommand = new RootCommand("app");
 rootCommand.SetHandlerService<IOptions, MyAppHandler>();
 
 var app = new CommandLineApplication(rootCommand);
-var services = app.Services;
 
-// Register the handler type
-services.AddSingleton<MyAppHandler>();
-
-// Register other applications services...
-services.AddLogging();
+app.ConfigureSevices((context, services) => 
+    {
+        // Register the handler type
+        services.AddSingleton<MyAppHandler>();
+        
+        // Register other application services...
+        services.AddLogging();
+    });
 
 app.Configure();
 return await app.RunAsync(args);

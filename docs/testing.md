@@ -8,7 +8,7 @@ By default, when an application invokes `CommandLineApplication.RunAsync(args)`,
 - A type was detected that has no argument converter
 - Variadic position arguments were misused
 
-The configuration check is verbose, and involves constructing symbol sets for each invokable command. Conversely at runtime, only a single symbol set is constructued based on the command the user selected.
+The configuration check is verbose and involves constructing symbol sets for each invokable command as opposed to at runtime, only a single symbol set is constructued based on the command the user selected.
 
 ### Unit testing the configuration
 
@@ -56,7 +56,7 @@ public class ApplicationConfigurationTest
 
 ### Disabling configuration checks during runtime
 
-If your application asserts the configuration in a unit test, then repeating the checks becomes redundant. Disable configuration checks during runtime using a module initializer.
+If your application asserts the configuration in a unit test, then repeating the checks becomes redundant. Disable configuration checks during runtime using a module initializer or setting the property shown below before calling `RunAsync()`.
 
 ```csharp
 [ModuleInitializer]
