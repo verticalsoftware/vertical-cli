@@ -1,6 +1,4 @@
-﻿using Vertical.Cli.Diagnostics;
-
-namespace Vertical.Cli.Configuration.Assertion.Types;
+﻿namespace Vertical.Cli.Configuration.Assertion.Types;
 
 /// <summary>
 /// Indicates a command aggregate model has a variadic argument that is not in the last

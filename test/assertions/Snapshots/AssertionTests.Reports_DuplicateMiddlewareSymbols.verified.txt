@@ -1,0 +1,4 @@
+﻿Middleware configuration::
+  Middleware identifier '--help' used across multiple symbols:
+    Middleware switch --help (system kind=None)
+    Middleware switch --help, -? (system kind=Help)

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
+﻿using Shouldly;
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Invocation;
 

@@ -1,5 +1,4 @@
-﻿using Vertical.Cli.Diagnostics;
-using Vertical.Cli.Invocation;
+﻿using Vertical.Cli.Invocation;
 using Vertical.Cli.IO;
 
 namespace Vertical.Cli.Middleware.Components;

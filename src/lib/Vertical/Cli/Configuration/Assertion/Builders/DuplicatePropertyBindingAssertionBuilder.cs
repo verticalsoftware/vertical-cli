@@ -16,7 +16,7 @@ internal sealed class DuplicatePropertyBindingAssertionBuilder : IAssertionBuild
     private static void FindDuplicateBindings(AssertionContext context, Command command)
     {
         var bindings = context
-            .GetModelConfiguration(command.ModelType!)
+            .GetModelConfiguration(command)
             .BindingSources;
 
         var duplicates = bindings

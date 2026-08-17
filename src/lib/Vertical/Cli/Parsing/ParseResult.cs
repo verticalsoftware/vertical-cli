@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Vertical.Cli.Configuration;
+﻿using Vertical.Cli.Configuration;
 using Vertical.Cli.Diagnostics;
 
 namespace Vertical.Cli.Parsing;

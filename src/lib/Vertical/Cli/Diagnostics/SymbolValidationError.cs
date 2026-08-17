@@ -1,5 +1,4 @@
-﻿using Vertical.Cli.Configuration;
-using Vertical.Cli.Help;
+﻿using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
 
 namespace Vertical.Cli.Diagnostics;

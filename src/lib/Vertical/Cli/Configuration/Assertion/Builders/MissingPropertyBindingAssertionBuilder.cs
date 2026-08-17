@@ -15,8 +15,8 @@ internal sealed class MissingPropertyBindingAssertionBuilder : IAssertionBuilder
 
     private static void ValidatePropertyBindings(AssertionContext context, Command command)
     {
-        var modelType = command.ModelType!;
-        var configuration = context.GetModelConfiguration(modelType);
+        var configuration = context.GetModelConfiguration(command);
+        var modelType = configuration.ModelType;
         var properties = modelType.GetProperties();
         var boundPropertyNames = configuration
             .BindingSources

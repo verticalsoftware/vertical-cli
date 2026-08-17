@@ -13,6 +13,7 @@ internal static class AssertionFramework
         new DeadEndCommandAssertionBuilder(),
         new DuplicateAliasAssertionBuilder(),
         new DuplicateCommandNameAssertionBuilder(),
+        new DuplicateMiddlewareIdentifierAssertionBuilder(),
         new DuplicatePropertyBindingAssertionBuilder(),
         new MissingConverterAssertionBuilder(),
         new MissingModelBinderAssertionBuilder(),

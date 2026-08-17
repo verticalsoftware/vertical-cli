@@ -1,6 +1,4 @@
-﻿using Vertical.Cli.Diagnostics;
-
-namespace Vertical.Cli.Configuration.Assertion.Types;
+﻿namespace Vertical.Cli.Configuration.Assertion.Types;
 
 /// <summary>
 /// Indicates two or more position arguments share the same ordinal position property.

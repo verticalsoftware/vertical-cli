@@ -11,13 +11,14 @@ namespace Vertical.Cli.Middleware;
 /// </summary>
 public sealed class MiddlewareBuilder
 {
-    private readonly List<MiddlewareDelegate> _middleware;
+    private readonly List<MiddlewareDelegate> _middleware = [];
+    private readonly HashSet<Type> _delegateTypes = [];
     private readonly List<MiddlewareSymbol> _symbols = [];
 
     private static List<MiddlewareDelegate> DefaultComponents =>
     [
-        HandleMiddlewareSwitchesMiddleware.InvokeAsync,
         HandleDirectiveSymbolHooksMiddleware.InvokeAsync,
+        HandleMiddlewareSwitchesMiddleware.InvokeAsync,
         HelpSystemMiddleware.InvokeAsync,
         DisplayHelpOptionSuggestionMiddleware.InvokeAsync,
         DisplayInputErrorsMiddleware.InvokeAsync,
@@ -25,9 +26,8 @@ public sealed class MiddlewareBuilder
         HandleConsoleCancellationMiddleware.InvokeAsync
     ];
 
-    private MiddlewareBuilder(List<MiddlewareDelegate> middleware)
+    private MiddlewareBuilder()
     {
-        _middleware = middleware;
     }
 
     internal MiddlewareDelegate BuildPipeline() => _middleware
@@ -36,12 +36,21 @@ public sealed class MiddlewareBuilder
                 first(context, ctx => second(ctx, next)));
 
     internal IReadOnlyList<MiddlewareSymbol> Symbols => _symbols;
-    
+
     /// <summary>
     /// Creates an instance of the <see cref="MiddlewareBuilder"/> class with the default components.
     /// </summary>
     /// <returns>A reference to this instance.</returns>
-    public static MiddlewareBuilder CreateDefault() => new(DefaultComponents);
+    public static MiddlewareBuilder CreateDefault() => new MiddlewareBuilder()
+        .HandleDirectives()
+        .HandleSwitches()
+        .DisplayHelpArticles()
+        .DisplayHelpOptionSuggestion()
+        .DisplayInputErrors()
+        .InjectResponseFileArguments()
+        .HandleConsoleCancellation();
+
+    internal bool IsRegistered(Type type) => _delegateTypes.Contains(type);
 
     /// <summary>
     /// Adds a directive.
@@ -110,50 +119,67 @@ public sealed class MiddlewareBuilder
     public MiddlewareBuilder Clear()
     {
         _middleware.Clear();
+        _delegateTypes.Clear();
         return this;
     }
 
     /// <summary>
     /// Adds middleware that evaluates directive tokens matched in the token list.
     /// </summary>
-    public MiddlewareBuilder HandleDirectives => AddLast(HandleDirectiveSymbolHooksMiddleware.InvokeAsync);
+    public MiddlewareBuilder HandleDirectives() => AddLast(
+        HandleDirectiveSymbolHooksMiddleware.InvokeAsync,
+        typeof(HandleDirectiveSymbolHooksMiddleware));
 
     /// <summary>
-    /// Adds middleware that evaluates command symbols matched in the token list.
+    /// Adds middleware that evaluates global switch symbols matched in the token list.
     /// </summary>
-    public MiddlewareBuilder HandleCommandSymbols => AddLast(HandleMiddlewareSwitchesMiddleware.InvokeAsync);
+    public MiddlewareBuilder HandleSwitches() => AddLast(
+        HandleMiddlewareSwitchesMiddleware.InvokeAsync,
+        typeof(HandleMiddlewareSwitchesMiddleware));
 
     /// <summary>
     /// Adds middleware that displays help articles when the help option is invoked on a command.
     /// </summary>
-    public MiddlewareBuilder DisplayHelpArticles => AddLast(HelpSystemMiddleware.InvokeAsync);
+    public MiddlewareBuilder DisplayHelpArticles() => AddLast(
+        HelpSystemMiddleware.InvokeAsync,
+        typeof(HelpSystemMiddleware));
     
     /// <summary>
     /// Adds middleware that listens for SIGTERM and SIGINT and invokes the internal
     /// cancellation source.
     /// </summary>
-    public MiddlewareBuilder HandleConsoleCancellation => AddLast(HandleConsoleCancellationMiddleware.InvokeAsync);
+    public MiddlewareBuilder HandleConsoleCancellation() => AddLast(
+        HandleConsoleCancellationMiddleware.InvokeAsync,
+        typeof(HandleConsoleCancellationMiddleware));
 
     /// <summary>
     /// Adds middleware that display input errors to the output.
     /// </summary>
-    public MiddlewareBuilder DisplayInputErrors => AddLast(DisplayInputErrorsMiddleware.InvokeAsync);
+    public MiddlewareBuilder DisplayInputErrors() => AddLast(
+        DisplayInputErrorsMiddleware.InvokeAsync,
+        typeof(DisplayInputErrorsMiddleware));
 
     /// <summary>
     /// Adds middleware that catches and displays application exceptions.
     /// </summary>
-    public MiddlewareBuilder DisplayApplicationExceptions => AddLast(DisplayApplicationExceptionsMiddleware.InvokeAsync);
+    public MiddlewareBuilder DisplayApplicationExceptions() => AddLast(
+        DisplayApplicationExceptionsMiddleware.InvokeAsync,
+        typeof(DisplayApplicationExceptionsMiddleware));
 
     /// <summary>
     /// Adds middleware that will inject arguments read from a response file stream to the token list.
     /// </summary>
-    public MiddlewareBuilder InjectResponseFileArguments => AddLast(InjectResponseFileArgumentsMiddleware.InvokeAsync);
+    public MiddlewareBuilder InjectResponseFileArguments() => AddLast(
+        InjectResponseFileArgumentsMiddleware.InvokeAsync,
+        typeof(InjectResponseFileArgumentsMiddleware));
 
     /// <summary>
     /// Adds middleware that will display a suggestion to consult the help system for the target command
     /// when input errors are detected.
     /// </summary>
-    public MiddlewareBuilder DisplayHelpOptionSuggestion => AddLast(DisplayHelpOptionSuggestionMiddleware.InvokeAsync);
+    public MiddlewareBuilder DisplayHelpOptionSuggestion() => AddLast(
+        DisplayHelpOptionSuggestionMiddleware.InvokeAsync,
+        typeof(DisplayHelpOptionSuggestionMiddleware));
 
     /// <summary>
     /// Adds a component to the start of the middleware pipeline.
@@ -176,6 +202,13 @@ public sealed class MiddlewareBuilder
     {
         ArgumentNullException.ThrowIfNull(middleware);
         _middleware.Add(middleware);
+        return this;
+    }
+
+    private MiddlewareBuilder AddLast(MiddlewareDelegate middleware, Type type)
+    {
+        _middleware.Add(middleware);
+        _delegateTypes.Add(type);
         return this;
     }
 }

@@ -24,7 +24,7 @@ public class CommandLineApplication
         ArgumentNullException.ThrowIfNull(rootCommand);
         _configuration = new RootConfiguration(rootCommand);
     }
-
+ 
     internal IRootConfigurationView GetConfiguration() => _configuration;
 
     /// <summary>
@@ -158,10 +158,13 @@ public class CommandLineApplication
     /// </summary>
     /// <param name="args">The application's input arguments.</param>
     /// <returns>The result code to return.</returns>
-    public async Task<int> RunAsync(string[] args)
+    public virtual async Task<int> RunAsync(string[] args)
     {
-        this.AssertConfiguration();
-        
+        if (AssertionContext.Enabled)
+        {
+            this.AssertConfiguration();
+        }
+
         await using var context = new InvocationContext(_configuration, args);
 
         var middlewarePipeline = _configuration

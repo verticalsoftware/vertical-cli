@@ -1,5 +1,4 @@
 ﻿using Vertical.Cli.Configuration;
-using Vertical.Cli.Conversion;
 using Vertical.Cli.Diagnostics;
 
 namespace Vertical.Cli.Binding;

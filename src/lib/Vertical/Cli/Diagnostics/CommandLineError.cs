@@ -1,7 +1,6 @@
 ﻿using Vertical.Cli.Configuration;
 using Vertical.Cli.Help;
 using Vertical.Cli.IO;
-using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Diagnostics;
 

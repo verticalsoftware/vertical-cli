@@ -1,6 +1,4 @@
 ﻿using Vertical.Cli.Help;
-using Vertical.Cli.Invocation;
-using Vertical.Cli.Parsing;
 
 namespace Vertical.Cli.Configuration;
 

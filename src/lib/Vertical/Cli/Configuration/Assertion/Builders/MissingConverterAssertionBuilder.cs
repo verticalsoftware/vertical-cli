@@ -11,7 +11,7 @@ internal sealed class MissingConverterAssertionBuilder : IAssertionBuilder
     {
         var propertyTypes = context
             .CallSites
-            .Select(command => context.GetModelConfiguration(command.ModelType!))
+            .Select(context.GetModelConfiguration)
             .SelectMany(configuration => configuration
                 .BindingSources
                 .Select(source => source.ValueType))

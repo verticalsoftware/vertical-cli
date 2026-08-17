@@ -37,6 +37,43 @@ public class AssertionTests
 
         app.GetConfigurationAssertions().ShouldBeEmpty();
     }
+
+    [Fact]
+    public Task Reports_DuplicateMiddlewareSymbols_Across_Commands()
+    {
+        var root = new RootCommand("app");
+        root.SetHandler<IModel>((_,_) => Task.FromResult(0));
+
+        var app = new CommandLineApplication(root);
+        app.ConfigureParser<IModel>(parser => parser
+            .ParseOption(x => x.Option, "--help")
+            .ParseRepeatableArgument(x => x.Options, ordinalPosition: 0, arity: Arity.One)
+            .ParseRepeatableArgument(x => x.Options2, ordinalPosition: 1,  arity: Arity.One)
+            .SetBinder(_ => Substitute.For<IModel>()));
+        app.AddArgumentConverter(Converters.Default);
+        app.AddCollectionConverter<string, string[]>(values => values.ToArray());
+
+        return Verify(ConfigurationAssertion.GetAssertionsAsText(app.GetConfigurationAssertions()));
+    }
+    
+    [Fact]
+    public Task Reports_DuplicateMiddlewareSymbols()
+    {
+        var root = new RootCommand("app");
+        root.SetHandler<IModel>((_,_) => Task.FromResult(0));
+
+        var app = new CommandLineApplication(root);
+        app.ConfigureParser<IModel>(parser => parser
+            .ParseOption(x => x.Option)
+            .ParseRepeatableArgument(x => x.Options, ordinalPosition: 0, arity: Arity.One)
+            .ParseRepeatableArgument(x => x.Options2, ordinalPosition: 1,  arity: Arity.One)
+            .SetBinder(_ => Substitute.For<IModel>()));
+        app.AddArgumentConverter(Converters.Default);
+        app.AddCollectionConverter<string, string[]>(values => values.ToArray());
+        app.ConfigureMiddleware(mw => mw.AddSwitch("Help2", "--help", _ => Task.FromResult<int?>(0)));
+
+        return Verify(ConfigurationAssertion.GetAssertionsAsText(app.GetConfigurationAssertions()));
+    }
     
     [Fact]
     public Task Reports_ArgumentOrdinalPositionAssertion()

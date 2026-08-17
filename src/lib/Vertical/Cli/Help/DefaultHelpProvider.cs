@@ -1,5 +1,4 @@
 ﻿using Vertical.Cli.Configuration;
-using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Help;
 

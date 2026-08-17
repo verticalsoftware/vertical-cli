@@ -1,6 +1,5 @@
 ﻿using Vertical.Cli.Configuration;
 using Vertical.Cli.IO;
-using Vertical.Cli.Middleware;
 
 namespace Vertical.Cli.Help;
 

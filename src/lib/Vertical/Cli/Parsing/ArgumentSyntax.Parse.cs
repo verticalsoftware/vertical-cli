@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Vertical.Cli.Diagnostics;
 
 namespace Vertical.Cli.Parsing;
 

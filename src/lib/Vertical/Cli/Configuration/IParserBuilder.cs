@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using Vertical.Cli.Binding;
 using Vertical.Cli.Help;
 using Vertical.Cli.Validation;
 

@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Configuration.Assertion.Types;
+using Vertical.Cli.Middleware;
 using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Configuration.Assertion;
@@ -10,7 +11,9 @@ public sealed class AssertionContext
 {
     private readonly Dictionary<Type, ModelConfiguration> _cachedModelConfigurations = [];
     private readonly Dictionary<Command, ILookup<SymbolKind, ICliSymbol>> _cachedSymbols = [];
-    
+    private readonly ModelConfiguration _emptyConfiguration = new(typeof(AssertionContext));
+    private readonly ILookup<string, MiddlewareSymbol> _middlewareSymbolIdentifiers;
+
     internal AssertionContext(CommandLineApplication application)
     {
         Application = application;
@@ -21,12 +24,30 @@ public sealed class AssertionContext
             .GetMiddlewareSymbols()
             .Where(symbol => symbol.Kind == SymbolKind.Directive)
             .ToArray();
+
+        _middlewareSymbolIdentifiers = Configuration
+            .GetMiddlewareSymbols()
+            .Append(Configuration.HelpOptions.CreateHelpSwitch())
+            .SelectMany(symbol => (symbol.Kind == SymbolKind.Directive ? [symbol.Identifier] : symbol.Aliases)
+                .Select(identifier => (identifier, symbol)))
+            .ToLookup(t => t.identifier, t => t.symbol);
     }
+
+    /// <summary>
+    /// Gets or sets whether assertions are enabled.
+    /// </summary>
+    public static bool Enabled { get; set; } = true;
 
     /// <summary>
     /// Gets the configuration's directives.
     /// </summary>
     public IReadOnlyList<ICliSymbol> Directives { get; set; }
+
+    /// <summary>
+    /// Gets an identifier lookup for middleware symbols.
+    /// </summary>
+    /// <returns></returns>
+    public ILookup<string, MiddlewareSymbol> GetMiddlewareIdentifierLookup() => _middlewareSymbolIdentifiers;
 
     /// <summary>
     /// Gets the command call sites.
@@ -54,13 +75,16 @@ public sealed class AssertionContext
     public CommandLineApplication Application { get; }
 
     /// <summary>
-    /// Gets a model configuration.
+    /// Gets a model configuration, or returns an empty instance if command does not
+    /// define a call site.
     /// </summary>
-    /// <param name="modelType">The model type.</param>
+    /// <param name="command">The command.</param>
     /// <returns><see cref="ModelConfiguration"/></returns>
-    public ModelConfiguration GetModelConfiguration(Type modelType)
+    public ModelConfiguration GetModelConfiguration(Command command)
     {
-        return _cachedModelConfigurations.GetOrAdd(modelType, () => Configuration.GetModelConfiguration(modelType));
+        return command.ModelType is { } type
+            ? GetModelConfiguration(type)
+            : _emptyConfiguration;
     }
 
     /// <summary>
@@ -69,7 +93,7 @@ public sealed class AssertionContext
     /// <param name="command">The command to get position arguments of.</param>
     /// <returns>Enumeration of <see cref="CliSymbol"/></returns>
     public IEnumerable<CliSymbol> GetPositionArguments(Command command) =>
-        GetSymbolLookup(Configuration, command)[SymbolKind.PositionArgument]
+        GetSymbolLookup(command)[SymbolKind.PositionArgument]
             .Cast<CliSymbol>();
 
     /// <summary>
@@ -79,8 +103,20 @@ public sealed class AssertionContext
     /// <returns>Enumeration of <see cref="CliSymbol"/></returns>
     public IEnumerable<ICliSymbol> GetNamedSymbols(Command command)
     {
-        var symbols = GetSymbolLookup(Configuration, command);
+        var symbols = GetSymbolLookup(command);
         return symbols[SymbolKind.Option].Concat(symbols[SymbolKind.Switch]);
+    }
+
+    /// <summary>
+    /// Gets all defined middleware symbols (include the system help option).
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<ICliSymbol> GetMiddlewareSymbols()
+    {
+        return Configuration
+            .GetMiddlewareSymbols()
+            .Cast<ICliSymbol>()
+            .Append(Configuration.HelpOptions.CreateHelpSwitch());
     }
 
     /// <summary>
@@ -90,12 +126,11 @@ public sealed class AssertionContext
     /// <returns>An enumeration of <see cref="CliSymbol"/> objects.</returns>
     public IEnumerable<ICliSymbol> GetSymbols(Command command)
     {
-        var symbols = GetSymbolLookup(Configuration, command);
+        var symbols = GetSymbolLookup(command);
         return symbols.SelectMany(grouping => grouping);
     }
 
     private ILookup<SymbolKind, ICliSymbol> GetSymbolLookup(
-        IRootConfigurationView configuration,
         Command command)
     {
         return _cachedSymbols.GetOrAdd(
@@ -104,8 +139,6 @@ public sealed class AssertionContext
                 .BindingSources
                 .OfType<CliSymbol>()
                 .Cast<ICliSymbol>()
-                .Concat(configuration.GetMiddlewareSymbols())
-                .Append(Configuration.HelpOptions.CreateHelpSwitch())
                 .ToLookup(symbol => symbol.Kind));
     }
 
@@ -117,5 +150,15 @@ public sealed class AssertionContext
             .SubCommands
             .SelectMany(Enumerate)
             .Append(command);
+    }
+
+    /// <summary>
+    /// Gets a model configuration.
+    /// </summary>
+    /// <param name="modelType">The model type.</param>
+    /// <returns><see cref="ModelConfiguration"/></returns>
+    private ModelConfiguration GetModelConfiguration(Type modelType)
+    {
+        return _cachedModelConfigurations.GetOrAdd(modelType, () => Configuration.GetModelConfiguration(modelType));
     }
 }

@@ -25,7 +25,7 @@ public static class AssertionDescriptor
             ICliSymbol { Kind: SymbolKind.Directive } directive => 
                 $"Directive {string.Join(", ", directive.Aliases)}",
             
-            ICliSymbol { Kind: SymbolKind.Switch } mwSwitch => $"Middleware switch {string.Join(", ", mwSwitch.Aliases)}",
+            ICliSymbol { Kind: SymbolKind.Switch } mwSwitch => $"Middleware switch {string.Join(", ", mwSwitch.Aliases)} (system kind={mwSwitch.SystemKind})",
             
             IBindingSource binding => $"({symbol.GetType().Name} <{binding.ModelType.Name}, {binding.ValueType.Name}:{binding.BindingName}>)",
             

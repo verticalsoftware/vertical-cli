@@ -18,7 +18,7 @@ internal sealed class MissingModelBinderAssertionBuilder : IAssertionBuilder
         if (!command.CanCreateCallSite)
             return;
 
-        if (context.GetModelConfiguration(command.ModelType!) is { HasModelBinder: true })
+        if (context.GetModelConfiguration(command!) is { HasModelBinder: true })
             return;
         
         context.Assertions.Add(new MissingModelBinderAssertion(command.ModelType!));

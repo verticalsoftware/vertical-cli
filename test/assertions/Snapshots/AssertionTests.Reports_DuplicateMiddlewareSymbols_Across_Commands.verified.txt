@@ -1,0 +1,4 @@
+﻿Command 'app':
+  Alias '--help' used across multiple symbols:
+    <IModel, String:Option> Option --help
+    Middleware switch --help, -? (system kind=Help)
