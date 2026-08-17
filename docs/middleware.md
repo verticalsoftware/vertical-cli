@@ -28,7 +28,7 @@ The following middleware actions are configured by default (in order):
 - Parse and inject argument tokens found in files identified by annotation tokens, then call the next middleware.
 - Add cancellation actions for `SIGTERM` and `SIGINT` signals, then call the next middleware. 
 
-The final middleware builds the parse result and invokes the command handler and cannot be removed.
+The final middleware builds the parse result and invokes the command handler.
 
 ### Customizing pre-processing with middleware
 

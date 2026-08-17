@@ -68,11 +68,18 @@ The following illustrates the schema of an `xml` help resource file:
         Remarks... 
     </topic>
     
-    <topic type="symbol" id="(Unbound).<Identifier>">
+    <!-- middleware switches -->
+    <topic type="symbol" id="(Switch).<Identifier>">
         Remarks...
     </topic>
-    
+
+    <!-- middleware directives -->    
     <topic type="symbol" id="(Directive).<identiier>>" parameter-name="parameter-name">
+        Remarks...
+    </topic>
+
+    <!-- the system's help symbol -->
+    <topic type="symbol" id="(Switch).Help">
         Remarks...
     </topic>
 </help>

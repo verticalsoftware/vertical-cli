@@ -68,7 +68,7 @@ app.ConfigureParser<IUploadOptions>(parser => parser
 
 The parser will automatically convert and set the following property types:
 - Types that implement `IParsable<T>` or `IParsable<T?>`. This covers `System` primitives and their nullable value-type variants.
-- `Enum`/`Enum?` valur types parsed using case-insensitive matching.
+- `Enum`/`Enum?` value types parsed using case-insensitive matching.
 - `string`, `FileInfo`, `DirectoryInfo`, and `Uri`.
 
 Additionally, the parser can set the following multi-value property types:
@@ -95,7 +95,7 @@ For collection types, conversion can be implemented by registering a `Converter<
 - `TElement` is the scalar value type.
 - `TCollection` is the collection type that implements `IEnumerable<TElement>`.
 
-In both types of implementation, applications should throw an exception if the conversion complete.
+In either implementation, applications should throw an exception if the conversion cannot complete.
 
 The following example demonstrates how to bind argument values to a dictionary:
 

@@ -51,12 +51,13 @@ public class ApplicationConfigurationTest
         var app = new MyCommandLineApplication();
         app.AssertConfiguration();
     }
+    
 }
 ```
 
 ### Disabling configuration checks during runtime
 
-If your application asserts the configuration in a unit test, then repeating the checks becomes redundant. Disable configuration checks during runtime using a module initializer or setting the property shown below before calling `RunAsync()`.
+If your application asserts the configuration in a unit test, then repeating the checks at runtime becomes redundant. Disable configuration checks during runtime using a module initializer or setting the property shown below before calling `RunAsync()`.
 
 ```csharp
 [ModuleInitializer]
@@ -64,4 +65,45 @@ static void Initialize()
 {
     AssertionContext.Enabled = false;
 }
+```
+
+### Abstracing the console
+
+When the framework writes error messages or help files, it does so by using a console abstraction API. During normal operation, the abstraction simply wraps `System.Console`, but for unit testing, it may be helpful to capture output to a `StringBuidler` or `MemoryStream` and use tools such as [Verify](https://github.com/VerifyTests/Verify). Our own internal test suite does this. The following example shows how the console can be abstracted for a unit test:
+
+```csharp
+class TestConsole : IConsole
+{
+    private readonly StringWriter _writer = new StringWriter(new StringBuilder());
+    
+    public TextReader In => throw new NotSupportedException();
+    
+    public TextWriter Out => _writer;
+    
+    public bool IsOutputRedirected => true;
+    
+    public int DisplayWidth => 120;
+    
+    public override string ToString() => _writer.ToString();
+}
+
+// Unit test...
+[Fact]
+public async Task RunAsync_Writes_Expected_Result()
+{
+    // arrange
+    var app = new CommandLineApplication(...);
+    var console = new TestConsole();
+    app.UseConsole(console);
+    
+    app.Configure();
+    
+    // act
+    await app.RunAsync(args);
+    
+    // assert
+    var output = console.ToString();
+    return Verify(output);
+}
+
 ```

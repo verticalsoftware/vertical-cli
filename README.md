@@ -5,7 +5,7 @@ Develop CLI applications using a rich argument binding framework.
 ![NuGet Version](https://img.shields.io/nuget/vpre/vertical-cli?label=vertical-cli)
 ![NuGet Version](https://img.shields.io/nuget/vpre/vertical-cli-dependencyinjection?label=vertical-cli-dependencyinjection)
 
-## Features
+### Features
 
 - Parses position arguments and  GNU short and long format options and switches.
 - Binds parsed argument values to strongly typed models using reflection-free source generation.
@@ -15,13 +15,13 @@ Develop CLI applications using a rich argument binding framework.
 - Defines a rich user input validation API.
 - Supports dependency injection using the [vertical-cli-dependencyinjection](https://www.nuget.org/packages/vertical-cli-dependencyinjection) companion package.
 
-## Installation
+### Installation
 
 ```shell
 $ dotnet pcakage add vertical-cli --prerelease
 ```
 
-## Quick start
+### Quick start
 
 ```csharp
 // Define a command
@@ -40,8 +40,8 @@ var app = new CommandLineApplication(rootCommand);
 
 // Configure the parser
 app.ConfigureParser<IOptions>(parser => parser
-    .AddOption(x => x.UserName)
-    .AddOption(x => x.Password));
+    .ParseOption(x => x.UserName)
+    .ParseOption(x => x.Password));
 
 // Applies generated configuration
 app.Configure();
@@ -58,3 +58,12 @@ public interface IOptions
 }
 ```
 
+### Docs
+
+- [Commands](docs/commands.md)
+- [Configuring the parser](docs/parser-config.md)
+- [Polymorphic models](docs/polymorhpic-models.md)
+- [Displaying help to the user](docs/help-system.md)
+- [Using dependency injection](docs/services.md)
+- [Customizing middleware](docs/middleware.md)
+- [Unit testing](docs/testing.md)

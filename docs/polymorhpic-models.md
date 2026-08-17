@@ -2,7 +2,7 @@
 
 ### Overview
 
-Simple applications will likely only define a root command, and along with it, a single command model. More complex applications define hierarchies of commands that may share options or arguments. Command models are defined using interfaces, and this design was purposefully chosen so that shared input components can be individually defined and then command models can be _composed_.
+Simple applications will likely only define a root command, and along with it, a single command model. More complex applications define a hierarchy of commands that may share options or arguments. Command models are defined using interfaces, and this design was purposefully chosen so that shared input components can be individually defined and then command models can be _composed_.
 
 Consider an application that acts as a suite of tools. Each tool requires authentication to a service. Additionally, the user can control logging output. Polymorphic command models provide separation of [configuration] concerns, and helps elimintate the repeitition of configuring shared symbols.
 
@@ -45,7 +45,7 @@ The `[GeneratedBinding]` attribute is a source generator signal. It will produce
 > 
 > The `GeneratedBinding` attribute only needs to be applied to final composed command model types, not every super type. 
 
-This attribute can be applied to an interface or a parameter:
+This attribute can be applied to a model's interface or a parameter where it is used:
 
 ```csharp
 command.SetHandler<IUploadOptions>(async 

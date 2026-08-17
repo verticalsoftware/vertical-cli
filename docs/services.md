@@ -6,7 +6,7 @@ The [vertical-cli-dependencyinjection](https://www.nuget.org/packages/vertical-c
 
 - The `CommandLineApplication` class gets an extension method named `ConfigureServices`, which registers a delegate that receives the invocation context and the service collection.
 - The `Command` class gets two extension `SetHandlerService` methods that can be used to instruct the framework to resolve `IHandler<TModel>` implementations for commands from a service provider.
-- The `InvocationContext` class gets a `BuildServiceProvider()` extension method. Application's don't need to use this unless they need the service provider in a middleware component.
+- The `InvocationContext` class gets a `BuildServiceProvider()` extension method. Application's typically don't need to use this API unless they need the service provider in a middleware component.
 
 ### Using services for command handlers
 
