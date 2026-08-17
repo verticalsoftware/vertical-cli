@@ -6,7 +6,7 @@ namespace Vertical.Cli.DependencyInjection;
 /// <summary>
 /// Defines extensions for <see cref="CommandLineApplication"/>
 /// </summary>
-public static class CommandLineApplicationExtensions
+public static class CommandLineDependencyInjectionExtensions
 {
     extension(CommandLineApplication app)
     {
