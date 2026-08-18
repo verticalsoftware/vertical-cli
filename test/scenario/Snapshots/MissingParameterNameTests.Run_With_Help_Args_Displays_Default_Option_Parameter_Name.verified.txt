@@ -1,0 +1,14 @@
+﻿Description:
+  This is a test command.
+
+Usage:
+  test <path> [options]
+  test --help | -?
+
+Arguments:
+  <path>     I have no interesting remarks...
+
+Options:
+  --port <port>     I have no interesting remarks either...
+  --help, -?        Display help for the current command.
+

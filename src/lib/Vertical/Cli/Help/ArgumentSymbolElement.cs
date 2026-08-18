@@ -36,10 +36,8 @@ internal sealed class ArgumentSymbolElement : IListElement
     {
         var required = argument.Arity.Minimum > 0;
 
-        var arityAnnotation = required ? "* " : string.Empty;
-        var (leftEnclosure, rightEnclosure) = required
-            ? ('<', '>')
-            : ('[', ']');
+        var arityAnnotation = required ? "* " : "  ";
+        var (leftEnclosure, rightEnclosure) = ('<', '>');
         var identifier = provider.GetIdentifier(argument);
         var aritySyntax = argument.Arity.Maximum.GetValueOrDefault(2) > 1
             ? "..."

@@ -1,5 +1,6 @@
 ﻿using System.Xml.XPath;
 using Vertical.Cli.Configuration;
+using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Help;
 
@@ -76,27 +77,19 @@ public sealed class XmlHelpProvider : IHelpProvider
     /// <inheritdoc />
     public string GetIdentifier(IHelpSubject subject)
     {
-        return subject switch
-        {
-            CliSymbol { Kind: SymbolKind.PositionArgument } argument  => 
-                GetNode(argument)?.GetAttribute(ParameterNameAttribute, string.Empty)
-                ??  argument.GetListIdentifier(),
-            
-            _ => subject.GetListIdentifier()
-        };
+        return subject is CliSymbol { Kind: SymbolKind.PositionArgument } symbol
+               && GetAttribute(symbol, ParameterNameAttribute) is { } identifier
+            ? identifier
+            : subject.GetListIdentifier();
     }
 
     /// <inheritdoc />
     public string? GetParameterName(ICliSymbol subject)
     {
-        return subject switch
-        {
-            { Kind: SymbolKind.Option or SymbolKind.Directive } =>
-                GetNode(subject)?.GetAttribute(ParameterNameAttribute, namespaceURI: string.Empty)
-                ?? subject.GetParameterName(),
-            
-            _ => subject.GetParameterName()
-        };
+        return subject is { Kind: SymbolKind.Option or SymbolKind.Directive }
+               && GetAttribute(subject, ParameterNameAttribute) is { } parameterName
+            ? parameterName
+            : subject.GetParameterName();
     }
 
     private XPathNavigator? GetNode(IHelpSubject subject)
@@ -104,5 +97,12 @@ public sealed class XmlHelpProvider : IHelpProvider
         var key = subject.HelpTopicKey;
         var path = $"/help/topic[@type='{key.TypeId}' and @id='{key.TopicId}']";
         return Navigator.SelectSingleNode(path);
+    }
+
+    private string? GetAttribute(IHelpSubject subject, string attributeName)
+    {
+        var node = GetNode(subject);
+        var attribute = node?.GetAttribute(attributeName, namespaceURI: string.Empty);
+        return attribute.NonWhiteSpaceOrNull();
     }
 }

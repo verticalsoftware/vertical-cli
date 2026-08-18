@@ -2,6 +2,7 @@
 
 Develop CLI applications using a rich argument binding framework.
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/verticalsoftware/vertical-cli/dev-build.yml)
 ![NuGet Version](https://img.shields.io/nuget/vpre/vertical-cli?label=vertical-cli)
 ![NuGet Version](https://img.shields.io/nuget/vpre/vertical-cli-dependencyinjection?label=vertical-cli-dependencyinjection)
 

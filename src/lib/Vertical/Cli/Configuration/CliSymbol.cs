@@ -93,7 +93,7 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
     public string GetListIdentifier() => Kind switch
     {
         SymbolKind.Option or SymbolKind.Switch => string.Join(", ", Aliases),
-        SymbolKind.PositionArgument => SymbolHelpTopic?.ParameterSyntax ?? BindingName,
+        SymbolKind.PositionArgument => SymbolHelpTopic?.ParameterSyntax ?? BindingName.ToLower(),
         _ => throw new InvalidOperationException($"Cannot return identifier for {Kind}.")
     };
 

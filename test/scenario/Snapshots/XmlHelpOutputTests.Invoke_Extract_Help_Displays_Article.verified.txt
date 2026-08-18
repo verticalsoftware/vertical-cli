@@ -12,7 +12,7 @@ Options:
   -c, --compression <type>     Compression type to use, one of gzip or brotli.
   -e, --encrypt <aes|rsa>      Encryption type to use to protect the files. If AES is used, the <KEY> references a
                                symmetric key. If RSA is used, <KEY> references the recipient's public key.
-  --timeout <>                 The maximum timespan for the operation to run, specific in hh:mm:ss.
+  --timeout <timeout>          The maximum timespan for the operation to run, specific in hh:mm:ss.
   --compute-sha                Compute and display the SHA-1 hashes for each output file.
   --overwrite                  Overwrite any existing output files with the same name.
 * --secret <key>               The symmetric key or the recipient's public key used to encrypt the archive.

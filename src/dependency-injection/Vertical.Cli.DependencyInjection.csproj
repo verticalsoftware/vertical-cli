@@ -19,10 +19,12 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyAttribute>false</GenerateAssemblyAttribute>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolsPackageFormat>snupkg</SymbolsPackageFormat>
     <SignAssembly>false</SignAssembly>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolsPackageFormat>snupkg</SymbolsPackageFormat>
+    <DebugType>embedded</DebugType>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
