@@ -84,6 +84,7 @@ public class HelpArticleWriter
 
         var elements = command
             .SubCommands
+            .OrderBy(c => c.Name)
             .Select(subCommand => CommandSymbolElement.Create(provider, subCommand));
         
         writer.WriteTable(elements, lineBounds);
