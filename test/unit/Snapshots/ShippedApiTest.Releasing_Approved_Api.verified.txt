@@ -1,0 +1,1103 @@
+﻿[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/verticalsoftware/vertical-cli")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Vertical.Cli.ConfigurationAssertions")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Vertical.Cli.UnitTests")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETCoreApp,Version=v10.0", FrameworkDisplayName=".NET 10.0")]
+namespace Vertical.Cli.Binding
+{
+    public sealed class BindingContext<TModel>
+        where TModel :  class
+    {
+        public Vertical.Cli.Binding.PropertyBindingInfo BindingInfo { get; }
+        public Vertical.Cli.Binding.BindingResult<TValue> GetBindingResult<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression) { }
+        public TValue GetValue<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression) { }
+    }
+    public static class BindingExtensions
+    {
+        public static System.Collections.Generic.IEnumerable<Vertical.Cli.Diagnostics.CommandLineError> GetErrors(this System.Collections.Generic.Dictionary<string, Vertical.Cli.Binding.IBindingResult> bindingResults) { }
+        extension(Vertical.Cli.Binding.PropertyBindingInfo bindingInfo)
+        {
+            public Vertical.Cli.Binding.BindingResult<TValue> CreateScalarBindingResult<TModel, TValue>(Vertical.Cli.Configuration.CliSymbol<TModel, TValue> symbol, string argument)
+                where TModel :  class { }
+            public Vertical.Cli.Binding.BindingResult<TCollection> CreateCollectionBindingResult<TModel, TElement, TCollection>(Vertical.Cli.Configuration.CliSymbol<TModel, TCollection> symbol, System.Collections.Generic.IEnumerable<string> arguments)
+                where TModel :  class
+                where TCollection : System.Collections.Generic.IEnumerable<TElement> { }
+        }
+    }
+    public sealed class BindingResult<TValue> : Vertical.Cli.Binding.IBindingResult
+    {
+        public string BindingName { get; }
+        public Vertical.Cli.Diagnostics.CommandLineError? Error { get; }
+        public TValue Value { get; }
+        public System.Type ValueType { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
+    public sealed class GeneratedBindingAttribute : System.Attribute
+    {
+        public GeneratedBindingAttribute() { }
+    }
+    public interface IBindingResult
+    {
+        string BindingName { get; }
+        Vertical.Cli.Diagnostics.CommandLineError? Error { get; }
+        System.Type ValueType { get; }
+    }
+    public interface IBindingSource
+    {
+        string BindingName { get; }
+        System.Type ModelType { get; }
+        System.Type ValueType { get; }
+        Vertical.Cli.Binding.PropertyBinder CreatePropertyBinder();
+    }
+    public delegate TModel ModelBinder<TModel>(Vertical.Cli.Binding.BindingContext<TModel> bindingContext);
+    public abstract class PropertyBinder
+    {
+        public Vertical.Cli.Configuration.CliSymbol? Symbol { get; }
+        public abstract Vertical.Cli.Binding.IBindingResult CreateBindingResult(Vertical.Cli.Binding.PropertyBindingInfo bindingInfo);
+    }
+    public sealed class PropertyBindingInfo
+    {
+        public Vertical.Cli.Utilities.ApplicationData AppData { get; }
+        public Vertical.Cli.IO.IConsole Console { get; }
+        public Vertical.Cli.Conversion.IConversionProvider ConversionProvider { get; }
+        public Vertical.Cli.Parsing.ParseResult ParseResult { get; }
+        public Vertical.Cli.Configuration.RootCommand RootCommand { get; }
+    }
+}
+namespace Vertical.Cli
+{
+    public class CommandLineApplication
+    {
+        public CommandLineApplication(Vertical.Cli.Configuration.RootCommand rootCommand) { }
+        public Vertical.Cli.Utilities.ApplicationData AppData { get; }
+        public Vertical.Cli.Configuration.RootCommand RootCommand { get; }
+        public Vertical.Cli.CommandLineApplication AddArgumentConverter<TValue>(System.Converter<string, TValue> converter) { }
+        public Vertical.Cli.CommandLineApplication AddCollectionConverter<TElement, TCollection>(System.Converter<System.Collections.Generic.IEnumerable<TElement>, TCollection> converter)
+            where TCollection : System.Collections.Generic.IEnumerable<TElement> { }
+        public Vertical.Cli.CommandLineApplication ConfigureHelp(System.Action<Vertical.Cli.Help.HelpSystemOptions> configure) { }
+        public Vertical.Cli.CommandLineApplication ConfigureMiddleware(System.Action<Vertical.Cli.Middleware.MiddlewareBuilder> configure) { }
+        public Vertical.Cli.CommandLineApplication ConfigureModel<TModel>(System.Action<Vertical.Cli.Configuration.IModelBuilder<TModel>> configure)
+            where TModel :  class { }
+        public Vertical.Cli.CommandLineApplication ConfigureParser<TModel>(System.Action<Vertical.Cli.Configuration.IParserBuilder<TModel>> configure)
+            where TModel :  class { }
+        public virtual System.Threading.Tasks.Task<int> RunAsync(string[] args) { }
+        public Vertical.Cli.CommandLineApplication UseConsole(Vertical.Cli.IO.IConsole console) { }
+        public Vertical.Cli.CommandLineApplication UseOutputFormatter(Vertical.Cli.IO.OutputFormatter outputFormatter) { }
+    }
+}
+namespace Vertical.Cli.Configuration
+{
+    public sealed class AliasList : System.Collections.Generic.IEnumerable<string>, System.Collections.IEnumerable
+    {
+        public AliasList() { }
+        public void Add(string value) { }
+        public System.Collections.Generic.IEnumerator<string> GetEnumerator() { }
+        public string[] GetValues() { }
+        public string[] GetValuesOrDefault(string templateName) { }
+        public static Vertical.Cli.Configuration.AliasList op_Implicit(string alias) { }
+    }
+    public readonly struct Arity
+    {
+        public Arity(int minimum, int? maximum) { }
+        public bool IsOptional { get; }
+        public bool IsVariadic { get; }
+        public int? Maximum { get; }
+        public int Minimum { get; }
+        public static Vertical.Cli.Configuration.Arity One { get; }
+        public static Vertical.Cli.Configuration.Arity OneOrMore { get; }
+        public static Vertical.Cli.Configuration.Arity ZeroOrMore { get; }
+        public static Vertical.Cli.Configuration.Arity ZeroOrOne { get; }
+        public void Deconstruct(out int min, out int max) { }
+        public override string ToString() { }
+        public static Vertical.Cli.Configuration.Arity Require(int count) { }
+    }
+    public abstract class CliSymbol : Vertical.Cli.Binding.IBindingSource, Vertical.Cli.Configuration.ICliSymbol, Vertical.Cli.Help.IHelpSubject, Vertical.Cli.Validation.IValidatable
+    {
+        public string[] Aliases { get; }
+        public Vertical.Cli.Configuration.Arity Arity { get; }
+        public string BindingName { get; }
+        public string DisplayName { get; }
+        public Vertical.Cli.Help.HelpTopic? HelpTopic { get; }
+        public Vertical.Cli.Help.HelpTopicKey HelpTopicKey { get; }
+        public Vertical.Cli.Configuration.SymbolKind Kind { get; }
+        public System.Type ModelType { get; }
+        public int? OrdinalPosition { get; }
+        public abstract Vertical.Cli.Configuration.ParameterArity? ParameterArity { get; }
+        public System.Reflection.PropertyInfo PropertyInfo { get; }
+        public Vertical.Cli.Configuration.SystemKind SystemKind { get; }
+        public System.Type ValueType { get; }
+        public abstract Vertical.Cli.Binding.PropertyBinder CreatePropertyBinder();
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Help.ExtendedRemarksSection> GetExtendedRemarksSections() { }
+        public string GetListIdentifier() { }
+        public string? GetParameterName() { }
+        public string? GetRemarks() { }
+        public override string ToString() { }
+        public abstract void Validate(Vertical.Cli.Validation.ValidationContext context);
+    }
+    public sealed class CliSymbol<TModel, TValue> : Vertical.Cli.Configuration.CliSymbol
+        where TModel :  class
+    {
+        public System.Func<TValue>? DefaultProvider { get; }
+        public override Vertical.Cli.Configuration.ParameterArity? ParameterArity { get; }
+        public override Vertical.Cli.Binding.PropertyBinder CreatePropertyBinder() { }
+        public override void Validate(Vertical.Cli.Validation.ValidationContext context) { }
+    }
+    public abstract class Command : Vertical.Cli.Help.IHelpSubject
+    {
+        public bool CanCreateCallSite { get; }
+        public Vertical.Cli.Help.CommandHelpTopic? HelpTopic { get; }
+        public Vertical.Cli.Help.HelpTopicKey HelpTopicKey { get; }
+        public System.Type? ModelType { get; }
+        public string Name { get; }
+        public Vertical.Cli.Configuration.ParameterArity? ParameterArity { get; }
+        public Vertical.Cli.Configuration.Command? Parent { get; }
+        public string Path { get; }
+        public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Configuration.Command> SubCommands { get; }
+        public void AddSubCommand(Vertical.Cli.Configuration.SubCommand command) { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.Command> GetAncestors() { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.Command> GetAncestorsAndSelf() { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Help.ExtendedRemarksSection> GetExtendedRemarksSections() { }
+        public string GetListIdentifier() { }
+        public string? GetParameterName() { }
+        public string? GetRemarks() { }
+        public void SetHandler<TModel>(System.Func<Vertical.Cli.Invocation.InvocationContext, Vertical.Cli.Invocation.IHandler<TModel>> handlerFactory)
+            where TModel :  class { }
+        public void SetHandler<TModel>(System.Func<TModel, System.Threading.CancellationToken, System.Threading.Tasks.Task<int>> handler)
+            where TModel :  class { }
+        public void SetHandlerProvider<TModel>(System.Func<Vertical.Cli.Invocation.InvocationContext, Vertical.Cli.Invocation.HandlerServiceProvider<TModel>> providerFactory)
+            where TModel :  class { }
+        public override string ToString() { }
+    }
+    public sealed class CommandName
+    {
+        public CommandName(string value) { }
+        public string Value { get; }
+        public static Vertical.Cli.Configuration.CommandName op_Implicit(string value) { }
+    }
+    public interface ICliSymbol : Vertical.Cli.Help.IHelpSubject
+    {
+        string[] Aliases { get; }
+        Vertical.Cli.Configuration.Arity Arity { get; }
+        string DisplayName { get; }
+        Vertical.Cli.Configuration.SymbolKind Kind { get; }
+        Vertical.Cli.Configuration.SystemKind SystemKind { get; }
+    }
+    public interface IModelBuilder<TModel>
+        where TModel :  class
+    {
+        Vertical.Cli.Configuration.ModelBuilder<TModel> MapBindingInfoValue<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression, System.Func<Vertical.Cli.Binding.PropertyBindingInfo, TValue> valueProvider);
+        Vertical.Cli.Configuration.ModelBuilder<TModel> MapStaticValue<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression, TValue value);
+        Vertical.Cli.Configuration.ModelBuilder<TModel> MapTextReader(System.Linq.Expressions.Expression<System.Func<TModel, System.IO.TextReader>> expression);
+        Vertical.Cli.Configuration.ModelBuilder<TModel> SetBinder(Vertical.Cli.Binding.ModelBinder<TModel> binder);
+    }
+    public interface IParserBuilder<TModel>
+        where TModel :  class
+    {
+        Vertical.Cli.Configuration.ModelBuilder<TModel> ParseArgument<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression, int ordinalPosition, bool required = false, System.Func<TValue>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null);
+        Vertical.Cli.Configuration.ModelBuilder<TModel> ParseOption<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, bool required = false, System.Func<TValue>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null);
+        Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, TElement[]>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<TElement[]>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, TElement[]>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null);
+        Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement, TCollection>(System.Linq.Expressions.Expression<System.Func<TModel, TCollection>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<TCollection>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, TCollection>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null)
+            where TCollection : System.Collections.Generic.IEnumerable<TElement>;
+        Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, TElement[]>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<TElement[]>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, TElement[]>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null);
+        Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement, TCollection>(System.Linq.Expressions.Expression<System.Func<TModel, TCollection>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<TCollection>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TCollection>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null)
+            where TCollection : System.Collections.Generic.IEnumerable<TElement>;
+        Vertical.Cli.Configuration.ModelBuilder<TModel> ParseSwitch(System.Linq.Expressions.Expression<System.Func<TModel, bool>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, bool>>? validate = null, Vertical.Cli.Help.HelpTopic? helpTopic = null);
+    }
+    public interface IRootConfigurationView : Vertical.Cli.Conversion.IConversionProvider
+    {
+        Vertical.Cli.Utilities.ApplicationData ApplicationData { get; }
+        Vertical.Cli.IO.IConsole Console { get; }
+        Vertical.Cli.Help.HelpSystemOptions HelpOptions { get; }
+        Vertical.Cli.IO.OutputFormatter OutputFormatter { get; }
+        Vertical.Cli.Configuration.RootCommand RootCommand { get; }
+        System.IO.Stream GetAnnotationResourceStream(string resource);
+        Vertical.Cli.Middleware.MiddlewareDelegate GetMiddlewarePipeline();
+        System.Collections.Generic.IReadOnlyList<Vertical.Cli.Middleware.MiddlewareSymbol> GetMiddlewareSymbols();
+        Vertical.Cli.Configuration.ModelConfiguration GetModelConfiguration(System.Type modelType);
+        bool HasArgumentConverter(System.Type type);
+        bool HasCollectionConverter(System.Type elementType, System.Type collectionType);
+    }
+    public static class ModelBuilderExtensions
+    {
+        extension<TModel>(Vertical.Cli.Configuration.ModelBuilder<TModel> builder)
+            where TModel :  class
+        {
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.IEnumerable<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.IEnumerable<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.IEnumerable<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.ICollection<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.ICollection<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.ICollection<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.IReadOnlyCollection<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.IReadOnlyCollection<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.IReadOnlyCollection<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.IList<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.IList<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.IList<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.IReadOnlyList<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.IReadOnlyList<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.IReadOnlyList<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.List<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.List<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.List<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.LinkedList<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.LinkedList<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.LinkedList<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.ISet<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.ISet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.ISet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.IReadOnlySet<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.IReadOnlySet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.IReadOnlySet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.HashSet<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.HashSet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.HashSet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.SortedSet<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.SortedSet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Generic.SortedSet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableArray<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableArray<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Immutable.ImmutableArray<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableList<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableList<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Immutable.ImmutableList<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableHashSet<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableHashSet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Immutable.ImmutableHashSet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableSortedSet<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableSortedSet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Immutable.ImmutableSortedSet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableStack<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableStack<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Immutable.ImmutableStack<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableQueue<TElement>>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableQueue<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, System.Collections.Immutable.ImmutableQueue<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.IEnumerable<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.IEnumerable<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.IEnumerable<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.ICollection<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.ICollection<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.ICollection<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.IReadOnlyCollection<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.IReadOnlyCollection<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.IReadOnlyCollection<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.IList<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.IList<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.IList<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.IReadOnlyList<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.IReadOnlyList<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.IReadOnlyList<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.List<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.List<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.List<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.LinkedList<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.LinkedList<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.LinkedList<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.ISet<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.ISet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.ISet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.IReadOnlySet<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.IReadOnlySet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.IReadOnlySet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.HashSet<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.HashSet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.HashSet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Generic.SortedSet<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Generic.SortedSet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Generic.SortedSet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableArray<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableArray<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Immutable.ImmutableArray<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableList<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableList<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Immutable.ImmutableList<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableHashSet<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableHashSet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Immutable.ImmutableHashSet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableSortedSet<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableSortedSet<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Immutable.ImmutableSortedSet<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableStack<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableStack<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Immutable.ImmutableStack<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+            public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, System.Collections.Immutable.ImmutableQueue<TElement>>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<System.Collections.Immutable.ImmutableQueue<TElement>>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, System.Collections.Immutable.ImmutableQueue<TElement>>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+        }
+    }
+    public sealed class ModelBuilder<TModel> : Vertical.Cli.Configuration.IModelBuilder<TModel>, Vertical.Cli.Configuration.IParserBuilder<TModel>
+        where TModel :  class
+    {
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> MapBindingInfoValue<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression, System.Func<Vertical.Cli.Binding.PropertyBindingInfo, TValue> valueProvider) { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> MapStaticValue<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression, TValue value) { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> MapTextReader(System.Linq.Expressions.Expression<System.Func<TModel, System.IO.TextReader>> expression) { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> MapTextWriter(System.Linq.Expressions.Expression<System.Func<TModel, System.IO.TextWriter>> expression) { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseArgument<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression, int ordinalPosition, bool required = false, System.Func<TValue>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseOption<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, bool required = false, System.Func<TValue>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, TElement[]>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<TElement[]>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, TElement[]>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableArgument<TElement, TCollection>(System.Linq.Expressions.Expression<System.Func<TModel, TCollection>> expression, int ordinalPosition, Vertical.Cli.Configuration.Arity? arity = default, System.Func<TCollection>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, TCollection>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null)
+            where TCollection : System.Collections.Generic.IEnumerable<TElement> { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement>(System.Linq.Expressions.Expression<System.Func<TModel, TElement[]>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<TElement[]>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, TElement[]>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null) { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseRepeatableOption<TElement, TCollection>(System.Linq.Expressions.Expression<System.Func<TModel, TCollection>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, Vertical.Cli.Configuration.Arity? arity = default, System.Func<TCollection>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TCollection>>? validate = null, Vertical.Cli.Help.SymbolHelpTopic? helpTopic = null)
+            where TCollection : System.Collections.Generic.IEnumerable<TElement> { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> ParseSwitch(System.Linq.Expressions.Expression<System.Func<TModel, bool>> expression, Vertical.Cli.Configuration.AliasList? aliases = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, bool>>? validate = null, Vertical.Cli.Help.HelpTopic? helpTopic = null) { }
+        public Vertical.Cli.Configuration.ModelBuilder<TModel> SetBinder(Vertical.Cli.Binding.ModelBinder<TModel> binder) { }
+    }
+    public sealed class ModelConfiguration
+    {
+        public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Binding.IBindingSource> BindingSources { get; }
+        public System.Type ModelType { get; }
+        public void AddBindingSource(Vertical.Cli.Binding.IBindingSource source) { }
+        public Vertical.Cli.Binding.ModelBinder<TModel> GetModelBinder<TModel>()
+            where TModel :  class { }
+        public void SetBinder<TModel>(Vertical.Cli.Binding.ModelBinder<TModel> binder)
+            where TModel :  class { }
+    }
+    public enum ParameterArity
+    {
+        ZeroOrOne = 0,
+        One = 1,
+    }
+    public sealed class RootCommand : Vertical.Cli.Configuration.Command
+    {
+        public RootCommand(Vertical.Cli.Configuration.CommandName name, Vertical.Cli.Help.CommandHelpTopic? helpTopic = null) { }
+    }
+    public sealed class SubCommand : Vertical.Cli.Configuration.Command
+    {
+        public SubCommand(Vertical.Cli.Configuration.CommandName name, Vertical.Cli.Help.CommandHelpTopic? helpTopic = null) { }
+    }
+    public enum SymbolKind
+    {
+        PositionArgument = 0,
+        Option = 1,
+        Switch = 2,
+        Directive = 3,
+    }
+    public enum SystemKind
+    {
+        None = 0,
+        Help = 1,
+    }
+}
+namespace Vertical.Cli.Configuration.Assertion
+{
+    public sealed class AssertionContext
+    {
+        public Vertical.Cli.CommandLineApplication Application { get; }
+        public System.Collections.Generic.List<Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion> Assertions { get; }
+        public Vertical.Cli.Configuration.Command[] CallSites { get; set; }
+        public Vertical.Cli.Configuration.Command[] Commands { get; }
+        public Vertical.Cli.Configuration.IRootConfigurationView Configuration { get; }
+        public System.Collections.Generic.IReadOnlyList<Vertical.Cli.Configuration.ICliSymbol> Directives { get; set; }
+        public static bool Enabled { get; set; }
+        public System.Linq.ILookup<string, Vertical.Cli.Middleware.MiddlewareSymbol> GetMiddlewareIdentifierLookup() { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.ICliSymbol> GetMiddlewareSymbols() { }
+        public Vertical.Cli.Configuration.ModelConfiguration GetModelConfiguration(Vertical.Cli.Configuration.Command command) { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.ICliSymbol> GetNamedSymbols(Vertical.Cli.Configuration.Command command) { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.CliSymbol> GetPositionArguments(Vertical.Cli.Configuration.Command command) { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.ICliSymbol> GetSymbols(Vertical.Cli.Configuration.Command command) { }
+    }
+    public static class AssertionDescriptor
+    {
+        public static string Create(object symbol) { }
+    }
+    public static class ConfigurationAssertionExtensions
+    {
+        extension(Vertical.Cli.CommandLineApplication app)
+        {
+            public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion> GetConfigurationAssertions() { }
+            public void AssertConfiguration() { }
+        }
+    }
+}
+namespace Vertical.Cli.Configuration.Assertion.Builders
+{
+    public interface IAssertionBuilder
+    {
+        void Build(Vertical.Cli.Configuration.Assertion.AssertionContext context);
+    }
+}
+namespace Vertical.Cli.Configuration.Assertion.Types
+{
+    public sealed class ArgumentOrdinalPositionAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public Vertical.Cli.Configuration.Command Command { get; }
+        public override string GroupingKey { get; }
+        public Vertical.Cli.Configuration.CliSymbol[] Symbols { get; }
+        public override string GetIssueDescription() { }
+        public override System.Collections.Generic.IEnumerable<string> GetIssueDetail() { }
+    }
+    public abstract class ConfigurationAssertion
+    {
+        protected ConfigurationAssertion() { }
+        public abstract string GroupingKey { get; }
+        public abstract string GetIssueDescription();
+        public virtual System.Collections.Generic.IEnumerable<string> GetIssueDetail() { }
+        public static string? GetAssertionsAsText(System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion> assertions) { }
+    }
+    public class DeadEndCommandAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public Vertical.Cli.Configuration.Command Command { get; }
+        public override string GroupingKey { get; }
+        public override string GetIssueDescription() { }
+    }
+    public sealed class DuplicateAliasAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public string Alias { get; }
+        public Vertical.Cli.Configuration.Command Command { get; }
+        public override string GroupingKey { get; }
+        public Vertical.Cli.Configuration.ICliSymbol[] Symbols { get; }
+        public override string GetIssueDescription() { }
+        public override System.Collections.Generic.IEnumerable<string> GetIssueDetail() { }
+    }
+    public sealed class DuplicateCommandNameAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public Vertical.Cli.Configuration.Command Command { get; }
+        public override string GroupingKey { get; }
+        public string Name { get; }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Configuration.Command> SubCommands { get; }
+        public override string GetIssueDescription() { }
+        public override System.Collections.Generic.IEnumerable<string> GetIssueDetail() { }
+    }
+    public sealed class DuplicateMiddlewareIdentifierAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public override string GroupingKey { get; }
+        public string Identifier { get; }
+        public Vertical.Cli.Middleware.MiddlewareSymbol[] Symbols { get; }
+        public override string GetIssueDescription() { }
+        public override System.Collections.Generic.IEnumerable<string> GetIssueDetail() { }
+    }
+    public sealed class DuplicatePropertyBindingAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public Vertical.Cli.Binding.IBindingSource[] BindingSources { get; }
+        public override string GroupingKey { get; }
+        public System.Type ModelType { get; }
+        public string PropertyName { get; }
+        public override string GetIssueDescription() { }
+        public override System.Collections.Generic.IEnumerable<string> GetIssueDetail() { }
+    }
+    public sealed class MissingArgumentConverterAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public override string GroupingKey { get; }
+        public System.Type Type { get; }
+        public override string GetIssueDescription() { }
+    }
+    public sealed class MissingCollectionConverterAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public System.Type CollectionType { get; }
+        public System.Type ElementType { get; }
+        public override string GroupingKey { get; }
+        public override string GetIssueDescription() { }
+    }
+    public sealed class MissingModelBinderAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public MissingModelBinderAssertion(System.Type modelType) { }
+        public override string GroupingKey { get; }
+        public System.Type ModelType { get; }
+        public override string GetIssueDescription() { }
+    }
+    public sealed class MissingPropertyBindingAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public MissingPropertyBindingAssertion(System.Type modelType, System.Reflection.PropertyInfo property) { }
+        public override string GroupingKey { get; }
+        public System.Type ModelType { get; }
+        public System.Reflection.PropertyInfo Property { get; }
+        public override string GetIssueDescription() { }
+    }
+    public sealed class MultipleVariadicArgumentsAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public MultipleVariadicArgumentsAssertion(Vertical.Cli.Configuration.Command command, Vertical.Cli.Configuration.ICliSymbol[] symbols) { }
+        public Vertical.Cli.Configuration.Command Command { get; }
+        public override string GroupingKey { get; }
+        public Vertical.Cli.Configuration.ICliSymbol[] Symbols { get; }
+        public override string GetIssueDescription() { }
+        public override System.Collections.Generic.IEnumerable<string> GetIssueDetail() { }
+    }
+    public sealed class VariadicArgumentPositionAssertion : Vertical.Cli.Configuration.Assertion.Types.ConfigurationAssertion
+    {
+        public Vertical.Cli.Configuration.Command Command { get; }
+        public override string GroupingKey { get; }
+        public Vertical.Cli.Configuration.ICliSymbol[] Symbols { get; }
+        public override string GetIssueDescription() { }
+        public override System.Collections.Generic.IEnumerable<string> GetIssueDetail() { }
+    }
+}
+namespace Vertical.Cli.Conversion
+{
+    public sealed class ConversionResult<TValue>
+    {
+        public Vertical.Cli.Diagnostics.CommandLineError? Error { get; }
+        public bool Success { get; }
+        public TValue Value { get; }
+        public override string ToString() { }
+    }
+    public static class Converters
+    {
+        public static System.Converter<string, string> Default { get; }
+        public static System.Converter<string, System.IO.DirectoryInfo> DirectoryInfo { get; }
+        public static System.Converter<string, System.IO.FileInfo> FileInfo { get; }
+        public static System.Converter<string, System.Uri> Uri { get; }
+        public static System.Converter<string, T> Enum<T>()
+            where T :  struct, System.Enum { }
+        public static System.Converter<string, T?> NullEnum<T>()
+            where T :  struct, System.Enum { }
+        public static System.Converter<string, T?> NullParsable<T>()
+            where T :  struct, System.IParsable<T> { }
+        public static System.Converter<string, T> Parsable<T>()
+            where T : System.IParsable<T> { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter)]
+    public sealed class GeneratedConversionAttribute : System.Attribute
+    {
+        public GeneratedConversionAttribute() { }
+    }
+    public interface IConversionProvider
+    {
+        System.Converter<string, TValue> GetArgumentConverter<TValue>();
+        System.Converter<System.Collections.Generic.IEnumerable<TElement>, TCollection> GetCollectionConverter<TElement, TCollection>()
+            where TCollection : System.Collections.Generic.IEnumerable<TElement>;
+        Vertical.Cli.Conversion.ConversionResult<TValue> TryConvertArgument<TValue>(Vertical.Cli.Configuration.ICliSymbol symbol, string argumentValue, System.Collections.Generic.List<Vertical.Cli.Diagnostics.CommandLineError> errorList);
+        Vertical.Cli.Conversion.ConversionResult<TCollection> TryConvertCollection<TElement, TCollection>(Vertical.Cli.Configuration.ICliSymbol symbol, System.Collections.Generic.IEnumerable<string> argumentValues, System.Collections.Generic.List<Vertical.Cli.Diagnostics.CommandLineError> errorList)
+            where TCollection : System.Collections.Generic.IEnumerable<TElement>;
+    }
+}
+namespace Vertical.Cli.Diagnostics
+{
+    public sealed class AbstractCommandError : Vertical.Cli.Diagnostics.CommandLineError
+    {
+        public AbstractCommandError(Vertical.Cli.Configuration.Command target) { }
+        public Vertical.Cli.Configuration.Command Target { get; }
+    }
+    public class AggregateCommandLineError : Vertical.Cli.Diagnostics.CommandLineError
+    {
+        public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Diagnostics.CommandLineError> Errors { get; }
+        public override void WriteOutputMessage(Vertical.Cli.IO.OutputWriter writer) { }
+    }
+    public class ArgumentConversionError : Vertical.Cli.Diagnostics.CommandLineError
+    {
+        public System.Exception? Exception { get; }
+        public System.Type ExpectedType { get; }
+        public string ReceivedArgument { get; }
+        public Vertical.Cli.Configuration.ICliSymbol Symbol { get; }
+    }
+    public abstract class CommandLineError
+    {
+        protected CommandLineError(string message) { }
+        public string Message { get; }
+        public override string ToString() { }
+        public virtual void WriteOutputMessage(Vertical.Cli.IO.OutputWriter writer) { }
+        public static string GetSymbolIdentifier(Vertical.Cli.Help.IHelpProvider helpProvider, object obj) { }
+    }
+    public sealed class CommandLineException : System.Exception
+    {
+        public CommandLineException(System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Diagnostics.CommandLineError> errors) { }
+        public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Diagnostics.CommandLineError> Errors { get; }
+    }
+    public sealed class MissingParameterError : Vertical.Cli.Diagnostics.CommandLineError
+    {
+        public Vertical.Cli.Configuration.ICliSymbol Symbol { get; }
+    }
+    public sealed class ResponseArgumentNotSupportedError : Vertical.Cli.Diagnostics.CommandLineError
+    {
+        public ResponseArgumentNotSupportedError(string annotation, int lineNumber, Vertical.Cli.Parsing.SyntaxKind syntaxKind, string argument) { }
+        public string Annotation { get; }
+        public string Argument { get; }
+        public int LineNumber { get; }
+        public Vertical.Cli.Parsing.SyntaxKind SyntaxKind { get; }
+    }
+    public sealed class ResponseResourceError : Vertical.Cli.Diagnostics.CommandLineError
+    {
+        public string Annotation { get; }
+        public System.Exception Exception { get; }
+    }
+    public sealed class SymbolArityError : Vertical.Cli.Diagnostics.CommandLineError
+    {
+        public string[] ArgumentsReceived { get; }
+        public Vertical.Cli.Configuration.ICliSymbol Symbol { get; }
+    }
+    public sealed class SymbolValidationError : Vertical.Cli.Diagnostics.CommandLineError
+    {
+        public object Model { get; }
+        public object? ReceivedValue { get; }
+        public Vertical.Cli.Validation.IValidatable Subject { get; }
+        public string ValidationMessage { get; }
+    }
+    public sealed class UnresolvedTokenError : Vertical.Cli.Diagnostics.CommandLineError
+    {
+        public Vertical.Cli.Parsing.ArgumentToken Token { get; }
+    }
+}
+namespace Vertical.Cli.Help
+{
+    public sealed class CommandHelpTopic : Vertical.Cli.Help.HelpTopic
+    {
+        public CommandHelpTopic(string remarks, string[]? invocationSyntaxes = null, Vertical.Cli.Help.ExtendedRemarksSection[]? extendedRemarks = null) { }
+        public Vertical.Cli.Help.ExtendedRemarksSection[]? ExtendedRemarks { get; }
+        public string[]? InvocationSyntaxes { get; }
+        public new static Vertical.Cli.Help.CommandHelpTopic op_Implicit(string remarks) { }
+    }
+    public class DefaultHelpProvider : Vertical.Cli.Help.IHelpProvider
+    {
+        public DefaultHelpProvider() { }
+        public virtual System.Collections.Generic.IEnumerable<Vertical.Cli.Help.ExtendedRemarksSection> GetExtendedRemarks(Vertical.Cli.Configuration.Command command) { }
+        public virtual string GetIdentifier(Vertical.Cli.Help.IHelpSubject subject) { }
+        public virtual string? GetParameterName(Vertical.Cli.Configuration.ICliSymbol subject) { }
+        public virtual string? GetRemarks(Vertical.Cli.Help.IHelpSubject subject) { }
+    }
+    public sealed class ExtendedRemarksSection
+    {
+        public ExtendedRemarksSection(string title, string remarks) { }
+        public string Remarks { get; }
+        public string Title { get; }
+    }
+    public class HelpArticleWriter
+    {
+        public HelpArticleWriter() { }
+        public virtual void WriteContent(Vertical.Cli.Help.HelpEventInfo eventInfo) { }
+    }
+    public sealed class HelpEventInfo
+    {
+        public required Vertical.Cli.Configuration.Command Command { get; init; }
+        public System.Collections.Generic.IReadOnlyCollection<Vertical.Cli.Configuration.ICliSymbol> DirectiveSymbols { get; init; }
+        public int DisplayWidth { get; }
+        public required Vertical.Cli.Help.IHelpProvider HelpProvider { get; init; }
+        public Vertical.Cli.Configuration.ICliSymbol HelpSymbol { get; }
+        public System.Collections.Generic.IReadOnlyList<Vertical.Cli.Configuration.ICliSymbol> NamedSymbols { get; set; }
+        public required Vertical.Cli.IO.OutputWriter OutputWriter { get; init; }
+        public System.Collections.Generic.IReadOnlyList<Vertical.Cli.Configuration.CliSymbol> PositionalSymbols { get; }
+        public System.Collections.Generic.IReadOnlyList<Vertical.Cli.Configuration.ICliSymbol> Symbols { get; }
+    }
+    public static class HelpSystem
+    {
+        public static void WriteArticle(Vertical.Cli.Configuration.IRootConfigurationView configuration, Vertical.Cli.Configuration.Command targetCommand) { }
+    }
+    public sealed class HelpSystemOptions
+    {
+        public HelpSystemOptions() { }
+        public Vertical.Cli.Help.HelpArticleWriter ArticleWriter { get; set; }
+        public Vertical.Cli.Help.IHelpProvider HelpProvider { get; set; }
+        public Vertical.Cli.Configuration.AliasList SymbolAliases { get; set; }
+        public Vertical.Cli.Help.HelpTopic? SymbolHelpTopic { get; set; }
+    }
+    public class HelpTopic
+    {
+        public string Remarks { get; }
+        public override string ToString() { }
+        public static Vertical.Cli.Help.HelpTopic op_Implicit(string str) { }
+    }
+    public sealed class HelpTopicKey
+    {
+        public string TopicId { get; }
+        public string TypeId { get; }
+        public override string ToString() { }
+    }
+    public interface IHelpProvider
+    {
+        System.Collections.Generic.IEnumerable<Vertical.Cli.Help.ExtendedRemarksSection> GetExtendedRemarks(Vertical.Cli.Configuration.Command command);
+        string GetIdentifier(Vertical.Cli.Help.IHelpSubject subject);
+        string? GetParameterName(Vertical.Cli.Configuration.ICliSymbol symbol);
+        string? GetRemarks(Vertical.Cli.Help.IHelpSubject subject);
+    }
+    public interface IHelpSubject
+    {
+        Vertical.Cli.Help.HelpTopic? HelpTopic { get; }
+        Vertical.Cli.Help.HelpTopicKey HelpTopicKey { get; }
+        Vertical.Cli.Configuration.ParameterArity? ParameterArity { get; }
+        System.Collections.Generic.IEnumerable<Vertical.Cli.Help.ExtendedRemarksSection> GetExtendedRemarksSections();
+        string GetListIdentifier();
+        string? GetParameterName();
+        string? GetRemarks();
+    }
+    public interface IListElement
+    {
+        int ComputedWidth { get; }
+        string Remarks { get; }
+        void RenderSyntax(Vertical.Cli.IO.OutputWriter writer);
+    }
+    public enum SymbolGroup
+    {
+        Argument = 0,
+        Options = 1,
+        Directives = 2,
+    }
+    public sealed class SymbolHelpTopic : Vertical.Cli.Help.HelpTopic
+    {
+        public SymbolHelpTopic(string remarks, string? parameterSyntax = null) { }
+        public string? ParameterSyntax { get; }
+        public new static Vertical.Cli.Help.SymbolHelpTopic op_Implicit(string remarks) { }
+    }
+    public sealed class XmlHelpProvider : Vertical.Cli.Help.IHelpProvider
+    {
+        public XmlHelpProvider(System.Func<System.IO.Stream> resourceStreamProvider) { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Help.ExtendedRemarksSection> GetExtendedRemarks(Vertical.Cli.Configuration.Command command) { }
+        public string GetIdentifier(Vertical.Cli.Help.IHelpSubject subject) { }
+        public string? GetParameterName(Vertical.Cli.Configuration.ICliSymbol subject) { }
+        public string? GetRemarks(Vertical.Cli.Help.IHelpSubject subject) { }
+    }
+    public static class XmlHelpWriter
+    {
+        public static void Write(System.IO.Stream stream, Vertical.Cli.CommandLineApplication application) { }
+    }
+}
+namespace Vertical.Cli.IO
+{
+    public enum DisplayElement
+    {
+        Default = 0,
+        Important = 1,
+        Heading = 2,
+        Remarks = 3,
+        CommandName = 4,
+        UsageSyntax = 5,
+        ListIdentifier = 6,
+        ParameterSyntax = 7,
+        RequiredAnnotation = 8,
+    }
+    public interface IConsole
+    {
+        int DisplayWidth { get; }
+        System.IO.TextReader In { get; }
+        bool IsOutputRedirected { get; }
+        System.IO.TextWriter Out { get; }
+    }
+    public class OutputFormatter
+    {
+        public OutputFormatter(System.Collections.Generic.Dictionary<Vertical.Cli.IO.DisplayElement, string>? theme = null) { }
+        public static Vertical.Cli.IO.OutputFormatter Default { get; }
+        public static Vertical.Cli.IO.OutputFormatter VerticalTheme { get; }
+        public virtual void WriteControlSequence(System.IO.TextWriter textWriter, Vertical.Cli.IO.DisplayElement element) { }
+    }
+    public sealed class OutputWriter
+    {
+        public int ColumnPosition { get; }
+        public int DisplayWidth { get; }
+        public bool IsNewLine { get; }
+        public void Return() { }
+        public void SetDisplayElement(Vertical.Cli.IO.DisplayElement element) { }
+        public void Write(System.ReadOnlySpan<char> span, Vertical.Cli.IO.DisplayElement? element = default) { }
+        public void Write(char c, Vertical.Cli.IO.DisplayElement? element = default) { }
+        public void Write(string str, Vertical.Cli.IO.DisplayElement? element = default) { }
+        public void WriteLine() { }
+        public void WriteLine(System.ReadOnlySpan<char> span, Vertical.Cli.IO.DisplayElement? element = default) { }
+        public void WriteLine(string str, Vertical.Cli.IO.DisplayElement? element = default) { }
+        public void WriteWhiteSpace(int count = 1) { }
+    }
+    public sealed class SystemConsole : Vertical.Cli.IO.IConsole
+    {
+        public SystemConsole() { }
+        public int DisplayWidth { get; }
+        public System.IO.TextReader In { get; }
+        public bool IsOutputRedirected { get; }
+        public System.IO.TextWriter Out { get; }
+    }
+}
+namespace Vertical.Cli.Invocation
+{
+    public static class CommandResolver
+    {
+        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "Target",
+                "EvaluatedToken"})]
+        public static System.ValueTuple<Vertical.Cli.Configuration.Command, Vertical.Cli.Parsing.ArgumentToken?> GetTarget(Vertical.Cli.Configuration.RootCommand rootCommand, Vertical.Cli.Parsing.TokenList tokenList) { }
+    }
+    public class HandlerServiceProvider<TModel> : System.IAsyncDisposable
+        where TModel :  class
+    {
+        public HandlerServiceProvider(System.Func<Vertical.Cli.Invocation.IHandler<TModel>> handlerFactory) { }
+        public Vertical.Cli.Invocation.IHandler<TModel> Instance { get; }
+        public virtual System.Threading.Tasks.ValueTask DisposeAsync() { }
+    }
+    public interface IHandlerServiceContext<in TModel> : System.IAsyncDisposable
+        where in TModel :  class
+    {
+        Vertical.Cli.Invocation.IHandler<TModel> GetHandler();
+    }
+    public interface IHandler<in TModel>
+        where in TModel :  class
+    {
+        System.Threading.Tasks.Task<int> HandleAsync(TModel options, System.Threading.CancellationToken cancellationToken);
+    }
+    public sealed class InvocationContext : System.IAsyncDisposable
+    {
+        public Vertical.Cli.Utilities.ApplicationData AppData { get; }
+        public string[] Arguments { get; }
+        public System.Threading.CancellationToken CancellationToken { get; }
+        public Vertical.Cli.Configuration.IRootConfigurationView Configuration { get; }
+        public Vertical.Cli.IO.IConsole Console { get; }
+        public System.Collections.Generic.List<Vertical.Cli.Diagnostics.CommandLineError> Errors { get; }
+        public bool IsInRoutableState { get; }
+        public Vertical.Cli.IO.OutputWriter OutputWriter { get; set; }
+        public int? Result { get; set; }
+        public Vertical.Cli.Configuration.RootCommand RootCommand { get; }
+        public Vertical.Cli.Parsing.TokenList TokenList { get; }
+        public void AddError(Vertical.Cli.Diagnostics.CommandLineError error) { }
+        public int AddErrors(System.Collections.Generic.IEnumerable<Vertical.Cli.Diagnostics.CommandLineError> errors) { }
+        public void AssertState() { }
+        public System.Threading.Tasks.ValueTask DisposeAsync() { }
+        public void RequestCancel() { }
+    }
+}
+namespace Vertical.Cli.Middleware
+{
+    public sealed class MiddlewareBuilder
+    {
+        public Vertical.Cli.Middleware.MiddlewareBuilder AddDirective(string identifier, System.Func<Vertical.Cli.Invocation.InvocationContext, System.Threading.Tasks.Task> handler, Vertical.Cli.Help.HelpTopic? helpTopic = null) { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder AddDirective<TValue>(string identifier, System.Func<Vertical.Cli.Middleware.ParameterizedMiddlewareDirectiveInfo<TValue>, System.Threading.Tasks.Task> handler, System.Func<TValue>? useDefault = null, System.Action<Vertical.Cli.Validation.IValidationEventInfo<Vertical.Cli.Invocation.InvocationContext, TValue>>? validate = null, Vertical.Cli.Help.HelpTopic? helpTopic = null) { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder AddFirst(Vertical.Cli.Middleware.MiddlewareDelegate middleware) { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder AddLast(Vertical.Cli.Middleware.MiddlewareDelegate middleware) { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder AddSwitch(string identifier, Vertical.Cli.Configuration.AliasList aliasList, System.Func<Vertical.Cli.Invocation.InvocationContext, System.Threading.Tasks.Task> handler, Vertical.Cli.Help.HelpTopic? helpTopic = null) { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder Clear() { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder DisplayApplicationExceptions() { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder DisplayHelpArticles() { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder DisplayHelpOptionSuggestion() { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder DisplayInputErrors() { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder HandleConsoleCancellation() { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder HandleDirectives() { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder HandleSwitches() { }
+        public Vertical.Cli.Middleware.MiddlewareBuilder InjectResponseFileArguments() { }
+        public static Vertical.Cli.Middleware.MiddlewareBuilder CreateDefault() { }
+    }
+    public delegate System.Threading.Tasks.Task MiddlewareDelegate(Vertical.Cli.Invocation.InvocationContext context, System.Func<Vertical.Cli.Invocation.InvocationContext, System.Threading.Tasks.Task> next);
+    public sealed class MiddlewareDirective : Vertical.Cli.Middleware.MiddlewareSymbol
+    {
+        public MiddlewareDirective(string identifier, System.Func<Vertical.Cli.Invocation.InvocationContext, System.Threading.Tasks.Task> handler, Vertical.Cli.Help.HelpTopic? helpTopic) { }
+        [System.Runtime.CompilerServices.PreserveBaseOverrides]
+        public new virtual System.Threading.Tasks.Task<int?> HandleAsync(Vertical.Cli.Invocation.InvocationContext context, Vertical.Cli.Parsing.ArgumentToken _) { }
+    }
+    public sealed class MiddlewareSwitch : Vertical.Cli.Middleware.MiddlewareSymbol
+    {
+        public MiddlewareSwitch(string identifier, string[] aliases, System.Func<Vertical.Cli.Invocation.InvocationContext, System.Threading.Tasks.Task> handler, Vertical.Cli.Help.HelpTopic? helpTopic) { }
+        public override System.Threading.Tasks.Task HandleAsync(Vertical.Cli.Invocation.InvocationContext context, Vertical.Cli.Parsing.ArgumentToken _) { }
+    }
+    public abstract class MiddlewareSymbol : Vertical.Cli.Configuration.ICliSymbol, Vertical.Cli.Help.IHelpSubject
+    {
+        public string[] Aliases { get; }
+        public Vertical.Cli.Configuration.Arity Arity { get; }
+        public string DisplayName { get; }
+        public Vertical.Cli.Help.HelpTopic? HelpTopic { get; }
+        public Vertical.Cli.Help.HelpTopicKey HelpTopicKey { get; }
+        public string Identifier { get; }
+        public Vertical.Cli.Configuration.SymbolKind Kind { get; }
+        public virtual Vertical.Cli.Configuration.ParameterArity? ParameterArity { get; }
+        public System.Type? ParameterType { get; }
+        public Vertical.Cli.Configuration.SystemKind SystemKind { get; }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Help.ExtendedRemarksSection> GetExtendedRemarksSections() { }
+        public string GetListIdentifier() { }
+        public string? GetParameterName() { }
+        public string? GetRemarks() { }
+        public abstract System.Threading.Tasks.Task HandleAsync(Vertical.Cli.Invocation.InvocationContext context, Vertical.Cli.Parsing.ArgumentToken token);
+        public override string ToString() { }
+    }
+    public sealed class ParameterizedMiddlewareDirectiveInfo<TValue>
+    {
+        public Vertical.Cli.Invocation.InvocationContext Context { get; }
+        public TValue Value { get; }
+        public override string ToString() { }
+    }
+    public sealed class ParameterizedMiddlewareDirective<TValue> : Vertical.Cli.Middleware.MiddlewareSymbol
+    {
+        public override Vertical.Cli.Configuration.ParameterArity? ParameterArity { get; }
+        public override System.Threading.Tasks.Task HandleAsync(Vertical.Cli.Invocation.InvocationContext context, Vertical.Cli.Parsing.ArgumentToken token) { }
+    }
+}
+namespace Vertical.Cli.Parsing
+{
+    public sealed class ArgumentSyntax
+    {
+        public string? ParameterValue { get; }
+        public char? SeparatorToken { get; }
+        public string? Symbol { get; }
+        public Vertical.Cli.Parsing.SyntaxKind SyntaxKind { get; }
+        public string Text { get; }
+        public override string ToString() { }
+        public static string CreateGnuAlias<TModel, TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression) { }
+        public static Vertical.Cli.Parsing.SyntaxKind GetSyntaxKind(string argument) { }
+        public static Vertical.Cli.Parsing.ArgumentSyntax Parse(string argument) { }
+    }
+    public sealed class ArgumentToken
+    {
+        public Vertical.Cli.Parsing.TokenKind Kind { get; }
+        public Vertical.Cli.Parsing.ArgumentToken? Next { get; }
+        public Vertical.Cli.Parsing.ArgumentToken? Previous { get; }
+        public string? Symbol { get; }
+        public string Text { get; }
+        public Vertical.Cli.Parsing.ITokenList? TokenList { get; }
+        public string? Value { get; }
+        public override int GetHashCode() { }
+        public override string ToString() { }
+    }
+    public interface ITokenList : System.Collections.Generic.IEnumerable<Vertical.Cli.Parsing.ArgumentToken>, System.Collections.IEnumerable
+    {
+        int Count { get; }
+        Vertical.Cli.Parsing.ArgumentToken? First { get; }
+        Vertical.Cli.Parsing.ArgumentToken? Last { get; }
+    }
+    public class ParseResult
+    {
+        public System.Collections.Generic.List<Vertical.Cli.Parsing.ArgumentToken> UnresolvedTokens { get; }
+        public System.Collections.Generic.IEnumerable<string> GetArgumentValues(string bindingName) { }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Diagnostics.UnresolvedTokenError> GetUnresolvedTokenErrors() { }
+    }
+    public sealed class ReadOnlyTokenList : System.Collections.Generic.IEnumerable<Vertical.Cli.Parsing.ArgumentToken>, System.Collections.IEnumerable, Vertical.Cli.Parsing.ITokenList
+    {
+        public int Count { get; }
+        public Vertical.Cli.Parsing.ArgumentToken? First { get; }
+        public Vertical.Cli.Parsing.ArgumentToken? Last { get; }
+        public System.Collections.Generic.IEnumerator<Vertical.Cli.Parsing.ArgumentToken> GetEnumerator() { }
+        public override string ToString() { }
+    }
+    public enum SyntaxKind
+    {
+        None = 0,
+        Option = 1,
+        OptionGroup = 2,
+        Directive = 3,
+        Annotation = 4,
+        OptionsTerminator = 5,
+    }
+    public enum TokenKind
+    {
+        CommandOrArgument = 0,
+        Argument = 1,
+        Option = 2,
+        OptionsTerminator = 3,
+        Directive = 4,
+        Annotation = 5,
+    }
+    public sealed class TokenList : System.Collections.Generic.IEnumerable<Vertical.Cli.Parsing.ArgumentToken>, System.Collections.IEnumerable, Vertical.Cli.Parsing.ITokenList
+    {
+        public TokenList(System.Collections.Generic.IEnumerable<Vertical.Cli.Parsing.ArgumentToken> tokens) { }
+        public TokenList(System.Collections.Generic.IEnumerable<string>? arguments = null) { }
+        public int Count { get; }
+        public Vertical.Cli.Parsing.ArgumentToken? First { get; }
+        public Vertical.Cli.Parsing.ArgumentToken? Last { get; }
+        public int Version { get; }
+        public void Append(System.Collections.Generic.IEnumerable<string> arguments) { }
+        public void Clear() { }
+        public System.Collections.Generic.IEnumerator<Vertical.Cli.Parsing.ArgumentToken> GetEnumerator() { }
+        public Vertical.Cli.Parsing.ArgumentToken? InsertAfter(Vertical.Cli.Parsing.ArgumentToken token, System.Collections.Generic.IEnumerable<string> arguments) { }
+        public void Remove(Vertical.Cli.Parsing.ArgumentToken token) { }
+        public override string ToString() { }
+    }
+}
+namespace Vertical.Cli.Utilities
+{
+    public sealed class ApplicationData
+    {
+        public ApplicationData() { }
+        public TOptions Configure<TOptions>(System.Action<TOptions>? configure = null)
+            where TOptions :  class, new () { }
+        public T GetValueOrDefault<T>(T defaultValue)
+            where T :  notnull { }
+        public void SetValue<T>(T value)
+            where T :  notnull { }
+    }
+    public readonly ref struct SplitSpan
+    {
+        public SplitSpan(System.ReadOnlySpan<char> span) { }
+        public SplitSpan(System.ReadOnlySpan<char> remainder, System.ReadOnlySpan<char> slice) { }
+        public bool HasRemainder { get; }
+        public bool HasSlice { get; }
+        public System.ReadOnlySpan<char> Remainder { get; }
+        public System.ReadOnlySpan<char> Slice { get; }
+        public static Vertical.Cli.Utilities.SplitSpan Empty { get; }
+        public Vertical.Cli.Utilities.SplitSpan SplitToWidth(int width) { }
+    }
+}
+namespace Vertical.Cli.Validation
+{
+    public static class ComparableValidationExtensions
+    {
+        extension<TModel, TValue>(Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> eventInfo)
+            where TModel :  class
+        {
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> MustBeLessThan(TValue value, System.Collections.Generic.IComparer<TValue>? comparer = null, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> MustBeLessOrEqualTo(TValue value, System.Collections.Generic.IComparer<TValue>? comparer = null, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> MustBeGreaterThan(TValue value, System.Collections.Generic.IComparer<TValue>? comparer = null, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> MustBeGreaterOrEqualTo(TValue value, System.Collections.Generic.IComparer<TValue>? comparer = null, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> MustBeInTheInclusiveRangeOf(TValue lowerValue, TValue upperValue, System.Collections.Generic.IComparer<TValue>? comparer = null, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> MustBeInTheExclusiveRangeOf(TValue lowerValue, TValue upperValue, System.Collections.Generic.IComparer<TValue>? comparer = null, System.Func<string>? formatMessage = null) { }
+        }
+        extension<TModel, Nullable`1>(Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue?> eventInfo)
+            where TModel :  class
+            where Nullable`1 :  struct
+        {
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, Nullable`1?> MustBeLessThanOrBeNull(Nullable`1? value, System.Collections.Generic.IComparer<Nullable`1?>? comparer = null, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, Nullable`1?> MustBeLessOrEqualToOrBeNull(Nullable`1? value, System.Collections.Generic.IComparer<Nullable`1?>? comparer = null, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, Nullable`1?> MustBeGreaterThanOrBeNull(Nullable`1? value, System.Collections.Generic.IComparer<Nullable`1?>? comparer = null, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, Nullable`1?> MustBeGreaterOrEqualToOrBeNull(Nullable`1? value, System.Collections.Generic.IComparer<Nullable`1?>? comparer = null, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, Nullable`1?> MustBeInTheInclusiveRangeOfOrBeNull(Nullable`1? lowerValue, Nullable`1? upperValue, System.Collections.Generic.IComparer<Nullable`1?>? comparer = null, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, Nullable`1?> MustBeInTheExclusiveRangeOfOrBeNull(Nullable`1? lowerValue, Nullable`1? upperValue, System.Collections.Generic.IComparer<Nullable`1?>? comparer = null, System.Func<string>? formatMessage = null) { }
+        }
+    }
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public static class FileSystemValidationExtensions
+    {
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.DirectoryInfo> CannotExist<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.DirectoryInfo> eventInfo, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.FileInfo> CannotExist<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.FileInfo> eventInfo, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.DirectoryInfo?> CannotExistOrBeNull<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.DirectoryInfo?> eventInfo, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.FileInfo?> CannotExistOrBeNull<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.FileInfo?> eventInfo, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.DirectoryInfo> MustExist<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.DirectoryInfo> eventInfo, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.FileInfo> MustExist<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.FileInfo> eventInfo, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.DirectoryInfo?> MustExistOrBeNull<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.DirectoryInfo?> eventInfo, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.FileInfo?> MustExistOrBeNull<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, System.IO.FileInfo?> eventInfo, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public sealed class <G>$EC4900233B2A6657BC4763AED22114B7<$T0>
+            where $T0 :  class
+        {
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, System.IO.FileInfo> CannotExist(System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, System.IO.FileInfo?> CannotExistOrBeNull(System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, System.IO.FileInfo> MustExist(System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, System.IO.FileInfo?> MustExistOrBeNull(System.Func<string>? formatMessage = null) { }
+            public static class <M>$45AFF59AACD92BD95FE28FB125F52890<TModel>
+                where TModel :  class { }
+            public static class <M>$D33ECD82766C13CBC71D48A27EBD7DB7<TModel>
+                where TModel :  class { }
+        }
+        public sealed class <G>$FB31029C6340BD162D080989CF7E5FC4<$T0>
+            where $T0 :  class
+        {
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, System.IO.DirectoryInfo> CannotExist(System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, System.IO.DirectoryInfo?> CannotExistOrBeNull(System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, System.IO.DirectoryInfo> MustExist(System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, System.IO.DirectoryInfo?> MustExistOrBeNull(System.Func<string>? formatMessage = null) { }
+            public static class <M>$4227FECDCCB01237FD55116439B8212B<TModel>
+                where TModel :  class { }
+            public static class <M>$77657F6F2A7166061DCB8FCAAEE254BE<TModel>
+                where TModel :  class { }
+        }
+    }
+    public interface IValidatable
+    {
+        void Validate(Vertical.Cli.Validation.ValidationContext context);
+    }
+    public interface IValidationEventInfo<out TModel, out TValue>
+        where out TModel :  class
+    {
+        TModel Model { get; }
+        Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> OK { get; }
+        Vertical.Cli.Validation.IValidatable Subject { get; }
+        TValue Value { get; }
+        Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> Error(string message);
+    }
+    public interface IValidationEventInfo<out TModel, out TElement, out TCollection> : Vertical.Cli.Validation.IValidationEventInfo<TModel, TCollection>
+        where out TModel :  class
+        where out TCollection : System.Collections.Generic.IEnumerable<TElement>
+    {
+        Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, TCollection> EachValue(System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement>> validate);
+    }
+    public static class SetValidationExtensions
+    {
+        extension<TModel, TValue>(Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> eventInfo)
+            where TModel :  class
+        {
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> MustBeOneOf(System.Collections.Generic.HashSet<TValue> set, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> CannotBeOneOf(System.Collections.Generic.HashSet<TValue> set, System.Func<string>? formatMessage = null) { }
+        }
+        extension<TModel, Nullable`1>(Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue?> eventInfo)
+            where TModel :  class
+            where Nullable`1 :  struct
+        {
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, Nullable`1?> MustBeOneOfOrBeNull(System.Collections.Generic.HashSet<Nullable`1?> set, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<TModel, Nullable`1?> CannotBeOneOfOrBeNull(System.Collections.Generic.HashSet<Nullable`1?> set, System.Func<string>? formatMessage = null) { }
+        }
+    }
+    public static class StringValidationExtensions
+    {
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, string> MustBeOfLength<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, string> eventInfo, int length, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, string?> MustBeOfLengthOrBeNull<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, string?> eventInfo, int length, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, string> MustMatchPattern<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, string> eventInfo, System.Text.RegularExpressions.Regex regex, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, string> MustMatchPattern<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, string> eventInfo, string pattern, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, string?> MustMatchPatternOrBeNull<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, string?> eventInfo, System.Text.RegularExpressions.Regex regex, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, string?> MustMatchPatternOrBeNull<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, string?> eventInfo, string pattern, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, string> MustNotExceedLength<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, string> eventInfo, int length, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public static Vertical.Cli.Validation.IValidationEventInfo<TModel, string?> MustNotExceedLengthOrBeNull<TModel>(this Vertical.Cli.Validation.IValidationEventInfo<TModel, string?> eventInfo, int length, System.Func<string>? formatMessage = null)
+            where TModel :  class { }
+        public sealed class <G>$E38C38DCE16A5D8B78F0565F807BAB6B<$T0>
+            where $T0 :  class
+        {
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, string> MustBeOfLength(int length, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, string?> MustBeOfLengthOrBeNull(int length, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, string> MustMatchPattern(System.Text.RegularExpressions.Regex regex, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, string> MustMatchPattern(string pattern, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, string?> MustMatchPatternOrBeNull(System.Text.RegularExpressions.Regex regex, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, string?> MustMatchPatternOrBeNull(string pattern, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, string> MustNotExceedLength(int length, System.Func<string>? formatMessage = null) { }
+            public Vertical.Cli.Validation.IValidationEventInfo<$T0, string?> MustNotExceedLengthOrBeNull(int length, System.Func<string>? formatMessage = null) { }
+            public static class <M>$7F120557AC8676FE16614C227014B44A<TModel>
+                where TModel :  class { }
+            public static class <M>$978B57F16BEBEAE82E3563F930550323<TModel>
+                where TModel :  class { }
+        }
+    }
+    public sealed class ValidationContext
+    {
+        public Vertical.Cli.Help.IHelpProvider HelpProvider { get; }
+        public object Model { get; }
+        public System.Collections.Generic.IEnumerable<Vertical.Cli.Validation.IValidatable> Subjects { get; }
+        public void AddError(Vertical.Cli.Diagnostics.SymbolValidationError error) { }
+        public static System.Collections.Generic.IEnumerable<Vertical.Cli.Diagnostics.CommandLineError> GetErrors(Vertical.Cli.Invocation.InvocationContext context, System.Collections.Generic.IEnumerable<Vertical.Cli.Validation.IValidatable> subjects, object model) { }
+    }
+    public class ValidationEventInfo<TModel, TValue> : Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue>
+        where TModel :  class
+    {
+        protected Vertical.Cli.Validation.ValidationContext Context { get; }
+        public TModel Model { get; }
+        public Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> OK { get; }
+        public Vertical.Cli.Validation.IValidatable Subject { get; }
+        public TValue Value { get; }
+        public Vertical.Cli.Validation.IValidationEventInfo<TModel, TValue> Error(string message) { }
+    }
+    public sealed class ValidationEventInfo<TModel, TElement, TCollection> : Vertical.Cli.Validation.ValidationEventInfo<TModel, TCollection>, Vertical.Cli.Validation.IValidationEventInfo<TModel, TCollection>, Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, TCollection>
+        where TModel :  class
+        where TCollection : System.Collections.Generic.IEnumerable<TElement>
+    {
+        public Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement, TCollection> EachValue(System.Action<Vertical.Cli.Validation.IValidationEventInfo<TModel, TElement>> validate) { }
+    }
+}

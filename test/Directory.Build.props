@@ -8,6 +8,7 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
         <PackageReference Include="NSubstitute" Version="6.0.0" />
         <PackageReference Include="Shouldly" Version="4.3.0" />
+        <PackageReference Include="PublicApiGenerator" Version="11.5.4" />
     </ItemGroup>
 
     <ItemGroup>
