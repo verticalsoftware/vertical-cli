@@ -1,4 +1,5 @@
 ﻿using Vertical.Cli.Configuration.Assertion.Types;
+using Vertical.Cli.Utilities;
 
 namespace Vertical.Cli.Configuration.Assertion.Builders;
 
@@ -17,7 +18,7 @@ internal sealed class MissingPropertyBindingAssertionBuilder : IAssertionBuilder
     {
         var configuration = context.GetModelConfiguration(command);
         var modelType = configuration.ModelType;
-        var properties = modelType.GetProperties();
+        var properties = modelType.GetAllProperties();
         var boundPropertyNames = configuration
             .BindingSources
             .Select(source => source.BindingName)

@@ -1,4 +1,6 @@
-﻿namespace Vertical.Cli.Utilities;
+﻿using System.Reflection;
+
+namespace Vertical.Cli.Utilities;
 
 internal static class ReflectionExtensions
 {
@@ -15,6 +17,14 @@ internal static class ReflectionExtensions
 
                 stack.PushRange(current.GetInterfaces().Where(visited.Add));
             }
+        }
+
+        public IEnumerable<PropertyInfo> GetAllProperties(BindingFlags bindingFlags = 
+            BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)
+        {
+            return type
+                .GetInterfacesAndSelf()
+                .SelectMany(type => type.GetProperties(bindingFlags));
         }
     }
 }
