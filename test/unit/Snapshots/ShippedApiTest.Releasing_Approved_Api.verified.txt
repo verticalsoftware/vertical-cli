@@ -187,6 +187,7 @@ namespace Vertical.Cli.Configuration
         Vertical.Cli.Configuration.ModelBuilder<TModel> MapBindingInfoValue<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression, System.Func<Vertical.Cli.Binding.PropertyBindingInfo, TValue> valueProvider);
         Vertical.Cli.Configuration.ModelBuilder<TModel> MapStaticValue<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>> expression, TValue value);
         Vertical.Cli.Configuration.ModelBuilder<TModel> MapTextReader(System.Linq.Expressions.Expression<System.Func<TModel, System.IO.TextReader>> expression);
+        Vertical.Cli.Configuration.ModelBuilder<TModel> MapTextWriter(System.Linq.Expressions.Expression<System.Func<TModel, System.IO.TextWriter>> expression);
         Vertical.Cli.Configuration.ModelBuilder<TModel> SetBinder(Vertical.Cli.Binding.ModelBinder<TModel> binder);
     }
     public interface IParserBuilder<TModel>
