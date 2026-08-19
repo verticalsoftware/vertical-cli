@@ -26,11 +26,7 @@ internal static class CallSite
             return -1;
         
         // Get the binding results
-        var bindingInfo = new PropertyBindingInfo(context)
-        {
-            ParseResult = parseResult,
-            ConsoleInput = root.Console.In
-        };
+        var bindingInfo = new PropertyBindingInfo(context, parseResult);
         
         var bindingResults = bindingSources
             .Select(source => source.CreatePropertyBinder().CreateBindingResult(bindingInfo))

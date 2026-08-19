@@ -3,6 +3,7 @@ using Vertical.Cli.Conversion;
 using Vertical.Cli.Diagnostics;
 using Vertical.Cli.Help;
 using Vertical.Cli.Invocation;
+using Vertical.Cli.IO;
 using Vertical.Cli.Parsing;
 using Vertical.Cli.Utilities;
 
@@ -16,11 +17,18 @@ public sealed class PropertyBindingInfo
     private readonly InvocationContext _context;
     private readonly IRootConfigurationView _configuration;
 
-    internal PropertyBindingInfo(InvocationContext context)
+    internal PropertyBindingInfo(InvocationContext context, ParseResult parseResult)
     {
+        ParseResult = parseResult;
+        
         _context = context;
         _configuration = _context.Configuration;
     }
+
+    /// <summary>
+    /// Gets the root command.
+    /// </summary>
+    public RootCommand RootCommand => _configuration.RootCommand;
 
     /// <summary>
     /// Gets the conversion provider.
@@ -40,15 +48,15 @@ public sealed class PropertyBindingInfo
     /// <summary>
     /// Gets the parse result.
     /// </summary>
-    public required ParseResult ParseResult { get; init; }
+    public ParseResult ParseResult { get; }
 
     /// <summary>
     /// Gets a read view of the application's options.
     /// </summary>
     public ApplicationData AppData => _configuration.ApplicationData;
-    
+
     /// <summary>
-    /// Gets the console abstraction input text reader.
+    /// Gets the console abstraction.
     /// </summary>
-    public required TextReader ConsoleInput { get; init; }
+    public IConsole Console => _configuration.Console;
 }

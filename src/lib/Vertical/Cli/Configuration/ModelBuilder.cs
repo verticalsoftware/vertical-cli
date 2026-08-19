@@ -313,14 +313,25 @@ public sealed class ModelBuilder<TModel> : IParserBuilder<TModel>, IModelBuilder
     }
 
     /// <summary>
-    /// Sets a <see cref="TextReader"/> property of model to the console abstraction's
+    /// Sets a <see cref="TextReader"/> property of a model to the console abstraction's
     /// input text reader.
     /// </summary>
     /// <param name="expression">Expression that identifies a model's <see cref="TextReader"/> property.</param>
     /// <returns>A reference to this instance.</returns>
-    public ModelBuilder<TModel> MapInputStream(Expression<Func<TModel, TextReader>> expression)
+    public ModelBuilder<TModel> MapTextReader(Expression<Func<TModel, TextReader>> expression)
     {
-        return MapBindingInfoValue(expression, info => info.ConsoleInput);
+        return MapBindingInfoValue(expression, info => info.Console.In);
+    }
+
+    /// <summary>
+    /// Sets a <see cref="TextWriter"/> property of a model to the console abstraction's
+    /// input text reader.
+    /// </summary>
+    /// <param name="expression">Expression that identifies a model's <see cref="TextReader"/> property.</param>
+    /// <returns>A reference to this instance.</returns>
+    public ModelBuilder<TModel> MapTextWriter(Expression<Func<TModel, TextWriter>> expression)
+    {
+        return MapBindingInfoValue(expression, info => info.Console.Out);
     }
 
     /// <summary>
