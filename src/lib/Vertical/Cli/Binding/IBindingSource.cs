@@ -26,4 +26,9 @@ public interface IBindingSource
     /// </summary>
     /// <returns><see cref="PropertyBinder"/></returns>
     PropertyBinder CreatePropertyBinder();
+    
+    /// <summary>
+    /// Gets whether the binding requires argument conversion.
+    /// </summary>
+    bool RequiresArgumentConverter { get; }
 }

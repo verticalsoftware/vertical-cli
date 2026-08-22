@@ -58,6 +58,9 @@ public abstract class CliSymbol : IBindingSource, ICliSymbol, IValidatable
     /// <inheritdoc />
     public abstract PropertyBinder CreatePropertyBinder();
 
+    /// <inheritdoc />
+    public bool RequiresArgumentConverter => true;
+
     /// <summary>
     /// Gets the parsing order for a positional argument.
     /// </summary>

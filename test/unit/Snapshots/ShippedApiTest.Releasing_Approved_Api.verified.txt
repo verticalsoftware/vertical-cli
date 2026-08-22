@@ -45,6 +45,7 @@ namespace Vertical.Cli.Binding
     {
         string BindingName { get; }
         System.Type ModelType { get; }
+        bool RequiresArgumentConverter { get; }
         System.Type ValueType { get; }
         Vertical.Cli.Binding.PropertyBinder CreatePropertyBinder();
     }
@@ -124,6 +125,7 @@ namespace Vertical.Cli.Configuration
         public int? OrdinalPosition { get; }
         public abstract Vertical.Cli.Configuration.ParameterArity? ParameterArity { get; }
         public System.Reflection.PropertyInfo PropertyInfo { get; }
+        public bool RequiresArgumentConverter { get; }
         public Vertical.Cli.Configuration.SystemKind SystemKind { get; }
         public System.Type ValueType { get; }
         public abstract Vertical.Cli.Binding.PropertyBinder CreatePropertyBinder();

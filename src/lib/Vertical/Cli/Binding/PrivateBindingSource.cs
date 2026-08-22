@@ -42,5 +42,8 @@ internal class PrivateBindingSource<TModel, TValue> : IBindingSource where TMode
     public PropertyBinder CreatePropertyBinder() => new Binder(this);
 
     /// <inheritdoc />
+    public bool RequiresArgumentConverter => false;
+
+    /// <inheritdoc />
     public override string ToString() => Description;
 }

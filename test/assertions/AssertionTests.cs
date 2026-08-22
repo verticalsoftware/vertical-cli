@@ -287,7 +287,6 @@ public class AssertionTests
 
     [Fact]
     public Task Reports_DuplicateAliasAssertion()
-
     {
         var root = new RootCommand("app");
         var subCommand = new SubCommand("create");
@@ -309,5 +308,21 @@ public class AssertionTests
         app.AddCollectionConverter<string, string[]>(values => values.ToArray());
 
         return Verify(ConfigurationAssertion.GetAssertionsAsText(app.GetConfigurationAssertions()));
+    }
+
+    [Fact]
+    public void Ignores_Non_Conversion_Binding_Sources()
+    {
+        var root = new RootCommand("app");
+        root.SetHandler<IModelWithPrivateBinding>((_, _) => Task.FromResult(0));
+
+        var app = new CommandLineApplication(root);
+        app.ConfigureModel<IModelWithPrivateBinding>(model => model
+            .MapBindingInfoValue(
+                x => x.OutputWriter,
+                info => info.OutputWriter)
+            .SetBinder(_ => null!));
+        
+        app.AssertConfiguration();
     }
 }

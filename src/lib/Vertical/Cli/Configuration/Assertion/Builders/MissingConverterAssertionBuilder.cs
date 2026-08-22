@@ -14,6 +14,7 @@ internal sealed class MissingConverterAssertionBuilder : IAssertionBuilder
             .Select(context.GetModelConfiguration)
             .SelectMany(configuration => configuration
                 .BindingSources
+                .Where(bindingSource => bindingSource.RequiresArgumentConverter)
                 .Select(source => source.ValueType))
             .Concat(context
                 .Directives
