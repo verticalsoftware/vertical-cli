@@ -59,6 +59,7 @@ namespace Vertical.Cli.Binding
         public Vertical.Cli.Utilities.ApplicationData AppData { get; }
         public Vertical.Cli.IO.IConsole Console { get; }
         public Vertical.Cli.Conversion.IConversionProvider ConversionProvider { get; }
+        public Vertical.Cli.IO.OutputWriter OutputWriter { get; }
         public Vertical.Cli.Parsing.ParseResult ParseResult { get; }
         public Vertical.Cli.Configuration.RootCommand RootCommand { get; }
     }

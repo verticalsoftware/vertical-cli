@@ -26,6 +26,11 @@ public sealed class PropertyBindingInfo
     }
 
     /// <summary>
+    /// Gets the current output writer.
+    /// </summary>
+    public OutputWriter OutputWriter => _context.OutputWriter;
+
+    /// <summary>
     /// Gets the root command.
     /// </summary>
     public RootCommand RootCommand => _configuration.RootCommand;
