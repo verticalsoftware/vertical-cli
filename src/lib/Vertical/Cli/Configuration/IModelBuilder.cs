@@ -37,7 +37,7 @@ public interface IModelBuilder<TModel> where TModel : class
     /// <returns>A reference to this instance.</returns>
     ModelBuilder<TModel> MapTextReader(Expression<Func<TModel, TextReader>> expression);
 
-    /// <summary>
+    /// <summary>0
     /// Establishes the action that creates instances of the model type.
     /// </summary>
     /// <param name="binder">

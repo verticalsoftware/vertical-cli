@@ -1,4 +1,5 @@
-﻿using System.Xml.XPath;
+﻿using System.Text.RegularExpressions;
+using System.Xml.XPath;
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Utilities;
 
@@ -10,6 +11,7 @@ namespace Vertical.Cli.Help;
 public sealed class XmlHelpProvider : IHelpProvider
 {
     private readonly Lazy<(XPathDocument Document, XPathNavigator Navigator)> _lazyResources;
+    private readonly Lazy<(string Key, string Value)[]> _lazyIdPrefixes;
     
     private const string ParameterNameAttribute = "parameter-name";
 
@@ -26,6 +28,19 @@ public sealed class XmlHelpProvider : IHelpProvider
             var document = new XPathDocument(resourceStreamProvider());
             var navigator = document.CreateNavigator();
             return (document, navigator);
+        });
+
+        _lazyIdPrefixes = new Lazy<(string Key, string Value)[]>(() =>
+        {
+            return Navigator
+                .Select("/help/prefixes/prefix")
+                .Cast<XPathNavigator>()
+                .Select(node => (
+                    key: $"({node.GetAttribute("key", string.Empty)})",
+                    value: node.GetAttribute("value", string.Empty)
+                ))
+                .Where(t => t is { key.Length: > 2, value.Length: > 0 })
+                .ToArray();
         });
     }
 
@@ -94,9 +109,19 @@ public sealed class XmlHelpProvider : IHelpProvider
 
     private XPathNavigator? GetNode(IHelpSubject subject)
     {
-        var key = subject.HelpTopicKey;
-        var path = $"/help/topic[@type='{key.TypeId}' and @id='{key.TopicId}']";
+        var key =  subject.HelpTopicKey;
+        var id = CreateLookupId(key);
+        var path = $"/help/topic[@type='{key.TypeId}' and @id='{id}']";
         return Navigator.SelectSingleNode(path);
+    }
+
+    private string CreateLookupId(HelpTopicKey subject)
+    {
+        return _lazyIdPrefixes
+            .Value
+            .Aggregate(
+                subject.TopicId,
+                (id, prefix) => id.Replace(prefix.Key, prefix.Value));
     }
 
     private string? GetAttribute(IHelpSubject subject, string attributeName)
