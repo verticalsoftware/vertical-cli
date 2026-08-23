@@ -6,7 +6,7 @@ namespace Vertical.Cli.ScenarioTests;
 public class XmlHelpOutputTests
 {
     private readonly XmlHelpFileAssemblyFixture _xmlDataFixture;
-    private readonly TestApplicationFixture _fixture = new();
+    private readonly TestApplicationFixtureNoCodeHelp _fixture = new();
 
     public XmlHelpOutputTests(XmlHelpFileAssemblyFixture xmlDataFixture)
     {
@@ -14,7 +14,7 @@ public class XmlHelpOutputTests
     }
 
     [Theory]
-    [InlineData(true), InlineData(false)]
+   [InlineData(false), InlineData(true)]
     public Task Invoke_Displays_Help_With_No_SubCommand(bool prefixed)
     {
         ConfigureXmlProvider(prefixed);
@@ -22,7 +22,7 @@ public class XmlHelpOutputTests
     }
 
     [Theory]
-    [InlineData(true), InlineData(false)]
+   [InlineData(false), InlineData(true)]
     public Task Invoke_Create_Help_Displays_Article(bool prefixed)
     {
         ConfigureXmlProvider(prefixed);
@@ -30,7 +30,7 @@ public class XmlHelpOutputTests
     }
 
     [Theory]
-    [InlineData(true), InlineData(false)]
+   [InlineData(false), InlineData(true)]
     public Task Invoke_Extract_Help_Displays_Article(bool prefixed)
     {
         ConfigureXmlProvider(prefixed);
@@ -39,7 +39,7 @@ public class XmlHelpOutputTests
 
     private void ConfigureXmlProvider(bool prefixed)
     {
-        var helpData = prefixed ? _xmlDataFixture.XmlHelpData : _xmlDataFixture.XmlPrefixedHelpData;
+        var helpData = prefixed ? _xmlDataFixture.XmlPrefixedHelpData : _xmlDataFixture.XmlHelpData;
         
         _fixture.Application.ConfigureHelp(options => options.HelpProvider = new XmlHelpProvider(
             () => new MemoryStream(helpData)));

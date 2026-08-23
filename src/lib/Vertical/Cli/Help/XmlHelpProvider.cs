@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.Xml.XPath;
+﻿using System.Xml.XPath;
 using Vertical.Cli.Configuration;
 using Vertical.Cli.Utilities;
 
@@ -10,9 +9,12 @@ namespace Vertical.Cli.Help;
 /// </summary>
 public sealed class XmlHelpProvider : IHelpProvider
 {
+    private record Prefix(string Key, string Value);
+
     private readonly Lazy<(XPathDocument Document, XPathNavigator Navigator)> _lazyResources;
-    private readonly Lazy<(string Key, string Value)[]> _lazyIdPrefixes;
-    
+    private readonly Lazy<Prefix[]> _lazyIdPrefixes;
+    private readonly bool _strictContent;
+
     private const string ParameterNameAttribute = "parameter-name";
 
     /// <summary>
@@ -21,8 +23,10 @@ public sealed class XmlHelpProvider : IHelpProvider
     /// <param name="resourceStreamProvider">
     /// A function invoked by the help system that returns the xml content stream.
     /// </param>
-    public XmlHelpProvider(Func<Stream> resourceStreamProvider)
+    /// <param name="strictContent"><c>true</c> to throw exceptions when any help element cannot be found.</param>
+    public XmlHelpProvider(Func<Stream> resourceStreamProvider, bool strictContent = false)
     {
+        _strictContent = strictContent;
         _lazyResources = new Lazy<(XPathDocument Document, XPathNavigator Navigator)>(() =>
         {
             var document = new XPathDocument(resourceStreamProvider());
@@ -30,16 +34,16 @@ public sealed class XmlHelpProvider : IHelpProvider
             return (document, navigator);
         });
 
-        _lazyIdPrefixes = new Lazy<(string Key, string Value)[]>(() =>
+        _lazyIdPrefixes = new Lazy<Prefix[]>(() =>
         {
             return Navigator
                 .Select("/help/prefixes/prefix")
                 .Cast<XPathNavigator>()
-                .Select(node => (
-                    key: $"({node.GetAttribute("key", string.Empty)})",
-                    value: node.GetAttribute("value", string.Empty)
+                .Select(node => new Prefix(
+                    $"({node.GetAttribute("key", string.Empty)})",
+                    node.GetAttribute("value", string.Empty)
                 ))
-                .Where(t => t is { key.Length: > 2, value.Length: > 0 })
+                .Where(t => t is { Key.Length: > 2, Value.Length: > 0 })
                 .ToArray();
         });
     }
@@ -110,18 +114,35 @@ public sealed class XmlHelpProvider : IHelpProvider
     private XPathNavigator? GetNode(IHelpSubject subject)
     {
         var key =  subject.HelpTopicKey;
-        var id = CreateLookupId(key);
+        var id = CreateLookupId(key.TopicId);
         var path = $"/help/topic[@type='{key.TypeId}' and @id='{id}']";
-        return Navigator.SelectSingleNode(path);
+
+        if (Navigator.SelectSingleNode(path) is { } node)
+            return node;
+
+        if (!_strictContent) return null;
+
+        throw new InvalidOperationException(
+            $"""
+             Failed to resolve element in Xml help document (strict resolution configured).
+               type:        {key.TypeId}
+               topicId:     {key.TopicId}
+               lookup:      {id}
+               x-path:      {path}
+             """);
     }
 
-    private string CreateLookupId(HelpTopicKey subject)
+    private string CreateLookupId(string topicId)
     {
-        return _lazyIdPrefixes
-            .Value
-            .Aggregate(
-                subject.TopicId,
-                (id, prefix) => id.Replace(prefix.Key, prefix.Value));
+        foreach (var prefix in _lazyIdPrefixes.Value)
+        {
+            if (!topicId.StartsWith(prefix.Value))
+                continue;
+
+            return $"{prefix.Key}{topicId[prefix.Value.Length..]}";
+        }
+
+        return topicId;
     }
 
     private string? GetAttribute(IHelpSubject subject, string attributeName)

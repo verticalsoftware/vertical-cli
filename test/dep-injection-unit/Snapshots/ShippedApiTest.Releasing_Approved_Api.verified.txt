@@ -664,7 +664,7 @@ namespace Vertical.Cli.Help
     }
     public sealed class XmlHelpProvider : Vertical.Cli.Help.IHelpProvider
     {
-        public XmlHelpProvider(System.Func<System.IO.Stream> resourceStreamProvider) { }
+        public XmlHelpProvider(System.Func<System.IO.Stream> resourceStreamProvider, bool strictContent = false) { }
         public System.Collections.Generic.IEnumerable<Vertical.Cli.Help.ExtendedRemarksSection> GetExtendedRemarks(Vertical.Cli.Configuration.Command command) { }
         public string GetIdentifier(Vertical.Cli.Help.IHelpSubject subject) { }
         public string? GetParameterName(Vertical.Cli.Configuration.ICliSymbol subject) { }

@@ -30,4 +30,5 @@
     <topic type="symbol" id="(Root).ICreateOptions.OutputFileSplitSize" parameter-name="size[bkmg]">The maximum allowable size of each split output file.</topic>
     <topic type="symbol" id="(Root).ICreateOptions.Properties" parameter-name="key=value">An addition metadata  key/value pair to include in the archive.</topic>
     <topic type="symbol" id="(Unbound).Version">Displays version information.</topic>
+    <topic type="symbol" id="(Directive).log-level" parameter-name="level">Configures verbosity of output logging. &lt;level&gt; = trace|debug|information|warning</topic>
 </help>
